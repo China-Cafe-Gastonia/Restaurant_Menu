@@ -5,50 +5,45 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>China Cafe Menu Editor</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #f8f8f8;
+            background-color: #f3f4f6;
+            color: #1f2937;
         }
-        .main-container {
-            display: flex;
-            flex-direction: column;
-            gap: 2rem;
-            padding: 2rem;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-        .section-container {
+        .card {
             background-color: white;
-            padding: 1.5rem;
-            border-radius: 12px;
+            padding: 2rem;
+            border-radius: 1rem;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
-        .admin-section {
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            transition: all 0.2s ease-in-out;
         }
-        .customer-menu {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 2rem;
+        .btn-primary {
+            background-color: #4f46e5;
+            color: white;
+            border: none;
         }
-        .category-container {
-            background-color: #f3f4f6;
-            padding: 1rem;
-            border-radius: 8px;
-            flex: 1 1 300px;
+        .btn-primary:hover {
+            background-color: #4338ca;
         }
-        .item-card {
-            background-color: white;
-            padding: 1rem;
-            border-radius: 8px;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-            margin-bottom: 0.5rem;
+        .btn-secondary {
+            background-color: #e5e7eb;
+            color: #4b5563;
+            border: none;
+        }
+        .btn-secondary:hover {
+            background-color: #d1d5db;
+        }
+        input[type="file"] {
+            border: 1px solid #d1d5db;
+            border-radius: 0.5rem;
+            padding: 0.5rem;
         }
         .modal {
             position: fixed;
@@ -57,313 +52,358 @@
             width: 100%;
             height: 100%;
             background-color: rgba(0, 0, 0, 0.5);
-            display: none;
+            display: flex;
             justify-content: center;
             align-items: center;
-            z-index: 1000;
+            z-index: 50;
         }
         .modal-content {
             background-color: white;
             padding: 2rem;
-            border-radius: 12px;
-            max-width: 500px;
-            width: 90%;
-            text-align: center;
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            border-radius: 1rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            max-width: 400px;
+            width: 100%;
         }
     </style>
 </head>
-<body class="bg-gray-100 font-inter">
+<body class="p-8">
 
-    <!-- Custom Modal -->
-    <div id="customModal" class="modal">
-        <div class="modal-content">
-            <p id="modalMessage" class="text-lg text-gray-800 mb-4"></p>
-            <div class="flex justify-center gap-4">
-                <button id="modalConfirmBtn" class="bg-red-500 text-white font-semibold py-2 px-4 rounded-full hover:bg-red-600 transition-colors">Confirm</button>
-                <button id="modalCancelBtn" class="bg-gray-300 text-gray-800 font-semibold py-2 px-4 rounded-full hover:bg-gray-400 transition-colors">Cancel</button>
-            </div>
-        </div>
-    </div>
-
-    <div class="main-container">
-
-        <!-- Header -->
-        <header class="text-center py-6">
-            <h1 class="text-4xl font-bold text-gray-800">China Cafe Menu Editor</h1>
-            <p id="loading-message" class="mt-2 text-gray-500">All data is saved in your browser's local storage.</p>
+    <!-- Main Container -->
+    <div class="max-w-4xl mx-auto space-y-8">
+        <header class="text-center mb-12">
+            <h1 class="text-4xl font-bold text-gray-900">China Cafe Menu Editor</h1>
+            <p class="mt-2 text-gray-500">All data is saved in your browser's local storage.</p>
         </header>
 
-        <!-- Admin View Section -->
-        <section id="admin-view" class="section-container admin-section">
-            <h2 class="text-2xl font-semibold text-gray-800 mb-4">Menu Management</h2>
-
-            <div class="flex flex-col sm:flex-row gap-4 mb-6">
-                <!-- Upload JSON File -->
-                <div class="flex-1">
-                    <label class="block text-gray-700 font-semibold mb-2">Upload New Menu (JSON)</label>
-                    <input type="file" id="json-upload" class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-violet-50 file:text-violet-700 hover:file:bg-violet-100 cursor-pointer">
-                </div>
-
-                <!-- Create Backup -->
-                <button id="create-backup-btn" class="sm:self-end bg-blue-500 text-white font-semibold py-2 px-4 rounded-full shadow-md hover:bg-blue-600 transition-colors">Create Backup</button>
-            </div>
-
-            <!-- Backups List -->
-            <div>
-                <h3 class="text-xl font-semibold text-gray-800 mb-2">Restore from Backup</h3>
-                <div id="backups-list" class="flex flex-wrap gap-2">
-                    <p class="text-gray-500">No backups found.</p>
+        <!-- Main Content Area -->
+        <main class="space-y-8">
+            <!-- Modal for password -->
+            <div id="password-modal" class="modal hidden">
+                <div class="modal-content">
+                    <h2 class="text-2xl font-semibold mb-4">Enter Password</h2>
+                    <p class="text-gray-600 mb-4">Please enter the password to access the admin features.</p>
+                    <input type="password" id="password-input" class="w-full p-2 border border-gray-300 rounded-md mb-4" placeholder="Password">
+                    <div class="flex justify-end space-x-2">
+                        <button id="cancel-password-btn" class="btn btn-secondary">Cancel</button>
+                        <button id="submit-password-btn" class="btn btn-primary">Submit</button>
+                    </div>
                 </div>
             </div>
 
-            <hr class="my-6 border-t border-gray-300">
+            <!-- Admin Section Card -->
+            <div class="card p-6 md:p-8 space-y-6">
+                <h2 class="text-2xl font-semibold text-gray-900 mb-4">Menu Management</h2>
+                
+                <!-- Admin features container, initially hidden -->
+                <div id="admin-features" class="space-y-6 hidden">
+                    <div class="flex flex-col md:flex-row items-start md:items-center justify-between space-y-4 md:space-y-0 md:space-x-4">
+                        <div class="flex-1">
+                            <label for="menu-upload" class="block text-gray-700 font-semibold mb-2">Upload New Menu (JSON)</label>
+                            <input type="file" id="menu-upload" class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-violet-50 file:text-violet-700 hover:file:bg-violet-100">
+                        </div>
+                        <button id="upload-button" class="btn btn-primary w-full md:w-auto">Upload Menu</button>
+                    </div>
 
-            <!-- Dynamic Menu Editor -->
-            <div id="menu-editor" class="space-y-8">
-                <h3 class="text-xl font-semibold text-gray-800">Edit Current Menu</h3>
-                <p class="text-gray-500">No menu data to display. Upload a menu to begin.</p>
+                    <div id="status-message" class="text-sm font-medium text-gray-500 hidden"></div>
+                    
+                    <div>
+                        <h3 class="text-lg font-semibold text-gray-800 mb-2">Restore from Backup</h3>
+                        <div id="backups-container" class="space-y-2">
+                            <p id="no-backups" class="text-gray-500 text-sm">No backups found.</p>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-end">
+                        <button id="create-backup-btn" class="btn btn-secondary">Create Backup</button>
+                    </div>
+                </div>
+                
+                <!-- Login button for admin section -->
+                <div id="login-section">
+                    <button id="login-button" class="btn btn-primary w-full">Access Admin</button>
+                </div>
             </div>
-        </section>
 
-        <!-- Customer View Section -->
-        <section class="section-container">
-            <h2 class="text-2xl font-semibold text-gray-800 mb-4">Customer View</h2>
-            <div id="customer-menu" class="customer-menu">
-                <p class="text-gray-500">Menu not available. Please upload a menu.</p>
+            <!-- Customer View Card -->
+            <div class="card p-6 md:p-8 space-y-6">
+                <h2 class="text-2xl font-semibold text-gray-900 mb-4">Customer View</h2>
+                <div id="menu-container" class="space-y-8">
+                    <p id="no-menu-message" class="text-gray-500 italic">Menu not available. Please upload a menu to begin.</p>
+                </div>
             </div>
-        </section>
-
+        </main>
     </div>
 
-    <script type="module">
-        const loadingMessage = document.getElementById('loading-message');
-        const jsonUpload = document.getElementById('json-upload');
-        const createBackupBtn = document.getElementById('create-backup-btn');
-        const backupsList = document.getElementById('backups-list');
-        const menuEditor = document.getElementById('menu-editor');
-        const customerMenu = document.getElementById('customer-menu');
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const adminFeatures = document.getElementById('admin-features');
+            const loginSection = document.getElementById('login-section');
+            const passwordModal = document.getElementById('password-modal');
+            const passwordInput = document.getElementById('password-input');
+            const submitPasswordBtn = document.getElementById('submit-password-btn');
+            const cancelPasswordBtn = document.getElementById('cancel-password-btn');
+            const loginButton = document.getElementById('login-button');
+            const uploadButton = document.getElementById('upload-button');
+            const createBackupBtn = document.getElementById('create-backup-btn');
+            const menuUpload = document.getElementById('menu-upload');
+            const menuContainer = document.getElementById('menu-container');
+            const noMenuMessage = document.getElementById('no-menu-message');
+            const statusMessage = document.getElementById('status-message');
+            const backupsContainer = document.getElementById('backups-container');
+            const noBackupsMessage = document.getElementById('no-backups');
 
-        const customModal = document.getElementById('customModal');
-        const modalMessage = document.getElementById('modalMessage');
-        const modalConfirmBtn = document.getElementById('modalConfirmBtn');
-        const modalCancelBtn = document.getElementById('modalCancelBtn');
-        let modalResolve;
+            const ADMIN_PASSWORD = "admin"; // Change this password!
 
-        // Custom Confirmation/Alert Modal
-        function showCustomModal(message, isConfirm = false) {
-            return new Promise(resolve => {
-                modalMessage.textContent = message;
-                modalConfirmBtn.style.display = isConfirm ? 'inline-block' : 'none';
-                modalCancelBtn.style.display = isConfirm ? 'inline-block' : 'none';
-                customModal.style.display = 'flex';
-                modalResolve = resolve;
-
-                modalConfirmBtn.onclick = () => {
-                    customModal.style.display = 'none';
-                    resolve(true);
-                };
-                modalCancelBtn.onclick = () => {
-                    customModal.style.display = 'none';
-                    resolve(false);
-                };
-            });
-        }
-
-        // --- localStorage Operations ---
-        const LOCAL_STORAGE_KEY = 'china_cafe_menu_data';
-        const LOCAL_STORAGE_BACKUPS_KEY = 'china_cafe_menu_backups';
-
-        const saveMenuToLocalStorage = (menuData) => {
-            try {
-                localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(menuData));
-                showCustomModal('Menu uploaded and saved successfully!');
-                renderMenu(menuData);
-            } catch (e) {
-                console.error("Error saving menu to local storage:", e);
-                showCustomModal('Error saving menu. See console for details.');
-            }
-        };
-
-        const loadMenuFromLocalStorage = () => {
-            try {
-                const menuData = localStorage.getItem(LOCAL_STORAGE_KEY);
-                return menuData ? JSON.parse(menuData) : null;
-            } catch (e) {
-                console.error("Error loading menu from local storage:", e);
-                return null;
-            }
-        };
-
-        const saveBackupsToLocalStorage = (backups) => {
-            try {
-                localStorage.setItem(LOCAL_STORAGE_BACKUPS_KEY, JSON.stringify(backups));
-            } catch (e) {
-                console.error("Error saving backups to local storage:", e);
-            }
-        };
-
-        const loadBackupsFromLocalStorage = () => {
-            try {
-                const backups = localStorage.getItem(LOCAL_STORAGE_BACKUPS_KEY);
-                return backups ? JSON.parse(backups) : [];
-            } catch (e) {
-                console.error("Error loading backups from local storage:", e);
-                return [];
-            }
-        };
-
-        const createBackup = () => {
-            const currentMenu = loadMenuFromLocalStorage();
-            if (!currentMenu) {
-                showCustomModal('No menu to backup.');
-                return;
-            }
-            const backups = loadBackupsFromLocalStorage();
-            const timestamp = new Date().toISOString();
-            backups.push({ timestamp: timestamp, data: currentMenu });
-            saveBackupsToLocalStorage(backups);
-            showCustomModal('Menu backup created successfully!');
-            renderBackups();
-        };
-
-        const restoreBackup = async (timestamp) => {
-            const confirm = await showCustomModal('Are you sure you want to restore this backup? This will overwrite the current menu.', true);
-            if (!confirm) return;
-
-            const backups = loadBackupsFromLocalStorage();
-            const backupToRestore = backups.find(b => b.timestamp === timestamp);
-            if (backupToRestore) {
-                saveMenuToLocalStorage(backupToRestore.data);
-                showCustomModal('Backup restored successfully!');
-            } else {
-                showCustomModal('Backup not found.');
-            }
-        };
-
-        // --- Rendering Logic ---
-        const renderMenu = (menuData) => {
-            renderAdminMenu(menuData);
-            renderCustomerMenu(menuData);
-        };
-
-        const renderAdminMenu = (menuData) => {
-            menuEditor.innerHTML = '';
-            if (!menuData) {
-                menuEditor.innerHTML = '<p class="text-gray-500">No menu data to display. Upload a menu to begin.</p>';
-                return;
+            // Password check function
+            function checkPassword() {
+                passwordModal.classList.remove('hidden');
+                passwordInput.value = '';
+                passwordInput.focus();
             }
 
-            const menu = menuData.menu;
-            menu.forEach(category => {
-                const categoryDiv = document.createElement('div');
-                categoryDiv.className = 'bg-gray-50 p-6 rounded-xl border border-gray-200';
-                categoryDiv.innerHTML = `<h4 class="text-lg font-semibold text-gray-700 mb-4">${category.category} (${category.chinese_name})</h4>`;
-
-                category.items.forEach(item => {
-                    const itemDiv = document.createElement('div');
-                    itemDiv.className = 'bg-white p-4 rounded-lg shadow-sm border border-gray-200 mb-2 flex justify-between items-center';
-                    const prices = typeof item.prices === 'object'
-                        ? Object.entries(item.prices).map(([key, value]) => `$${value} (${key})`).join(' / ')
-                        : `$${item.price}`;
-                    itemDiv.innerHTML = `
-                        <div>
-                            <p class="font-medium text-gray-900">${item.name}</p>
-                            <p class="text-sm text-gray-500">${item.description || ''}</p>
-                            <p class="text-sm text-gray-600 font-semibold mt-1">${prices}</p>
-                        </div>
-                        <div class="flex gap-2">
-                            <button class="edit-btn bg-yellow-400 text-white p-1 rounded-full hover:bg-yellow-500 transition-colors">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z" /><path fill-rule="evenodd" d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" clip-rule="evenodd" /></svg>
-                            </button>
-                            <button class="delete-btn bg-red-500 text-white p-1 rounded-full hover:bg-red-600 transition-colors">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm6 0a1 1 0 012 0v6a1 1 0 11-2 0V8z" clip-rule="evenodd" /></svg>
-                            </button>
-                        </div>
-                    `;
-                    categoryDiv.appendChild(itemDiv);
-                });
-                menuEditor.appendChild(categoryDiv);
-            });
-        };
-
-        const renderCustomerMenu = (menuData) => {
-            customerMenu.innerHTML = '';
-            if (!menuData) {
-                customerMenu.innerHTML = '<p class="text-gray-500">Menu not available. Please upload a menu.</p>';
-                return;
+            // Function to show admin features
+            function showAdminFeatures() {
+                loginSection.classList.add('hidden');
+                adminFeatures.classList.remove('hidden');
+                passwordModal.classList.add('hidden');
             }
 
-            const menu = menuData.menu;
-            menu.forEach(category => {
-                const categoryContainer = document.createElement('div');
-                categoryContainer.className = 'category-container';
-                categoryContainer.innerHTML = `
-                    <h3 class="text-xl font-bold text-gray-800 mb-2">${category.category} <span class="text-gray-500 text-sm">(${category.chinese_name})</span></h3>
-                    ${category.note ? `<p class="text-sm text-gray-600 mb-4">${category.note}</p>` : ''}
-                `;
+            loginButton.addEventListener('click', checkPassword);
 
-                category.items.forEach(item => {
-                    const itemCard = document.createElement('div');
-                    itemCard.className = 'item-card';
-                    const prices = typeof item.prices === 'object'
-                        ? Object.entries(item.prices).map(([key, value]) => `<span>${key}: $${value}</span>`).join(' &bull; ')
-                        : `$${item.price}`;
-
-                    itemCard.innerHTML = `
-                        <p class="font-semibold text-gray-900">${item.name}</p>
-                        <p class="text-gray-600 text-sm mt-1">${item.description || ''}</p>
-                        <p class="text-gray-800 text-sm font-bold mt-2">${prices}</p>
-                    `;
-                    categoryContainer.appendChild(itemCard);
-                });
-
-                customerMenu.appendChild(categoryContainer);
-            });
-        };
-
-        const renderBackups = () => {
-            backupsList.innerHTML = '';
-            const backups = loadBackupsFromLocalStorage();
-            if (backups.length === 0) {
-                backupsList.innerHTML = '<p class="text-gray-500">No backups found.</p>';
-                return;
-            }
-            backups.forEach(backup => {
-                const date = new Date(backup.timestamp).toLocaleString();
-                const restoreBtn = document.createElement('button');
-                restoreBtn.className = 'bg-green-500 text-white font-semibold text-xs py-1 px-3 rounded-full hover:bg-green-600 transition-colors';
-                restoreBtn.textContent = date;
-                restoreBtn.onclick = () => restoreBackup(backup.timestamp);
-                backupsList.appendChild(restoreBtn);
-            });
-        };
-
-        // --- Event Listeners and Initial Load ---
-        jsonUpload.addEventListener('change', (event) => {
-            const file = event.target.files[0];
-            if (!file) return;
-
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                try {
-                    const json = JSON.parse(e.target.result);
-                    saveMenuToLocalStorage(json);
-                } catch (error) {
-                    console.error("Error parsing JSON:", error);
-                    showCustomModal('Error parsing JSON file. Please ensure it is a valid format.');
+            submitPasswordBtn.addEventListener('click', () => {
+                if (passwordInput.value === ADMIN_PASSWORD) {
+                    showAdminFeatures();
+                } else {
+                    alert('Incorrect password. Please try again.');
                 }
-            };
-            reader.readAsText(file);
+            });
+
+            cancelPasswordBtn.addEventListener('click', () => {
+                passwordModal.classList.add('hidden');
+            });
+            
+            // --- Core App Logic ---
+
+            const MENU_STORAGE_KEY = 'chinaCafeMenu';
+            const BACKUPS_STORAGE_KEY = 'chinaCafeMenuBackups';
+
+            function saveMenuToLocalStorage(menuData) {
+                try {
+                    localStorage.setItem(MENU_STORAGE_KEY, JSON.stringify(menuData));
+                    renderMenu(menuData);
+                    showStatus('Menu saved successfully.', 'success');
+                } catch (e) {
+                    console.error('Error saving menu to local storage:', e);
+                    showStatus('Error: Could not save menu.', 'error');
+                }
+            }
+
+            function loadMenuFromLocalStorage() {
+                try {
+                    const storedMenu = localStorage.getItem(MENU_STORAGE_KEY);
+                    if (storedMenu) {
+                        const menuData = JSON.parse(storedMenu);
+                        renderMenu(menuData);
+                    } else {
+                        renderMenu(null);
+                    }
+                } catch (e) {
+                    console.error('Error loading menu from local storage:', e);
+                    showStatus('Error: Could not load menu.', 'error');
+                    renderMenu(null);
+                }
+            }
+
+            function showStatus(message, type) {
+                statusMessage.textContent = message;
+                statusMessage.className = `mt-2 text-sm font-medium ${type === 'success' ? 'text-green-600' : 'text-red-600'}`;
+                statusMessage.classList.remove('hidden');
+                setTimeout(() => {
+                    statusMessage.classList.add('hidden');
+                }, 3000);
+            }
+
+            function renderMenu(menuData) {
+                menuContainer.innerHTML = '';
+                if (!menuData || !menuData.menu || menuData.menu.length === 0) {
+                    noMenuMessage.classList.remove('hidden');
+                    return;
+                }
+                noMenuMessage.classList.add('hidden');
+
+                const notes = menuData.notes;
+                if (notes) {
+                    for (const noteKey in notes) {
+                        const noteDiv = document.createElement('div');
+                        noteDiv.className = 'text-center bg-gray-100 p-4 rounded-lg my-4';
+                        noteDiv.innerHTML = `<h3 class="text-xl font-bold mb-2 capitalize">${noteKey.replace('_', ' ')}</h3><p class="text-gray-700">${notes[noteKey]}</p>`;
+                        menuContainer.appendChild(noteDiv);
+                    }
+                }
+
+                menuData.menu.forEach(category => {
+                    const categoryDiv = document.createElement('div');
+                    categoryDiv.className = 'space-y-4';
+                    
+                    const headerHtml = `
+                        <div class="flex justify-between items-center border-b-2 border-gray-300 pb-2">
+                            <h3 class="text-3xl font-semibold text-gray-800">${category.category}</h3>
+                            <span class="text-xl text-gray-500">${category.chinese_name || ''}</span>
+                        </div>
+                    `;
+                    categoryDiv.innerHTML = headerHtml;
+
+                    if (category.note) {
+                        const noteP = document.createElement('p');
+                        noteP.className = 'text-gray-500 italic text-sm';
+                        noteP.textContent = `Note: ${category.note}`;
+                        categoryDiv.appendChild(noteP);
+                    }
+
+                    const itemsList = document.createElement('div');
+                    itemsList.className = 'space-y-4';
+
+                    category.items.forEach(item => {
+                        const itemDiv = document.createElement('div');
+                        itemDiv.className = 'flex flex-col md:flex-row justify-between items-start md:items-center p-4 bg-gray-50 rounded-lg shadow-sm';
+                        
+                        let priceHtml = '';
+                        if (item.price) {
+                            priceHtml = `<span class="text-lg font-bold text-gray-900">$${item.price}</span>`;
+                        } else if (item.prices) {
+                            priceHtml = `<div class="flex flex-wrap gap-2 md:gap-4">${Object.keys(item.prices).map(key => `
+                                <div class="text-sm">
+                                    <span class="font-semibold text-gray-600">${key}:</span>
+                                    <span class="font-bold text-gray-900">$${item.prices[key]}</span>
+                                </div>`).join('')}</div>`;
+                        }
+
+                        itemDiv.innerHTML = `
+                            <div class="flex-1 mb-2 md:mb-0">
+                                <h4 class="text-xl font-semibold text-gray-800">${item.name}</h4>
+                                <p class="text-gray-600 text-sm md:text-base">${item.description}</p>
+                                ${item.with_and_or_text ? `<p class="text-gray-500 text-sm">with/and/or ${item.with_and_or_text}</p>` : ''}
+                            </div>
+                            <div class="mt-2 md:mt-0 md:ml-4 text-right">
+                                ${priceHtml}
+                            </div>
+                        `;
+                        itemsList.appendChild(itemDiv);
+                    });
+
+                    categoryDiv.appendChild(itemsList);
+                    menuContainer.appendChild(categoryDiv);
+                });
+            }
+
+            function loadBackups() {
+                try {
+                    const storedBackups = localStorage.getItem(BACKUPS_STORAGE_KEY);
+                    const backups = storedBackups ? JSON.parse(storedBackups) : [];
+                    renderBackups(backups);
+                } catch (e) {
+                    console.error('Error loading backups from local storage:', e);
+                    showStatus('Error: Could not load backups.', 'error');
+                }
+            }
+
+            function renderBackups(backups) {
+                backupsContainer.innerHTML = '';
+                if (backups.length === 0) {
+                    noBackupsMessage.classList.remove('hidden');
+                    return;
+                }
+                noBackupsMessage.classList.add('hidden');
+
+                backups.forEach((backup, index) => {
+                    const backupDiv = document.createElement('div');
+                    backupDiv.className = 'flex justify-between items-center p-3 bg-gray-100 rounded-lg shadow-sm';
+                    
+                    const backupDate = new Date(backup.timestamp);
+                    const dateString = backupDate.toLocaleDateString() + ' ' + backupDate.toLocaleTimeString();
+
+                    backupDiv.innerHTML = `
+                        <span class="text-gray-700 font-medium">Backup #${index + 1} (${dateString})</span>
+                        <div class="space-x-2">
+                            <button data-index="${index}" class="restore-btn btn btn-primary text-sm px-3 py-1">Restore</button>
+                            <button data-index="${index}" class="delete-btn btn btn-secondary text-sm px-3 py-1">Delete</button>
+                        </div>
+                    `;
+                    backupsContainer.appendChild(backupDiv);
+                });
+            }
+
+            // Event listeners
+            uploadButton.addEventListener('click', () => {
+                const file = menuUpload.files[0];
+                if (!file) {
+                    showStatus('Please select a JSON file to upload.', 'error');
+                    return;
+                }
+
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    try {
+                        const menuData = JSON.parse(e.target.result);
+                        if (!menuData.menu) {
+                            showStatus('Error: The JSON file must have a "menu" key.', 'error');
+                            return;
+                        }
+                        saveMenuToLocalStorage(menuData);
+                    } catch (error) {
+                        console.error('Error parsing JSON file:', error);
+                        showStatus('Error: Invalid JSON file format.', 'error');
+                    }
+                };
+                reader.onerror = () => {
+                    showStatus('Error reading file.', 'error');
+                };
+                reader.readAsText(file);
+            });
+
+            createBackupBtn.addEventListener('click', () => {
+                const storedMenu = localStorage.getItem(MENU_STORAGE_KEY);
+                if (!storedMenu) {
+                    showStatus('Cannot create backup: No menu data found.', 'error');
+                    return;
+                }
+
+                let backups = JSON.parse(localStorage.getItem(BACKUPS_STORAGE_KEY) || '[]');
+                const newBackup = {
+                    timestamp: new Date().toISOString(),
+                    data: JSON.parse(storedMenu)
+                };
+                backups.push(newBackup);
+                localStorage.setItem(BACKUPS_STORAGE_KEY, JSON.stringify(backups));
+                loadBackups();
+                showStatus('Backup created successfully.', 'success');
+            });
+
+            backupsContainer.addEventListener('click', (e) => {
+                const target = e.target;
+                if (target.classList.contains('restore-btn')) {
+                    const index = target.dataset.index;
+                    let backups = JSON.parse(localStorage.getItem(BACKUPS_STORAGE_KEY) || '[]');
+                    if (backups[index]) {
+                        saveMenuToLocalStorage(backups[index].data);
+                        showStatus('Menu restored from backup.', 'success');
+                    }
+                } else if (target.classList.contains('delete-btn')) {
+                    const index = target.dataset.index;
+                    let backups = JSON.parse(localStorage.getItem(BACKUPS_STORAGE_KEY) || '[]');
+                    backups.splice(index, 1);
+                    localStorage.setItem(BACKUPS_STORAGE_KEY, JSON.stringify(backups));
+                    loadBackups();
+                    showStatus('Backup deleted.', 'success');
+                }
+            });
+
+            // Initial load
+            loadMenuFromLocalStorage();
+            loadBackups();
         });
-
-        createBackupBtn.addEventListener('click', createBackup);
-
-        // Initial load
-        const initialMenu = loadMenuFromLocalStorage();
-        renderMenu(initialMenu);
-        renderBackups();
-
     </script>
+
 </body>
 </html>
