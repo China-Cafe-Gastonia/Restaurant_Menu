@@ -1,205 +1,184 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Console</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-    <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f3f4f6;
-        }
-        .container {
-            max-width: 600px;
-            margin: auto;
-            padding: 2rem;
-        }
-        .card {
-            background-color: white;
-            border-radius: 1rem;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-            padding: 2rem;
-        }
-    </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Console</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+            padding: 2rem;
+        }
+        .card {
+            background-color: white;
+            border-radius: 1rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+    </style>
 </head>
-<body class="bg-gray-100 flex items-center justify-center min-h-screen">
+<body class="bg-gray-100 text-gray-800">
+    <div class="container mt-12">
+        <header class="text-center mb-8">
+            <h1 class="text-3xl font-bold text-gray-900">Restaurant Admin Console</h1>
+            <p class="text-gray-500">Manage your menu data in Firestore</p>
+        </header>
 
-    <div class="container">
-        <div class="card">
-            <h1 class="text-3xl font-bold text-center mb-6 text-orange-600">Admin Menu Upload</h1>
-            <p class="text-center text-gray-500 mb-8">Upload a JSON file to update the restaurant menu.</p>
-            <p id="filePath" class="text-center text-sm font-semibold text-green-600 mb-4"></p>
+        <div class="card">
+            <h2 class="text-2xl font-semibold mb-4">Menu Management</h2>
+            <p class="mb-4 text-gray-600">
+                Upload a JSON file to update your menu or delete the entire menu from Firestore.
+            </p>
 
-            <!-- File Upload & Actions Section -->
-            <div class="flex flex-col items-center space-y-4">
-                <input type="file" id="jsonFile" accept=".json" class="block w-full text-sm text-gray-500
-                    file:mr-4 file:py-2 file:px-4
-                    file:rounded-full file:border-0
-                    file:text-sm file:font-semibold
-                    file:bg-orange-50 file:text-orange-700
-                    hover:file:bg-orange-100"/>
-                
-                <div class="flex space-x-4">
-                    <button id="uploadButton" class="bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-6 rounded-full transition-all duration-200 shadow-md">Upload Menu</button>
-                    <button id="deleteButton" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-6 rounded-full transition-all duration-200 shadow-md">Delete Menu</button>
-                </div>
-            </div>
+            <div class="mb-4">
+                <label for="jsonFile" class="block text-sm font-medium text-gray-700">Select Menu JSON File</label>
+                <input type="file" id="jsonFile" accept=".json" class="mt-1 block w-full text-sm text-gray-500
+                    file:mr-4 file:py-2 file:px-4
+                    file:rounded-full file:border-0
+                    file:text-sm file:font-semibold
+                    file:bg-blue-50 file:text-blue-700
+                    hover:file:bg-blue-100">
+            </div>
 
-            <div id="statusMessage" class="mt-8 text-center text-gray-700 font-semibold"></div>
-        </div>
-    </div>
+            <div class="flex space-x-4">
+                <button id="uploadButton" class="bg-orange-500 text-white font-semibold py-2 px-6 rounded-full shadow-md hover:bg-orange-600 transition-colors">
+                    Upload Menu
+                </button>
+                <button id="deleteButton" class="bg-red-500 text-white font-semibold py-2 px-6 rounded-full shadow-md hover:bg-red-600 transition-colors">
+                    Delete Menu
+                </button>
+            </div>
+            
+            <div id="statusMessage" class="mt-6 text-sm font-medium"></div>
+        </div>
+    </div>
 
-    <!-- Firebase SDKs -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, getDocs, addDoc, doc, setDoc, deleteDoc, writeBatch } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-        import { setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-        
-        // Log all Firebase debug messages
-        setLogLevel('debug');
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getFirestore, collection, getDocs, writeBatch, doc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+        import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
-        // Global variables for Firebase configuration provided by the environment
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
-        const authToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
-        const filePath = document.getElementById('filePath');
-        const jsonFile = document.getElementById('jsonFile');
-        const statusMessage = document.getElementById('statusMessage');
-        const uploadButton = document.getElementById('uploadButton');
-        const deleteButton = document.getElementById('deleteButton');
-        
-        // The file path to the uploaded menu data, which the system provides
-        const jsonFilePath = "uploaded:09.16.2025.json";
-        filePath.textContent = `Using data from file: ${jsonFilePath.split(':')[1]}`;
+        // IMPORTANT: REPLACE WITH YOUR OWN FIREBASE CONFIGURATION
+        const firebaseConfig = {
+            apiKey: "YOUR_API_KEY",
+            authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+            projectId: "YOUR_PROJECT_ID",
+            storageBucket: "YOUR_PROJECT_ID.appspot.com",
+            messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+            appId: "YOUR_APP_ID"
+        };
+        
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+        
+        // UI elements
+        const uploadButton = document.getElementById('uploadButton');
+        const deleteButton = document.getElementById('deleteButton');
+        const statusMessage = document.getElementById('statusMessage');
+        const jsonFile = document.getElementById('jsonFile'); // New input element reference
 
-        let db;
-        let auth;
-        let userId = '';
+        let userId = null;
 
-        // Initialize Firebase and authenticate
-        async function initializeFirebase() {
-            try {
-                const app = initializeApp(firebaseConfig);
-                auth = getAuth(app);
-                db = getFirestore(app);
+        // Sign in anonymously to get a user ID
+        signInAnonymously(auth).then((userCredential) => {
+            userId = userCredential.user.uid;
+            statusMessage.textContent = 'Firebase initialized. Ready.';
+        }).catch((error) => {
+            console.error("Authentication Error:", error);
+            statusMessage.textContent = `Authentication Error: ${error.message}`;
+        });
 
-                if (authToken) {
-                    await signInWithCustomToken(auth, authToken);
-                } else {
-                    await signInAnonymously(auth);
-                }
+        // Upload a JSON file to Firestore
+        uploadButton.addEventListener('click', async () => {
+            if (!db || !userId) {
+                statusMessage.textContent = 'Firebase is not initialized. Please wait.';
+                return;
+            }
 
-                userId = auth.currentUser?.uid || 'anonymous';
-                statusMessage.textContent = 'Firebase connected. User signed in.';
-            } catch (error) {
-                console.error("Error initializing Firebase or signing in:", error);
-                statusMessage.textContent = 'Failed to connect to Firebase. Check console for details.';
-            }
-        }
+            const file = jsonFile.files[0];
+            if (!file) {
+                statusMessage.textContent = 'Please select a JSON file to upload.';
+                return;
+            }
 
-        // Fetch JSON data from the uploaded file
-        async function fetchMenuData() {
-            try {
-                const response = await fetch(jsonFilePath);
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                const data = await response.json();
-                
-                // Extract and flatten the menu items from the JSON structure
-                const flattenedItems = [];
-                if (data.menu && Array.isArray(data.menu)) {
-                    data.menu.forEach(category => {
-                        if (category.items && Array.isArray(category.items)) {
-                            category.items.forEach(item => {
-                                // Handle different price formats
-                                let priceValue = item.price || (item.prices ? Object.values(item.prices)[0] : '0');
-                                flattenedItems.push({
-                                    name: item.name,
-                                    description: item.description,
-                                    category: category.category,
-                                    price: parseFloat(priceValue),
-                                    chinese_name: item.chinese_name || '',
-                                });
-                            });
-                        }
-                    });
-                }
-                return flattenedItems;
-            } catch (error) {
-                console.error("Error fetching or parsing JSON:", error);
-                statusMessage.textContent = `Error: Could not load JSON file.`;
-                return null;
-            }
-        }
+            statusMessage.textContent = 'Uploading menu...';
 
-        // Upload menu from JSON to Firestore
-        uploadButton.addEventListener('click', async () => {
-            if (!db || !userId) {
-                statusMessage.textContent = 'Firebase is not initialized. Please wait.';
-                return;
-            }
+            try {
+                const fileReader = new FileReader();
+                fileReader.onload = async (event) => {
+                    try {
+                        const menuData = JSON.parse(event.target.result);
+                        if (!Array.isArray(menuData)) {
+                            statusMessage.textContent = 'Error: The uploaded file is not a valid JSON array.';
+                            return;
+                        }
 
-            statusMessage.textContent = 'Uploading menu...';
-            const menuData = await fetchMenuData();
-            if (!menuData) return;
+                        // Reference to the collection
+                        const menuRef = collection(db, `artifacts/${firebaseConfig.appId}/public/data/menu_data`);
+                        
+                        // Delete all existing documents
+                        const existingDocs = await getDocs(menuRef);
+                        const deleteBatch = writeBatch(db);
+                        existingDocs.forEach((doc) => {
+                            deleteBatch.delete(doc.ref);
+                        });
+                        await deleteBatch.commit();
 
-            try {
-                const batch = writeBatch(db);
-                const menuRef = collection(db, `artifacts/${appId}/public/data/menu_data`);
-                
-                // Delete existing documents in a batch
-                const existingDocs = await getDocs(menuRef);
-                existingDocs.docs.forEach(d => {
-                    batch.delete(doc(db, `artifacts/${appId}/public/data/menu_data`, d.id));
-                });
-                await batch.commit();
+                        // Add new documents
+                        const newBatch = writeBatch(db);
+                        menuData.forEach(item => {
+                            const newDocRef = doc(menuRef);
+                            newBatch.set(newDocRef, item);
+                        });
+                        await newBatch.commit();
 
-                // Add new documents in a new batch
-                const newBatch = writeBatch(db);
-                menuData.forEach(item => {
-                    const docRef = doc(menuRef);
-                    newBatch.set(docRef, item);
-                });
-                await newBatch.commit();
+                        statusMessage.textContent = `Menu uploaded successfully! Added ${menuData.length} items.`;
+                    } catch (parseError) {
+                        console.error("Error parsing JSON file:", parseError);
+                        statusMessage.textContent = `Error parsing JSON file: ${parseError.message}`;
+                    }
+                };
+                fileReader.readAsText(file);
+            } catch (error) {
+                console.error("Error uploading menu:", error);
+                statusMessage.textContent = `Error uploading menu: ${error.message}`;
+            }
+        });
 
-                statusMessage.textContent = `Menu uploaded successfully! Added ${menuData.length} items.`;
-            } catch (error) {
-                console.error("Error uploading menu:", error);
-                statusMessage.textContent = `Error uploading menu: ${error.message}`;
-            }
-        });
+        // Delete the entire menu from Firestore
+        deleteButton.addEventListener('click', async () => {
+            if (!db || !userId) {
+                statusMessage.textContent = 'Firebase is not initialized. Please wait.';
+                return;
+            }
 
-        // Delete the entire menu from Firestore
-        deleteButton.addEventListener('click', async () => {
-            if (!db || !userId) {
-                statusMessage.textContent = 'Firebase is not initialized. Please wait.';
-                return;
-            }
-
-            try {
-                statusMessage.textContent = 'Deleting menu...';
-                const menuRef = collection(db, `artifacts/${appId}/public/data/menu_data`);
-                const existingDocs = await getDocs(menuRef);
-                const batch = writeBatch(db);
-                existingDocs.docs.forEach(d => {
-                    batch.delete(doc(db, `artifacts/${appId}/public/data/menu_data`, d.id));
-                });
-                await batch.commit();
-                statusMessage.textContent = 'Menu deleted successfully.';
-            } catch (error) {
-                console.error("Error deleting menu:", error);
-                statusMessage.textContent = `Error deleting menu: ${error.message}`;
-            }
-        });
-
-        // Initial setup
-        initializeFirebase();
-    </script>
+            try {
+                statusMessage.textContent = 'Deleting menu...';
+                const menuRef = collection(db, `artifacts/${firebaseConfig.appId}/public/data/menu_data`);
+                const existingDocs = await getDocs(menuRef);
+                const deleteBatch = writeBatch(db);
+                existingDocs.forEach((doc) => {
+                    deleteBatch.delete(doc.ref);
+                });
+                await deleteBatch.commit();
+                statusMessage.textContent = 'Menu deleted successfully!';
+            } catch (error) {
+                console.error("Error deleting menu:", error);
+                statusMessage.textContent = `Error deleting menu: ${error.message}`;
+            }
+        });
+    </script>
 </body>
 </html>
