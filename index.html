@@ -3,407 +3,185 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>China Cafe Menu Editor</title>
+    <title>Restaurant Menu</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         body {
             font-family: 'Inter', sans-serif;
             background-color: #f3f4f6;
-            color: #1f2937;
         }
-        .card {
-            background-color: white;
+        .container {
+            max-width: 800px;
+            margin: auto;
             padding: 2rem;
-            border-radius: 1rem;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
-        .btn {
-            padding: 0.75rem 1.5rem;
-            border-radius: 0.5rem;
-            font-weight: 600;
-            transition: all 0.2s ease-in-out;
-        }
-        .btn-primary {
-            background-color: #4f46e5;
-            color: white;
-            border: none;
-        }
-        .btn-primary:hover {
-            background-color: #4338ca;
-        }
-        .btn-secondary {
-            background-color: #e5e7eb;
-            color: #4b5563;
-            border: none;
-        }
-        .btn-secondary:hover {
-            background-color: #d1d5db;
-        }
-        input[type="file"] {
-            border: 1px solid #d1d5db;
-            border-radius: 0.5rem;
-            padding: 0.5rem;
-        }
-        .modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 50;
-        }
-        .modal-content {
+        .menu-card {
             background-color: white;
-            padding: 2rem;
             border-radius: 1rem;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            max-width: 400px;
-            width: 100%;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            padding: 2rem;
+            margin-bottom: 2rem;
         }
     </style>
 </head>
-<body class="p-8">
-
-    <!-- Main Container -->
-    <div class="max-w-4xl mx-auto space-y-8">
-        <header class="text-center mb-12">
-            <h1 class="text-4xl font-bold text-gray-900">China Cafe Menu Editor</h1>
-            <p class="mt-2 text-gray-500">All data is saved in your browser's local storage.</p>
+<body class="bg-gray-100 min-h-screen">
+    <div class="container">
+        <!-- Restaurant Info -->
+        <header id="restaurantInfo" class="text-center pb-6">
+            <h1 id="restaurantName" class="text-4xl font-bold text-orange-600 mb-2"></h1>
+            <p id="restaurantLocation" class="text-gray-500"></p>
+            <p id="restaurantHours" class="text-gray-500"></p>
+            <p id="restaurantPhone" class="text-gray-500"></p>
         </header>
-
-        <!-- Main Content Area -->
-        <main class="space-y-8">
-            <!-- Modal for password -->
-            <div id="password-modal" class="modal hidden">
-                <div class="modal-content">
-                    <h2 class="text-2xl font-semibold mb-4">Enter Password</h2>
-                    <p class="text-gray-600 mb-4">Please enter the password to access the admin features.</p>
-                    <input type="password" id="password-input" class="w-full p-2 border border-gray-300 rounded-md mb-4" placeholder="Password">
-                    <div class="flex justify-end space-x-2">
-                        <button id="cancel-password-btn" class="btn btn-secondary">Cancel</button>
-                        <button id="submit-password-btn" class="btn btn-primary">Submit</button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Admin Section Card -->
-            <div class="card p-6 md:p-8 space-y-6">
-                <h2 class="text-2xl font-semibold text-gray-900 mb-4">Menu Management</h2>
-                
-                <!-- Admin features container, initially hidden -->
-                <div id="admin-features" class="space-y-6 hidden">
-                    <div class="flex flex-col md:flex-row items-start md:items-center justify-between space-y-4 md:space-y-0 md:space-x-4">
-                        <div class="flex-1">
-                            <label for="menu-upload" class="block text-gray-700 font-semibold mb-2">Upload New Menu (JSON)</label>
-                            <input type="file" id="menu-upload" class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-violet-50 file:text-violet-700 hover:file:bg-violet-100">
-                        </div>
-                        <button id="upload-button" class="btn btn-primary w-full md:w-auto">Upload Menu</button>
-                    </div>
-
-                    <div id="status-message" class="text-sm font-medium text-gray-500 hidden"></div>
-                    
-                    <div>
-                        <h3 class="text-lg font-semibold text-gray-800 mb-2">Restore from Backup</h3>
-                        <div id="backups-container" class="space-y-2">
-                            <p id="no-backups" class="text-gray-500 text-sm">No backups found.</p>
-                        </div>
-                    </div>
-
-                    <div class="flex justify-end">
-                        <button id="create-backup-btn" class="btn btn-secondary">Create Backup</button>
-                    </div>
-                </div>
-                
-                <!-- Login button for admin section -->
-                <div id="login-section">
-                    <button id="login-button" class="btn btn-primary w-full">Access Admin</button>
-                </div>
-            </div>
-
-            <!-- Customer View Card -->
-            <div class="card p-6 md:p-8 space-y-6">
-                <h2 class="text-2xl font-semibold text-gray-900 mb-4">Customer View</h2>
-                <div id="menu-container" class="space-y-8">
-                    <p id="no-menu-message" class="text-gray-500 italic">Menu not available. Please upload a menu to begin.</p>
-                </div>
-            </div>
+        
+        <!-- Menu Categories -->
+        <main id="menuContainer" class="grid gap-8">
+            <div id="loading" class="text-center font-semibold text-gray-500 mt-12">Loading menu...</div>
+            <div id="no-items" class="hidden text-center font-semibold text-gray-500 mt-12">No menu items available. Please check back later.</div>
         </main>
     </div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const adminFeatures = document.getElementById('admin-features');
-            const loginSection = document.getElementById('login-section');
-            const passwordModal = document.getElementById('password-modal');
-            const passwordInput = document.getElementById('password-input');
-            const submitPasswordBtn = document.getElementById('submit-password-btn');
-            const cancelPasswordBtn = document.getElementById('cancel-password-btn');
-            const loginButton = document.getElementById('login-button');
-            const uploadButton = document.getElementById('upload-button');
-            const createBackupBtn = document.getElementById('create-backup-btn');
-            const menuUpload = document.getElementById('menu-upload');
-            const menuContainer = document.getElementById('menu-container');
-            const noMenuMessage = document.getElementById('no-menu-message');
-            const statusMessage = document.getElementById('status-message');
-            const backupsContainer = document.getElementById('backups-container');
-            const noBackupsMessage = document.getElementById('no-backups');
+    <!-- Firebase SDKs -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, onSnapshot, doc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        
+        // Log all Firebase debug messages
+        setLogLevel('debug');
 
-            const ADMIN_PASSWORD = "admin"; // Change this password!
+        // Global variables for Firebase configuration provided by the environment
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
+        const authToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+        
+        const menuContainer = document.getElementById('menuContainer');
+        const loadingMessage = document.getElementById('loading');
+        const noItemsMessage = document.getElementById('no-items');
 
-            // Password check function
-            function checkPassword() {
-                passwordModal.classList.remove('hidden');
-                passwordInput.value = '';
-                passwordInput.focus();
-            }
+        const restaurantName = document.getElementById('restaurantName');
+        const restaurantLocation = document.getElementById('restaurantLocation');
+        const restaurantHours = document.getElementById('restaurantHours');
+        const restaurantPhone = document.getElementById('restaurantPhone');
 
-            // Function to show admin features
-            function showAdminFeatures() {
-                loginSection.classList.add('hidden');
-                adminFeatures.classList.remove('hidden');
-                passwordModal.classList.add('hidden');
-            }
+        let db;
+        let auth;
+        let userId = '';
 
-            loginButton.addEventListener('click', checkPassword);
+        // Initialize Firebase and authenticate
+        async function initializeFirebase() {
+            try {
+                const app = initializeApp(firebaseConfig);
+                auth = getAuth(app);
+                db = getFirestore(app);
 
-            submitPasswordBtn.addEventListener('click', () => {
-                if (passwordInput.value === ADMIN_PASSWORD) {
-                    showAdminFeatures();
+                if (authToken) {
+                    await signInWithCustomToken(auth, authToken);
                 } else {
-                    alert('Incorrect password. Please try again.');
+                    await signInAnonymously(auth);
                 }
-            });
+                userId = auth.currentUser?.uid || 'anonymous';
+            } catch (error) {
+                console.error("Error initializing Firebase or signing in:", error);
+                loadingMessage.textContent = 'Failed to connect to Firebase. Check console for details.';
+            }
+        }
 
-            cancelPasswordBtn.addEventListener('click', () => {
-                passwordModal.classList.add('hidden');
-            });
+        // Fetch static restaurant data from JSON
+        async function fetchRestaurantData() {
+            try {
+                const response = await fetch("uploaded:09.16.2025.json");
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const data = await response.json();
+                if (data.restaurant) {
+                    restaurantName.textContent = data.restaurant.name;
+                    restaurantLocation.textContent = data.restaurant.location;
+                    restaurantHours.textContent = data.restaurant.hours;
+                    restaurantPhone.textContent = data.restaurant.phone;
+                }
+            } catch (error) {
+                console.error("Error fetching restaurant data:", error);
+            }
+        }
+        
+        // Render menu items dynamically
+        function renderMenu(items) {
+            menuContainer.innerHTML = ''; // Clear the container
+
+            if (items.length === 0) {
+                noItemsMessage.classList.remove('hidden');
+                return;
+            }
+
+            noItemsMessage.classList.add('hidden');
             
-            // --- Core App Logic ---
-
-            const MENU_STORAGE_KEY = 'chinaCafeMenu';
-            const BACKUPS_STORAGE_KEY = 'chinaCafeMenuBackups';
-
-            function saveMenuToLocalStorage(menuData) {
-                try {
-                    localStorage.setItem(MENU_STORAGE_KEY, JSON.stringify(menuData));
-                    renderMenu(menuData);
-                    showStatus('Menu saved successfully.', 'success');
-                } catch (e) {
-                    console.error('Error saving menu to local storage:', e);
-                    showStatus('Error: Could not save menu.', 'error');
+            const categories = items.reduce((acc, item) => {
+                const category = item.category || 'Uncategorized';
+                if (!acc[category]) {
+                    acc[category] = [];
                 }
+                acc[category].push(item);
+                return acc;
+            }, {});
+
+            for (const category in categories) {
+                const categoryCard = document.createElement('div');
+                categoryCard.className = 'menu-card';
+                categoryCard.innerHTML = `
+                    <h2 class="text-2xl font-bold text-gray-800 mb-4">${category}</h2>
+                    <ul class="space-y-6">
+                        ${categories[category].map(item => `
+                            <li class="flex justify-between items-start">
+                                <div>
+                                    <p class="font-bold text-gray-900">${item.name}</p>
+                                    <p class="text-sm text-gray-500 italic">${item.chinese_name}</p>
+                                    <p class="text-gray-600 text-sm mt-1">${item.description}</p>
+                                </div>
+                                <span class="font-bold text-orange-600 text-lg ml-4 flex-shrink-0">$${item.price.toFixed(2)}</span>
+                            </li>
+                        `).join('')}
+                    </ul>
+                `;
+                menuContainer.appendChild(categoryCard);
+            }
+        }
+
+        // Listen for real-time menu updates from Firestore
+        async function listenForMenuUpdates() {
+            if (!db) {
+                console.log("Database not initialized, retrying...");
+                await new Promise(resolve => setTimeout(resolve, 500));
+                return listenForMenuUpdates();
             }
 
-            function loadMenuFromLocalStorage() {
-                try {
-                    const storedMenu = localStorage.getItem(MENU_STORAGE_KEY);
-                    if (storedMenu) {
-                        const menuData = JSON.parse(storedMenu);
-                        renderMenu(menuData);
-                    } else {
-                        renderMenu(null);
-                    }
-                } catch (e) {
-                    console.error('Error loading menu from local storage:', e);
-                    showStatus('Error: Could not load menu.', 'error');
-                    renderMenu(null);
-                }
-            }
-
-            function showStatus(message, type) {
-                statusMessage.textContent = message;
-                statusMessage.className = `mt-2 text-sm font-medium ${type === 'success' ? 'text-green-600' : 'text-red-600'}`;
-                statusMessage.classList.remove('hidden');
-                setTimeout(() => {
-                    statusMessage.classList.add('hidden');
-                }, 3000);
-            }
-
-            function renderMenu(menuData) {
-                menuContainer.innerHTML = '';
-                if (!menuData || !menuData.menu || menuData.menu.length === 0) {
-                    noMenuMessage.classList.remove('hidden');
-                    return;
-                }
-                noMenuMessage.classList.add('hidden');
-
-                const notes = menuData.notes;
-                if (notes) {
-                    for (const noteKey in notes) {
-                        const noteDiv = document.createElement('div');
-                        noteDiv.className = 'text-center bg-gray-100 p-4 rounded-lg my-4';
-                        noteDiv.innerHTML = `<h3 class="text-xl font-bold mb-2 capitalize">${noteKey.replace('_', ' ')}</h3><p class="text-gray-700">${notes[noteKey]}</p>`;
-                        menuContainer.appendChild(noteDiv);
-                    }
-                }
-
-                menuData.menu.forEach(category => {
-                    const categoryDiv = document.createElement('div');
-                    categoryDiv.className = 'space-y-4';
-                    
-                    const headerHtml = `
-                        <div class="flex justify-between items-center border-b-2 border-gray-300 pb-2">
-                            <h3 class="text-3xl font-semibold text-gray-800">${category.category}</h3>
-                            <span class="text-xl text-gray-500">${category.chinese_name || ''}</span>
-                        </div>
-                    `;
-                    categoryDiv.innerHTML = headerHtml;
-
-                    if (category.note) {
-                        const noteP = document.createElement('p');
-                        noteP.className = 'text-gray-500 italic text-sm';
-                        noteP.textContent = `Note: ${category.note}`;
-                        categoryDiv.appendChild(noteP);
-                    }
-
-                    const itemsList = document.createElement('div');
-                    itemsList.className = 'space-y-4';
-
-                    category.items.forEach(item => {
-                        const itemDiv = document.createElement('div');
-                        itemDiv.className = 'flex flex-col md:flex-row justify-between items-start md:items-center p-4 bg-gray-50 rounded-lg shadow-sm';
-                        
-                        let priceHtml = '';
-                        if (item.price) {
-                            priceHtml = `<span class="text-lg font-bold text-gray-900">$${item.price}</span>`;
-                        } else if (item.prices) {
-                            priceHtml = `<div class="flex flex-wrap gap-2 md:gap-4">${Object.keys(item.prices).map(key => `
-                                <div class="text-sm">
-                                    <span class="font-semibold text-gray-600">${key}:</span>
-                                    <span class="font-bold text-gray-900">$${item.prices[key]}</span>
-                                </div>`).join('')}</div>`;
-                        }
-
-                        itemDiv.innerHTML = `
-                            <div class="flex-1 mb-2 md:mb-0">
-                                <h4 class="text-xl font-semibold text-gray-800">${item.name}</h4>
-                                <p class="text-gray-600 text-sm md:text-base">${item.description}</p>
-                                ${item.with_and_or_text ? `<p class="text-gray-500 text-sm">with/and/or ${item.with_and_or_text}</p>` : ''}
-                            </div>
-                            <div class="mt-2 md:mt-0 md:ml-4 text-right">
-                                ${priceHtml}
-                            </div>
-                        `;
-                        itemsList.appendChild(itemDiv);
-                    });
-
-                    categoryDiv.appendChild(itemsList);
-                    menuContainer.appendChild(categoryDiv);
+            const menuRef = collection(db, `artifacts/${appId}/public/data/menu_data`);
+            
+            onSnapshot(menuRef, (querySnapshot) => {
+                const menuItems = [];
+                querySnapshot.forEach((doc) => {
+                    menuItems.push(doc.data());
                 });
-            }
-
-            function loadBackups() {
-                try {
-                    const storedBackups = localStorage.getItem(BACKUPS_STORAGE_KEY);
-                    const backups = storedBackups ? JSON.parse(storedBackups) : [];
-                    renderBackups(backups);
-                } catch (e) {
-                    console.error('Error loading backups from local storage:', e);
-                    showStatus('Error: Could not load backups.', 'error');
-                }
-            }
-
-            function renderBackups(backups) {
-                backupsContainer.innerHTML = '';
-                if (backups.length === 0) {
-                    noBackupsMessage.classList.remove('hidden');
-                    return;
-                }
-                noBackupsMessage.classList.add('hidden');
-
-                backups.forEach((backup, index) => {
-                    const backupDiv = document.createElement('div');
-                    backupDiv.className = 'flex justify-between items-center p-3 bg-gray-100 rounded-lg shadow-sm';
-                    
-                    const backupDate = new Date(backup.timestamp);
-                    const dateString = backupDate.toLocaleDateString() + ' ' + backupDate.toLocaleTimeString();
-
-                    backupDiv.innerHTML = `
-                        <span class="text-gray-700 font-medium">Backup #${index + 1} (${dateString})</span>
-                        <div class="space-x-2">
-                            <button data-index="${index}" class="restore-btn btn btn-primary text-sm px-3 py-1">Restore</button>
-                            <button data-index="${index}" class="delete-btn btn btn-secondary text-sm px-3 py-1">Delete</button>
-                        </div>
-                    `;
-                    backupsContainer.appendChild(backupDiv);
-                });
-            }
-
-            // Event listeners
-            uploadButton.addEventListener('click', () => {
-                const file = menuUpload.files[0];
-                if (!file) {
-                    showStatus('Please select a JSON file to upload.', 'error');
-                    return;
-                }
-
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    try {
-                        const menuData = JSON.parse(e.target.result);
-                        if (!menuData.menu) {
-                            showStatus('Error: The JSON file must have a "menu" key.', 'error');
-                            return;
-                        }
-                        saveMenuToLocalStorage(menuData);
-                    } catch (error) {
-                        console.error('Error parsing JSON file:', error);
-                        showStatus('Error: Invalid JSON file format.', 'error');
-                    }
-                };
-                reader.onerror = () => {
-                    showStatus('Error reading file.', 'error');
-                };
-                reader.readAsText(file);
+                renderMenu(menuItems);
+                loadingMessage.classList.add('hidden');
+            }, (error) => {
+                console.error("Error listening to Firestore:", error);
+                loadingMessage.textContent = 'Error fetching menu data.';
             });
+        }
+        
+        // Initial setup on window load
+        window.onload = async () => {
+            await initializeFirebase();
+            await fetchRestaurantData();
+            listenForMenuUpdates();
+        };
 
-            createBackupBtn.addEventListener('click', () => {
-                const storedMenu = localStorage.getItem(MENU_STORAGE_KEY);
-                if (!storedMenu) {
-                    showStatus('Cannot create backup: No menu data found.', 'error');
-                    return;
-                }
-
-                let backups = JSON.parse(localStorage.getItem(BACKUPS_STORAGE_KEY) || '[]');
-                const newBackup = {
-                    timestamp: new Date().toISOString(),
-                    data: JSON.parse(storedMenu)
-                };
-                backups.push(newBackup);
-                localStorage.setItem(BACKUPS_STORAGE_KEY, JSON.stringify(backups));
-                loadBackups();
-                showStatus('Backup created successfully.', 'success');
-            });
-
-            backupsContainer.addEventListener('click', (e) => {
-                const target = e.target;
-                if (target.classList.contains('restore-btn')) {
-                    const index = target.dataset.index;
-                    let backups = JSON.parse(localStorage.getItem(BACKUPS_STORAGE_KEY) || '[]');
-                    if (backups[index]) {
-                        saveMenuToLocalStorage(backups[index].data);
-                        showStatus('Menu restored from backup.', 'success');
-                    }
-                } else if (target.classList.contains('delete-btn')) {
-                    const index = target.dataset.index;
-                    let backups = JSON.parse(localStorage.getItem(BACKUPS_STORAGE_KEY) || '[]');
-                    backups.splice(index, 1);
-                    localStorage.setItem(BACKUPS_STORAGE_KEY, JSON.stringify(backups));
-                    loadBackups();
-                    showStatus('Backup deleted.', 'success');
-                }
-            });
-
-            // Initial load
-            loadMenuFromLocalStorage();
-            loadBackups();
-        });
     </script>
-
 </body>
 </html>
