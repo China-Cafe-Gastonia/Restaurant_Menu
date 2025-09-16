@@ -105,6 +105,9 @@
         .btn-green {
             @apply bg-green-500 text-white shadow-lg hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-400;
         }
+        .btn-purple {
+            @apply bg-purple-600 text-white shadow-lg hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500;
+        }
         .button-container {
             display: flex;
             flex-wrap: wrap;
@@ -172,8 +175,9 @@
         <!-- Admin Editing View -->
         <div id="adminView" class="hidden">
             <div class="button-container">
-                <button id="saveBtn" class="btn btn-green">Save Menu</button>
-                <button id="loadBtn" class="btn btn-secondary">Load Saved Menu</button>
+                <button id="saveBtn" class="btn btn-green">Save to Drafts</button>
+                <button id="loadBtn" class="btn btn-secondary">Load Draft</button>
+                <button id="publishBtn" class="btn btn-purple">Publish to Public</button>
                 <button id="downloadBtn" class="btn btn-secondary">Download JSON</button>
                 <button id="logoutBtn" class="btn btn-secondary">Logout</button>
             </div>
@@ -218,6 +222,7 @@
 
         const saveBtn = document.getElementById('saveBtn');
         const loadBtn = document.getElementById('loadBtn');
+        const publishBtn = document.getElementById('publishBtn');
         const downloadBtn = document.getElementById('downloadBtn');
 
         const statusMessage = document.getElementById('statusMessage');
@@ -285,7 +290,34 @@
             }
         }
 
-        async function fetchMenuData() {
+        // Loads the live, public-facing menu
+        async function loadPublicMenu() {
+            if (!db) {
+                await fetchLocalMenuData();
+                return;
+            }
+
+            const docRef = doc(db, `artifacts/${appId}/public/data/menus`, 'public_menu');
+            try {
+                const docSnap = await getDoc(docRef);
+                if (docSnap.exists()) {
+                    const loadedData = docSnap.data();
+                    menuData = loadedData;
+                    renderMenu(menuData, false); // Render read-only menu
+                    showStatus('Menu loaded successfully from Firestore!', 'success', statusMessage);
+                } else {
+                    // No public menu found, so load from the local file as a fallback.
+                    await fetchLocalMenuData();
+                }
+            } catch (error) {
+                console.error("Error loading public menu from Firestore:", error);
+                showStatus('Error loading public menu. Check console for details.', 'error', statusMessage);
+                await fetchLocalMenuData();
+            }
+        }
+
+        // A helper function to load from the local JSON file
+        async function fetchLocalMenuData() {
             try {
                 const response = await fetch('menu.json');
                 if (!response.ok) {
@@ -293,12 +325,58 @@
                 }
                 const data = await response.json();
                 menuData = data;
-                renderMenu(menuData, false); // Render read-only menu
+                renderMenu(menuData, false);
                 showStatus('Menu loaded successfully from menu.json!', 'success', statusMessage);
             } catch (error) {
-                console.error('Failed to load menu data:', error);
+                console.error('Failed to load menu data from menu.json:', error);
                 showStatus('Error loading menu. Check console for details.', 'error', statusMessage);
             }
+        }
+
+        // Loads the private, admin-facing menu (draft)
+        async function loadAdminMenu() {
+            if (!db || !userId) {
+                showStatus('Firebase not initialized. Cannot load.', 'error', adminStatusMessage);
+                return;
+            }
+            const docRef = doc(db, `artifacts/${appId}/users/${userId}/menu_data`, 'admin_menu');
+            try {
+                const docSnap = await getDoc(docRef);
+                if (docSnap.exists()) {
+                    const loadedData = docSnap.data();
+                    menuData = loadedData;
+                    renderMenu(menuData, true);
+                    showStatus('Admin draft loaded successfully from Firestore!', 'success', adminStatusMessage);
+                } else {
+                    showStatus('No saved draft found. Starting with default.', 'error', adminStatusMessage);
+                    fetchLocalMenuData();
+                }
+            } catch (error) {
+                console.error("Error loading admin menu from Firestore:", error);
+                showStatus('Error loading admin menu. Check console for details.', 'error', adminStatusMessage);
+            }
+        }
+
+        function updateMenuDataFromDOM() {
+            if (!menuData) return;
+            const prices = document.querySelectorAll('#adminMenuContainer .price');
+            prices.forEach(priceEl => {
+                const name = priceEl.dataset.name;
+                const size = priceEl.dataset.size;
+                const newPrice = priceEl.textContent.trim().replace('$', '');
+
+                menuData.menu.forEach(category => {
+                    category.items.forEach(item => {
+                        if (item.name === name) {
+                            if (size === 'single' && item.price) {
+                                item.price = newPrice;
+                            } else if (item.prices && item.prices[size]) {
+                                item.prices[size] = newPrice;
+                            }
+                        }
+                    });
+                });
+            });
         }
 
         function renderMenu(data, isEditable) {
@@ -360,28 +438,6 @@
             });
         }
 
-        function updateMenuDataFromDOM() {
-            if (!menuData) return;
-            const prices = document.querySelectorAll('#adminMenuContainer .price');
-            prices.forEach(priceEl => {
-                const name = priceEl.dataset.name;
-                const size = priceEl.dataset.size;
-                const newPrice = priceEl.textContent.trim().replace('$', '');
-
-                menuData.menu.forEach(category => {
-                    category.items.forEach(item => {
-                        if (item.name === name) {
-                            if (size === 'single' && item.price) {
-                                item.price = newPrice;
-                            } else if (item.prices && item.prices[size]) {
-                                item.prices[size] = newPrice;
-                            }
-                        }
-                    });
-                });
-            });
-        }
-
         function downloadJSON() {
             updateMenuDataFromDOM();
             const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(menuData, null, 2));
@@ -394,44 +450,52 @@
             showStatus('JSON file downloaded successfully!', 'success', adminStatusMessage);
         }
 
-        async function saveMenu() {
+        async function saveAdminMenu() {
             if (!db || !userId) {
                 showStatus('Firebase not initialized. Cannot save.', 'error', adminStatusMessage);
                 return;
             }
             updateMenuDataFromDOM();
-            const docRef = doc(db, `artifacts/${appId}/users/${userId}/menu_data`, 'current_menu');
+            const docRef = doc(db, `artifacts/${appId}/users/${userId}/menu_data`, 'admin_menu');
             try {
                 await setDoc(docRef, menuData);
-                showStatus('Menu saved successfully to Firestore!', 'success', adminStatusMessage);
+                showStatus('Menu saved successfully to drafts!', 'success', adminStatusMessage);
             } catch (error) {
                 console.error("Error saving menu to Firestore:", error);
                 showStatus('Error saving menu. Check console for details.', 'error', adminStatusMessage);
             }
         }
-
-        async function loadMenu() {
+        
+        async function publishMenu() {
             if (!db || !userId) {
-                showStatus('Firebase not initialized. Cannot load.', 'error', adminStatusMessage);
+                showStatus('Firebase not initialized. Cannot publish.', 'error', adminStatusMessage);
                 return;
             }
-            const docRef = doc(db, `artifacts/${appId}/users/${userId}/menu_data`, 'current_menu');
+            // First, update the local data from the DOM
+            updateMenuDataFromDOM();
+            
+            const adminDocRef = doc(db, `artifacts/${appId}/users/${userId}/menu_data`, 'admin_menu');
+            const publicDocRef = doc(db, `artifacts/${appId}/public/data/menus`, 'public_menu');
+            
             try {
-                const docSnap = await getDoc(docRef);
+                // Get the current admin draft
+                const docSnap = await getDoc(adminDocRef);
                 if (docSnap.exists()) {
-                    const loadedData = docSnap.data();
-                    menuData = loadedData;
-                    renderMenu(menuData, true);
-                    showStatus('Menu loaded successfully from Firestore!', 'success', adminStatusMessage);
+                    const dataToPublish = docSnap.data();
+                    // Publish the data to the public document
+                    await setDoc(publicDocRef, dataToPublish);
+                    showStatus('Menu successfully published!', 'success', adminStatusMessage);
+                    // Also refresh the public view to show the change
+                    loadPublicMenu();
                 } else {
-                    showStatus('No saved menu found. Starting with default.', 'error', adminStatusMessage);
-                    fetchMenuData();
+                    showStatus('No admin draft found to publish.', 'error', adminStatusMessage);
                 }
             } catch (error) {
-                console.error("Error loading menu from Firestore:", error);
-                showStatus('Error loading menu. Check console for details.', 'error', adminStatusMessage);
+                console.error("Error publishing menu:", error);
+                showStatus('Error publishing menu. Check console for details.', 'error', adminStatusMessage);
             }
         }
+
 
         // Event Listeners
         adminLoginBtn.addEventListener('click', () => {
@@ -442,7 +506,7 @@
             const password = passwordInput.value;
             if (password === adminPassword) {
                 showAdminView();
-                renderMenu(menuData, true); // Render editable menu
+                loadAdminMenu(); // Load the editable draft menu upon login
                 loginMessage.classList.add('hidden');
                 passwordInput.value = '';
             } else {
@@ -463,15 +527,17 @@
             }
             // Always return to public view
             showPublicView();
+            loadPublicMenu();
         });
 
-        saveBtn.addEventListener('click', saveMenu);
-        loadBtn.addEventListener('click', loadMenu);
+        saveBtn.addEventListener('click', saveAdminMenu);
+        loadBtn.addEventListener('click', loadAdminMenu);
+        publishBtn.addEventListener('click', publishMenu);
         downloadBtn.addEventListener('click', downloadJSON);
 
         window.onload = () => {
-            fetchMenuData();
             initFirebase();
+            loadPublicMenu(); // Load the public menu from Firestore on initial page load
         };
 
     </script>
