@@ -91,12 +91,11 @@
         <!-- Header -->
         <header class="text-center py-6">
             <h1 class="text-4xl font-bold text-gray-800">China Cafe Menu Editor</h1>
-            <p id="loading-message" class="mt-2 text-gray-500">Loading...</p>
-            <p id="user-id-display" class="mt-2 text-sm text-gray-500"></p>
+            <p id="loading-message" class="mt-2 text-gray-500">All data is saved in your browser's local storage.</p>
         </header>
 
         <!-- Admin View Section -->
-        <section id="admin-view" class="section-container admin-section hidden">
+        <section id="admin-view" class="section-container admin-section">
             <h2 class="text-2xl font-semibold text-gray-800 mb-4">Menu Management</h2>
 
             <div class="flex flex-col sm:flex-row gap-4 mb-6">
@@ -137,29 +136,13 @@
 
     </div>
 
-    <!-- Firebase SDKs -->
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, getDoc, setDoc, onSnapshot, collection, query, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-        import { setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-
-        // Enable debug logs for Firestore
-        setLogLevel('debug');
-
         const loadingMessage = document.getElementById('loading-message');
-        const userIdDisplay = document.getElementById('user-id-display');
-        const adminView = document.getElementById('admin-view');
         const jsonUpload = document.getElementById('json-upload');
         const createBackupBtn = document.getElementById('create-backup-btn');
         const backupsList = document.getElementById('backups-list');
         const menuEditor = document.getElementById('menu-editor');
         const customerMenu = document.getElementById('customer-menu');
-
-        let db;
-        let auth;
-        let appId;
-        let userId;
 
         const customModal = document.getElementById('customModal');
         const modalMessage = document.getElementById('modalMessage');
@@ -187,145 +170,75 @@
             });
         }
 
-        // --- Firebase Initialization and Auth ---
-        const initializeFirebase = async () => {
+        // --- localStorage Operations ---
+        const LOCAL_STORAGE_KEY = 'china_cafe_menu_data';
+        const LOCAL_STORAGE_BACKUPS_KEY = 'china_cafe_menu_backups';
+
+        const saveMenuToLocalStorage = (menuData) => {
             try {
-                // Get global variables
-                appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-                const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
-                const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
-                
-                // Initialize Firebase
-                const app = initializeApp(firebaseConfig);
-                db = getFirestore(app);
-                auth = getAuth(app);
-
-                // Sign in with custom token or anonymously
-                if (initialAuthToken) {
-                    await signInWithCustomToken(auth, initialAuthToken);
-                } else {
-                    await signInAnonymously(auth);
-                }
-
-                onAuthStateChanged(auth, (user) => {
-                    if (user) {
-                        userId = user.uid;
-                        userIdDisplay.textContent = `User ID: ${userId}`;
-                        loadingMessage.textContent = 'Successfully authenticated!';
-                        adminView.classList.remove('hidden');
-                        
-                        // Start listening for menu and backups
-                        listenForMenuChanges();
-                        listenForBackups();
-                    } else {
-                        userId = null;
-                        userIdDisplay.textContent = 'Not authenticated.';
-                        loadingMessage.textContent = 'Please sign in to manage the menu.';
-                        adminView.classList.add('hidden');
-                    }
-                });
-            } catch (error) {
-                console.error("Error initializing Firebase:", error);
-                loadingMessage.textContent = 'Error loading application. Check the console for details.';
-            }
-        };
-
-        // --- Firestore Operations ---
-        const getMenuDocRef = () => doc(db, `/artifacts/${appId}/public/data/menus/current_menu`);
-        const getBackupsCollectionRef = () => collection(db, `/artifacts/${appId}/public/data/menus/backups`);
-
-        const saveMenuToFirestore = async (menuData) => {
-            if (!userId) {
-                showCustomModal('Authentication required to save data.');
-                return;
-            }
-            try {
-                await setDoc(getMenuDocRef(), { data: menuData });
+                localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(menuData));
                 showCustomModal('Menu uploaded and saved successfully!');
+                renderMenu(menuData);
             } catch (e) {
-                console.error("Error saving menu: ", e);
+                console.error("Error saving menu to local storage:", e);
                 showCustomModal('Error saving menu. See console for details.');
             }
         };
 
-        const createBackup = async () => {
-            if (!userId) {
-                showCustomModal('Authentication required to create a backup.');
-                return;
-            }
+        const loadMenuFromLocalStorage = () => {
             try {
-                const menuDoc = await getDoc(getMenuDocRef());
-                if (menuDoc.exists()) {
-                    const menuData = menuDoc.data().data;
-                    const timestamp = new Date().toISOString();
-                    const backupDocRef = doc(getBackupsCollectionRef(), timestamp);
-                    await setDoc(backupDocRef, { data: menuData, createdAt: timestamp });
-                    showCustomModal('Menu backup created successfully!');
-                } else {
-                    showCustomModal('No menu to backup.');
-                }
+                const menuData = localStorage.getItem(LOCAL_STORAGE_KEY);
+                return menuData ? JSON.parse(menuData) : null;
             } catch (e) {
-                console.error("Error creating backup: ", e);
-                showCustomModal('Error creating backup. See console for details.');
+                console.error("Error loading menu from local storage:", e);
+                return null;
             }
         };
 
-        const restoreBackup = async (backupId) => {
-            if (!userId) {
-                showCustomModal('Authentication required to restore a backup.');
+        const saveBackupsToLocalStorage = (backups) => {
+            try {
+                localStorage.setItem(LOCAL_STORAGE_BACKUPS_KEY, JSON.stringify(backups));
+            } catch (e) {
+                console.error("Error saving backups to local storage:", e);
+            }
+        };
+
+        const loadBackupsFromLocalStorage = () => {
+            try {
+                const backups = localStorage.getItem(LOCAL_STORAGE_BACKUPS_KEY);
+                return backups ? JSON.parse(backups) : [];
+            } catch (e) {
+                console.error("Error loading backups from local storage:", e);
+                return [];
+            }
+        };
+
+        const createBackup = () => {
+            const currentMenu = loadMenuFromLocalStorage();
+            if (!currentMenu) {
+                showCustomModal('No menu to backup.');
                 return;
             }
+            const backups = loadBackupsFromLocalStorage();
+            const timestamp = new Date().toISOString();
+            backups.push({ timestamp: timestamp, data: currentMenu });
+            saveBackupsToLocalStorage(backups);
+            showCustomModal('Menu backup created successfully!');
+            renderBackups();
+        };
+
+        const restoreBackup = async (timestamp) => {
             const confirm = await showCustomModal('Are you sure you want to restore this backup? This will overwrite the current menu.', true);
             if (!confirm) return;
 
-            try {
-                const backupDocRef = doc(getBackupsCollectionRef(), backupId);
-                const backupDoc = await getDoc(backupDocRef);
-                if (backupDoc.exists()) {
-                    await setDoc(getMenuDocRef(), { data: backupDoc.data().data });
-                    showCustomModal('Backup restored successfully!');
-                } else {
-                    showCustomModal('Backup not found.');
-                }
-            } catch (e) {
-                console.error("Error restoring backup: ", e);
-                showCustomModal('Error restoring backup. See console for details.');
+            const backups = loadBackupsFromLocalStorage();
+            const backupToRestore = backups.find(b => b.timestamp === timestamp);
+            if (backupToRestore) {
+                saveMenuToLocalStorage(backupToRestore.data);
+                showCustomModal('Backup restored successfully!');
+            } else {
+                showCustomModal('Backup not found.');
             }
-        };
-
-        const listenForMenuChanges = () => {
-            onSnapshot(getMenuDocRef(), (docSnapshot) => {
-                if (docSnapshot.exists()) {
-                    const menuData = docSnapshot.data().data;
-                    renderMenu(menuData);
-                } else {
-                    renderMenu(null);
-                }
-            }, (error) => {
-                console.error("Error listening to menu changes:", error);
-                showCustomModal("Error loading menu. Please try refreshing the page.");
-            });
-        };
-
-        const listenForBackups = () => {
-            onSnapshot(query(getBackupsCollectionRef()), (querySnapshot) => {
-                backupsList.innerHTML = '';
-                if (querySnapshot.empty) {
-                    backupsList.innerHTML = '<p class="text-gray-500">No backups found.</p>';
-                    return;
-                }
-                querySnapshot.forEach((doc) => {
-                    const timestamp = doc.id;
-                    const date = new Date(timestamp).toLocaleString();
-                    const restoreBtn = document.createElement('button');
-                    restoreBtn.className = 'bg-green-500 text-white font-semibold text-xs py-1 px-3 rounded-full hover:bg-green-600 transition-colors';
-                    restoreBtn.textContent = date;
-                    restoreBtn.onclick = () => restoreBackup(timestamp);
-                    backupsList.appendChild(restoreBtn);
-                });
-            }, (error) => {
-                console.error("Error listening to backups:", error);
-            });
         };
 
         // --- Rendering Logic ---
@@ -350,11 +263,14 @@
                 category.items.forEach(item => {
                     const itemDiv = document.createElement('div');
                     itemDiv.className = 'bg-white p-4 rounded-lg shadow-sm border border-gray-200 mb-2 flex justify-between items-center';
+                    const prices = typeof item.prices === 'object'
+                        ? Object.entries(item.prices).map(([key, value]) => `$${value} (${key})`).join(' / ')
+                        : `$${item.price}`;
                     itemDiv.innerHTML = `
                         <div>
                             <p class="font-medium text-gray-900">${item.name}</p>
                             <p class="text-sm text-gray-500">${item.description || ''}</p>
-                            <p class="text-sm text-gray-600 font-semibold mt-1">$${typeof item.price === 'object' ? Object.values(item.price).join(' / ') : item.price}</p>
+                            <p class="text-sm text-gray-600 font-semibold mt-1">${prices}</p>
                         </div>
                         <div class="flex gap-2">
                             <button class="edit-btn bg-yellow-400 text-white p-1 rounded-full hover:bg-yellow-500 transition-colors">
@@ -386,17 +302,17 @@
                     <h3 class="text-xl font-bold text-gray-800 mb-2">${category.category} <span class="text-gray-500 text-sm">(${category.chinese_name})</span></h3>
                     ${category.note ? `<p class="text-sm text-gray-600 mb-4">${category.note}</p>` : ''}
                 `;
-                
+
                 category.items.forEach(item => {
                     const itemCard = document.createElement('div');
                     itemCard.className = 'item-card';
-                    const prices = typeof item.prices === 'object' 
+                    const prices = typeof item.prices === 'object'
                         ? Object.entries(item.prices).map(([key, value]) => `<span>${key}: $${value}</span>`).join(' &bull; ')
                         : `$${item.price}`;
 
                     itemCard.innerHTML = `
                         <p class="font-semibold text-gray-900">${item.name}</p>
-                        <p class="text-gray-600 text-sm mt-1">${item.description}</p>
+                        <p class="text-gray-600 text-sm mt-1">${item.description || ''}</p>
                         <p class="text-gray-800 text-sm font-bold mt-2">${prices}</p>
                     `;
                     categoryContainer.appendChild(itemCard);
@@ -405,17 +321,34 @@
                 customerMenu.appendChild(categoryContainer);
             });
         };
-        
-        // --- Event Listeners ---
+
+        const renderBackups = () => {
+            backupsList.innerHTML = '';
+            const backups = loadBackupsFromLocalStorage();
+            if (backups.length === 0) {
+                backupsList.innerHTML = '<p class="text-gray-500">No backups found.</p>';
+                return;
+            }
+            backups.forEach(backup => {
+                const date = new Date(backup.timestamp).toLocaleString();
+                const restoreBtn = document.createElement('button');
+                restoreBtn.className = 'bg-green-500 text-white font-semibold text-xs py-1 px-3 rounded-full hover:bg-green-600 transition-colors';
+                restoreBtn.textContent = date;
+                restoreBtn.onclick = () => restoreBackup(backup.timestamp);
+                backupsList.appendChild(restoreBtn);
+            });
+        };
+
+        // --- Event Listeners and Initial Load ---
         jsonUpload.addEventListener('change', (event) => {
             const file = event.target.files[0];
             if (!file) return;
 
             const reader = new FileReader();
-            reader.onload = async (e) => {
+            reader.onload = (e) => {
                 try {
                     const json = JSON.parse(e.target.result);
-                    await saveMenuToFirestore(json);
+                    saveMenuToLocalStorage(json);
                 } catch (error) {
                     console.error("Error parsing JSON:", error);
                     showCustomModal('Error parsing JSON file. Please ensure it is a valid format.');
@@ -426,9 +359,11 @@
 
         createBackupBtn.addEventListener('click', createBackup);
 
-        // --- Initialize the App ---
-        initializeFirebase();
-    </script>
+        // Initial load
+        const initialMenu = loadMenuFromLocalStorage();
+        renderMenu(initialMenu);
+        renderBackups();
 
+    </script>
 </body>
 </html>
