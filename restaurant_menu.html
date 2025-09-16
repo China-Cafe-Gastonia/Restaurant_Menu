@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>China Cafe Menu Editor</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f7f7f7;
+            color: #333;
+        }
+        .container {
+            max-width: 900px;
+            margin: auto;
+            padding: 1.5rem;
+        }
+        .section-title {
+            position: relative;
+            text-align: center;
+            font-weight: bold;
+            font-size: 2.25rem;
+            color: #880e4f;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+        }
+        .section-title::after {
+            content: '';
+            display: block;
+            width: 50%;
+            height: 4px;
+            background-color: #ffcdd2;
+            margin: 0.5rem auto 1.5rem;
+            border-radius: 9999px;
+        }
+        .menu-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid #e5e7eb;
+            transition: background-color 0.3s;
+        }
+        .menu-item:last-child {
+            border-bottom: none;
+        }
+        .menu-item-info {
+            flex-grow: 1;
+        }
+        .menu-item-name {
+            font-weight: 600;
+            font-size: 1rem;
+        }
+        .menu-item-description {
+            font-size: 0.875rem;
+            color: #6b7280;
+            margin-top: 0.25rem;
+        }
+        .price {
+            font-weight: bold;
+            font-size: 1.125rem;
+            color: #880e4f;
+            background-color: transparent;
+            border: 1px solid transparent;
+            padding: 0.25rem;
+            min-width: 50px;
+            text-align: right;
+            border-radius: 0.375rem;
+            transition: background-color 0.3s, border-color 0.3s;
+        }
+        .price.editable {
+            background-color: #fff;
+            border-color: #ccc;
+        }
+        .price.editable:focus {
+            outline: none;
+            border-color: #880e4f;
+            box-shadow: 0 0 0 2px #fbcfe8;
+        }
+        .price-container {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            min-width: 120px;
+        }
+        .price-label-group {
+            display: flex;
+            gap: 0.25rem;
+            align-items: center;
+        }
+        .price-label {
+            font-size: 0.875rem;
+            color: #6b7280;
+            white-space: nowrap;
+        }
+        .btn {
+            @apply px-4 py-2 rounded-lg font-bold transition-all duration-300 transform hover:scale-105;
+        }
+        .btn-primary {
+            @apply bg-pink-600 text-white shadow-lg hover:bg-pink-700 focus:outline-none focus:ring-2 focus:ring-pink-500;
+        }
+        .btn-secondary {
+            @apply bg-gray-200 text-gray-800 shadow-lg hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400;
+        }
+        .btn-green {
+            @apply bg-green-500 text-white shadow-lg hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-400;
+        }
+        .button-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 1.5rem;
+        }
+        .user-id-container {
+            text-align: center;
+            margin-top: 1.5rem;
+            font-size: 0.875rem;
+            color: #9ca3af;
+        }
+        .user-id-label {
+            font-weight: bold;
+            color: #4b5563;
+        }
+        .alert {
+            @apply p-4 rounded-lg text-center mt-4 font-semibold;
+        }
+        .alert-success {
+            @apply bg-green-100 text-green-700;
+        }
+        .alert-error {
+            @apply bg-red-100 text-red-700;
+        }
+        .login-form {
+            max-width: 400px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background-color: #fff;
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        .login-input {
+            @apply w-full px-4 py-2 my-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-pink-500;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="text-center my-8">
+            <h1 class="text-4xl sm:text-5xl font-extrabold text-pink-700">China Cafe</h1>
+            <h2 class="text-lg sm:text-xl font-medium text-gray-600 mt-2">Menu</h2>
+        </header>
+
+        <!-- Main View (Read-only) -->
+        <div id="publicView">
+            <div class="button-container">
+                <button id="adminLoginBtn" class="btn btn-primary">Admin Login</button>
+            </div>
+            <div id="statusMessage" class="alert hidden"></div>
+            <div id="menuContainer" class="mt-8"></div>
+        </div>
+
+        <!-- Admin Login View -->
+        <div id="loginView" class="login-form hidden">
+            <h3 class="text-xl font-bold mb-4">Admin Login</h3>
+            <input type="password" id="passwordInput" class="login-input" placeholder="Enter password">
+            <button id="loginBtn" class="btn btn-primary w-full mt-2">Login</button>
+            <button id="logoutBtn" class="btn btn-secondary w-full mt-2 hidden">Logout</button>
+            <p id="loginMessage" class="mt-4 text-red-500 hidden"></p>
+        </div>
+
+        <!-- Admin Editing View -->
+        <div id="adminView" class="hidden">
+            <div class="button-container">
+                <button id="saveBtn" class="btn btn-green">Save Menu</button>
+                <button id="loadBtn" class="btn btn-secondary">Load Saved Menu</button>
+                <button id="downloadBtn" class="btn btn-secondary">Download JSON</button>
+            </div>
+            <div id="adminStatusMessage" class="alert hidden"></div>
+            <div class="user-id-container hidden" id="userIdContainer">
+                <span class="user-id-label">User ID:</span> <span id="userIdDisplay"></span>
+            </div>
+            <div id="adminMenuContainer" class="mt-8"></div>
+        </div>
+
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc, setDoc, setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Set log level for Firestore
+        setLogLevel('debug');
+
+        let menuData = null;
+        let db, auth, userId;
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+
+        const adminPassword = "admin"; // **SECURITY NOTE:** Hardcoded passwords are not secure for production. This is for demonstration purposes only.
+
+        // UI elements
+        const publicView = document.getElementById('publicView');
+        const loginView = document.getElementById('loginView');
+        const adminView = document.getElementById('adminView');
+
+        const menuContainer = document.getElementById('menuContainer');
+        const adminMenuContainer = document.getElementById('adminMenuContainer');
+
+        const adminLoginBtn = document.getElementById('adminLoginBtn');
+        const passwordInput = document.getElementById('passwordInput');
+        const loginBtn = document.getElementById('loginBtn');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const loginMessage = document.getElementById('loginMessage');
+
+        const saveBtn = document.getElementById('saveBtn');
+        const loadBtn = document.getElementById('loadBtn');
+        const downloadBtn = document.getElementById('downloadBtn');
+
+        const statusMessage = document.getElementById('statusMessage');
+        const adminStatusMessage = document.getElementById('adminStatusMessage');
+        const userIdContainer = document.getElementById('userIdContainer');
+        const userIdDisplay = document.getElementById('userIdDisplay');
+
+        // Functions to show/hide views
+        function showPublicView() {
+            publicView.classList.remove('hidden');
+            loginView.classList.add('hidden');
+            adminView.classList.add('hidden');
+        }
+
+        function showLoginView() {
+            publicView.classList.add('hidden');
+            loginView.classList.remove('hidden');
+            adminView.classList.add('hidden');
+        }
+
+        function showAdminView() {
+            publicView.classList.add('hidden');
+            loginView.classList.add('hidden');
+            adminView.classList.remove('hidden');
+        }
+
+        function showStatus(message, type, targetElement) {
+            targetElement.textContent = message;
+            targetElement.className = `alert ${type === 'success' ? 'alert-success' : 'alert-error'}`;
+            targetElement.classList.remove('hidden');
+            setTimeout(() => {
+                targetElement.classList.add('hidden');
+            }, 3000);
+        }
+
+        async function initFirebase() {
+            try {
+                if (Object.keys(firebaseConfig).length > 0) {
+                    const app = initializeApp(firebaseConfig);
+                    db = getFirestore(app);
+                    auth = getAuth(app);
+
+                    onAuthStateChanged(auth, async (user) => {
+                        if (user) {
+                            userId = user.uid;
+                            userIdDisplay.textContent = userId;
+                            userIdContainer.classList.remove('hidden');
+                        } else {
+                            userId = crypto.randomUUID();
+                            userIdDisplay.textContent = 'Anonymous';
+                            userIdContainer.classList.remove('hidden');
+                        }
+                    });
+
+                    if (initialAuthToken) {
+                        await signInWithCustomToken(auth, initialAuthToken);
+                    } else {
+                        await signInAnonymously(auth);
+                    }
+                } else {
+                    console.error('Firebase config is not available. Firestore features are disabled.');
+                }
+            } catch (error) {
+                console.error("Firebase initialization failed:", error);
+            }
+        }
+
+        async function fetchMenuData() {
+            try {
+                const response = await fetch('menu.json');
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const data = await response.json();
+                menuData = data;
+                renderMenu(menuData, false); // Render read-only menu
+                showStatus('Menu loaded successfully from menu.json!', 'success', statusMessage);
+            } catch (error) {
+                console.error('Failed to load menu data:', error);
+                showStatus('Error loading menu. Check console for details.', 'error', statusMessage);
+            }
+        }
+
+        function renderMenu(data, isEditable) {
+            const targetContainer = isEditable ? adminMenuContainer : menuContainer;
+            targetContainer.innerHTML = '';
+            data.menu.forEach(category => {
+                const categoryDiv = document.createElement('div');
+                categoryDiv.className = 'my-8 p-6 bg-white rounded-xl shadow-md';
+                categoryDiv.innerHTML = `
+                    <div class="mb-4">
+                        <h3 class="section-title text-center text-2xl font-bold text-gray-800">${category.category} <span class="text-xl text-gray-500">${category.chinese_name}</span></h3>
+                        ${category.note ? `<p class="text-center text-sm text-gray-500 italic mb-4">${category.note}</p>` : ''}
+                    </div>
+                `;
+
+                const itemsList = document.createElement('div');
+                category.items.forEach(item => {
+                    const itemDiv = document.createElement('div');
+                    itemDiv.className = 'menu-item';
+                    itemDiv.innerHTML = `
+                        <div class="menu-item-info">
+                            <div class="menu-item-name">${item.name}</div>
+                            ${item.description ? `<div class="menu-item-description">${item.description}</div>` : ''}
+                        </div>
+                    `;
+
+                    const priceContainer = document.createElement('div');
+                    priceContainer.className = 'price-container';
+
+                    if (item.prices) {
+                        for (const size in item.prices) {
+                            const priceDiv = document.createElement('div');
+                            priceDiv.className = 'price-label-group';
+                            priceDiv.innerHTML = `
+                                <span class="price-label">${size}: $</span>
+                                <span class="price">${item.prices[size]}</span>
+                            `;
+                            priceDiv.querySelector('.price').dataset.name = item.name;
+                            priceDiv.querySelector('.price').dataset.size = size;
+                            priceDiv.querySelector('.price').contentEditable = isEditable;
+                            if (isEditable) priceDiv.querySelector('.price').classList.add('editable');
+                            priceContainer.appendChild(priceDiv);
+                        }
+                    } else if (item.price) {
+                        const priceDiv = document.createElement('div');
+                        priceDiv.className = 'price-label-group';
+                        priceDiv.innerHTML = `<span class="price-label">$</span><span class="price">${item.price}</span>`;
+                        priceDiv.querySelector('.price').dataset.name = item.name;
+                        priceDiv.querySelector('.price').dataset.size = 'single';
+                        priceDiv.querySelector('.price').contentEditable = isEditable;
+                        if (isEditable) priceDiv.querySelector('.price').classList.add('editable');
+                        priceContainer.appendChild(priceDiv);
+                    }
+                    itemDiv.appendChild(priceContainer);
+                    itemsList.appendChild(itemDiv);
+                });
+                categoryDiv.appendChild(itemsList);
+                targetContainer.appendChild(categoryDiv);
+            });
+        }
+
+        function updateMenuDataFromDOM() {
+            if (!menuData) return;
+            const prices = document.querySelectorAll('#adminMenuContainer .price');
+            prices.forEach(priceEl => {
+                const name = priceEl.dataset.name;
+                const size = priceEl.dataset.size;
+                const newPrice = priceEl.textContent.trim().replace('$', '');
+
+                menuData.menu.forEach(category => {
+                    category.items.forEach(item => {
+                        if (item.name === name) {
+                            if (size === 'single' && item.price) {
+                                item.price = newPrice;
+                            } else if (item.prices && item.prices[size]) {
+                                item.prices[size] = newPrice;
+                            }
+                        }
+                    });
+                });
+            });
+        }
+
+        function downloadJSON() {
+            updateMenuDataFromDOM();
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(menuData, null, 2));
+            const downloadAnchorNode = document.createElement('a');
+            downloadAnchorNode.setAttribute("href", dataStr);
+            downloadAnchorNode.setAttribute("download", "china_cafe_menu_updated.json");
+            document.body.appendChild(downloadAnchorNode);
+            downloadAnchorNode.click();
+            downloadAnchorNode.remove();
+            showStatus('JSON file downloaded successfully!', 'success', adminStatusMessage);
+        }
+
+        async function saveMenu() {
+            if (!db || !userId) {
+                showStatus('Firebase not initialized. Cannot save.', 'error', adminStatusMessage);
+                return;
+            }
+            updateMenuDataFromDOM();
+            const docRef = doc(db, `artifacts/${appId}/users/${userId}/menu_data`, 'current_menu');
+            try {
+                await setDoc(docRef, menuData);
+                showStatus('Menu saved successfully to Firestore!', 'success', adminStatusMessage);
+            } catch (error) {
+                console.error("Error saving menu to Firestore:", error);
+                showStatus('Error saving menu. Check console for details.', 'error', adminStatusMessage);
+            }
+        }
+
+        async function loadMenu() {
+            if (!db || !userId) {
+                showStatus('Firebase not initialized. Cannot load.', 'error', adminStatusMessage);
+                return;
+            }
+            const docRef = doc(db, `artifacts/${appId}/users/${userId}/menu_data`, 'current_menu');
+            try {
+                const docSnap = await getDoc(docRef);
+                if (docSnap.exists()) {
+                    const loadedData = docSnap.data();
+                    menuData = loadedData;
+                    renderMenu(menuData, true);
+                    showStatus('Menu loaded successfully from Firestore!', 'success', adminStatusMessage);
+                } else {
+                    showStatus('No saved menu found. Starting with default.', 'error', adminStatusMessage);
+                    fetchMenuData();
+                }
+            } catch (error) {
+                console.error("Error loading menu from Firestore:", error);
+                showStatus('Error loading menu. Check console for details.', 'error', adminStatusMessage);
+            }
+        }
+
+        // Event Listeners
+        adminLoginBtn.addEventListener('click', () => {
+            showLoginView();
+        });
+
+        loginBtn.addEventListener('click', () => {
+            const password = passwordInput.value;
+            if (password === adminPassword) {
+                showAdminView();
+                renderMenu(menuData, true); // Render editable menu
+                loginMessage.classList.add('hidden');
+                passwordInput.value = '';
+            } else {
+                loginMessage.textContent = 'Incorrect password. Please try again.';
+                loginMessage.classList.remove('hidden');
+            }
+        });
+
+        saveBtn.addEventListener('click', saveMenu);
+        loadBtn.addEventListener('click', loadMenu);
+        downloadBtn.addEventListener('click', downloadJSON);
+
+        window.onload = () => {
+            fetchMenuData();
+            initFirebase();
+        };
+
+    </script>
+</body>
+</html>
