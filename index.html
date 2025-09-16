@@ -166,7 +166,6 @@
             <h3 class="text-xl font-bold mb-4">Admin Login</h3>
             <input type="password" id="passwordInput" class="login-input" placeholder="Enter password">
             <button id="loginBtn" class="btn btn-primary w-full mt-2">Login</button>
-            <button id="logoutBtn" class="btn btn-secondary w-full mt-2 hidden">Logout</button>
             <p id="loginMessage" class="mt-4 text-red-500 hidden"></p>
         </div>
 
@@ -176,6 +175,7 @@
                 <button id="saveBtn" class="btn btn-green">Save Menu</button>
                 <button id="loadBtn" class="btn btn-secondary">Load Saved Menu</button>
                 <button id="downloadBtn" class="btn btn-secondary">Download JSON</button>
+                <button id="logoutBtn" class="btn btn-secondary">Logout</button>
             </div>
             <div id="adminStatusMessage" class="alert hidden"></div>
             <div class="user-id-container hidden" id="userIdContainer">
@@ -188,7 +188,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, getDoc, setDoc, setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // Set log level for Firestore
@@ -451,6 +451,20 @@
             }
         });
 
+        logoutBtn.addEventListener('click', async () => {
+            if (auth) {
+                try {
+                    await signOut(auth);
+                    showStatus('Logged out successfully.', 'success', adminStatusMessage);
+                } catch (error) {
+                    console.error("Logout failed:", error);
+                    showStatus('Logout failed. Check console for details.', 'error', adminStatusMessage);
+                }
+            }
+            // Always return to public view
+            showPublicView();
+        });
+
         saveBtn.addEventListener('click', saveMenu);
         loadBtn.addEventListener('click', loadMenu);
         downloadBtn.addEventListener('click', downloadJSON);
@@ -463,4 +477,3 @@
     </script>
 </body>
 </html>
-
