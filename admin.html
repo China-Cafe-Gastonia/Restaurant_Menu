@@ -51,6 +51,7 @@
 
     <!-- Admin UI (hidden until logged in) -->
     <div id="adminMain" style="display:none;">
+
         <!-- Field/Form 1: Menu Management Controls -->
         <div id="adminControls" class="card mb-4">
             <div class="flex justify-between items-center mb-4">
@@ -82,7 +83,15 @@
 
         <!-- Field/Form 2: Editable Menu UI (like index.html, but editable) -->
         <div id="adminEditableMenu" class="mb-4">
-            <!-- Will be filled by script with editable restaurant info, hours, notes, and menu data -->
+            <div class="container mt-8">
+                <header class="text-center mb-8">
+                    <h1 id="restaurantName" class="text-4xl font-extrabold text-gray-900"></h1>
+                    <div id="restaurantInfo" class="text-lg text-gray-600 mt-2"></div>
+                    <div id="restaurantNotes" class="mt-4"></div>
+                </header>
+                <div id="loadingMessage" class="text-center text-gray-500 text-lg">Loading menu...</div>
+                <div id="menuContainer"></div>
+            </div>
         </div>
 
         <!-- Save Menu Button (hidden by default, shown when menu is edited) -->
