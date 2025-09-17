@@ -81,19 +81,25 @@
             <div id="statusMessage" class="mt-6 text-sm font-medium"></div>
             <div id="menuEditSection" class="mt-8"></div>
         <!-- Console Section -->
-        <div id="consoleCard" class="card mt-8">
+        <div id="consoleCard" class="card mt-8" style="position:fixed; left:0; right:0; bottom:0; z-index:50; max-width:600px; margin:auto; box-shadow:0 -2px 8px rgba(0,0,0,0.08);">
             <h2 class="text-xl font-semibold mb-2">Console</h2>
             <textarea id="consoleInput" rows="2" class="w-full border rounded p-2 mb-2 font-mono text-sm" placeholder="Enter command or message..."></textarea>
             <div class="flex gap-2 mb-2">
                 <button id="runConsoleBtn" class="bg-blue-600 text-white px-4 py-1 rounded">Run</button>
                 <button id="clearConsoleBtn" class="bg-gray-300 text-gray-800 px-4 py-1 rounded">Clear</button>
             </div>
-            <div id="consoleOutput" class="bg-gray-100 border rounded p-2 min-h-[60px] font-mono text-sm text-gray-700" style="white-space:pre-wrap;"></div>
+            <div id="consoleOutput" class="bg-gray-100 border rounded p-2 font-mono text-sm text-gray-700" style="white-space:pre-wrap; max-height:160px; overflow-y:auto;"></div>
         </div>
         </div>
     </div>
 
     <script type="module">
+
+    // Clear console output functionality
+    document.getElementById('clearConsoleBtn').addEventListener('click', () => {
+        const consoleOutput = document.getElementById('consoleOutput');
+        if (consoleOutput) consoleOutput.textContent = '';
+    });
 
     // Helper: Render menu edit table
     function renderMenuEditTable(menuItems) {

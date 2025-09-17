@@ -87,13 +87,17 @@
         function renderMenu(menuItems) {
             const menuContainer = document.getElementById('menuContainer');
             menuContainer.innerHTML = '';
-            // Extract restaurant info and notes from the first item that has them
+            // Separate _info doc and menu items
             let restaurant = null;
             let notes = null;
+            let menuDocs = [];
             for (const item of menuItems) {
-                if (item.restaurant && !restaurant) restaurant = item.restaurant;
-                if (item.notes && !notes) notes = item.notes;
-                if (restaurant && notes) break;
+                if (item._id === '_info') {
+                    if (item.restaurant) restaurant = item.restaurant;
+                    if (item.notes) notes = item.notes;
+                } else {
+                    menuDocs.push(item);
+                }
             }
             // Render restaurant info
             const nameEl = document.getElementById('restaurantName');
@@ -118,13 +122,13 @@
             } else {
                 notesEl.innerHTML = '';
             }
-            if (!menuItems || menuItems.length === 0) {
+            if (!menuDocs || menuDocs.length === 0) {
                 menuContainer.innerHTML = '<div class="text-center text-gray-400 text-xl py-12">Menu not available or under maintenance.</div>';
                 return;
             }
-            // Sort menuItems by categoryOrder and itemOrder if present
-            menuItems = menuItems.slice();
-            menuItems.sort((a, b) => {
+            // Sort menuDocs by categoryOrder and itemOrder if present
+            menuDocs = menuDocs.slice();
+            menuDocs.sort((a, b) => {
                 if (typeof a.categoryOrder === 'number' && typeof b.categoryOrder === 'number') {
                     if (a.categoryOrder !== b.categoryOrder) return a.categoryOrder - b.categoryOrder;
                     if (typeof a.itemOrder === 'number' && typeof b.itemOrder === 'number') {
@@ -134,7 +138,7 @@
                 return 0;
             });
             // Group by category (now in correct order)
-            const groupedMenu = menuItems.reduce((acc, item) => {
+            const groupedMenu = menuDocs.reduce((acc, item) => {
                 (acc[item.category] = acc[item.category] || []).push(item);
                 return acc;
             }, {});
@@ -182,7 +186,7 @@
                 // If using Firestore, expect flat array
                 const menuItems = [];
                 querySnapshot.forEach((doc) => {
-                    menuItems.push(doc.data());
+                    menuItems.push({ ...doc.data(), _id: doc.id });
                 });
                 renderMenu(menuItems);
                 document.getElementById('loadingMessage').classList.add('hidden');
