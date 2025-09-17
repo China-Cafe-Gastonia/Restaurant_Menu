@@ -84,6 +84,16 @@
             </div>
             <div id="statusMessage" class="mt-6 text-sm font-medium"></div>
             <div id="menuEditSection" class="mt-8"></div>
+        <!-- Console Section -->
+        <div id="consoleCard" class="card mt-8">
+            <h2 class="text-xl font-semibold mb-2">Console</h2>
+            <textarea id="consoleInput" rows="2" class="w-full border rounded p-2 mb-2 font-mono text-sm" placeholder="Enter command or message..."></textarea>
+            <div class="flex gap-2 mb-2">
+                <button id="runConsoleBtn" class="bg-blue-600 text-white px-4 py-1 rounded">Run</button>
+                <button id="clearConsoleBtn" class="bg-gray-300 text-gray-800 px-4 py-1 rounded">Clear</button>
+            </div>
+            <div id="consoleOutput" class="bg-gray-100 border rounded p-2 min-h-[60px] font-mono text-sm text-gray-700" style="white-space:pre-wrap;"></div>
+        </div>
         </div>
     </div>
 
@@ -377,5 +387,46 @@
             }
         });
     </script>
+    // --- Console logic ---
+    const consoleInput = document.getElementById('consoleInput');
+    const consoleOutput = document.getElementById('consoleOutput');
+    const runConsoleBtn = document.getElementById('runConsoleBtn');
+    const clearConsoleBtn = document.getElementById('clearConsoleBtn');
+
+    if (runConsoleBtn && consoleInput && consoleOutput) {
+        runConsoleBtn.addEventListener('click', () => {
+            const cmd = consoleInput.value.trim();
+            if (!cmd) return;
+            try {
+                // For now, just echo the command. You can expand this to run JS or admin actions.
+                let result = '';
+                if (cmd.toLowerCase() === 'help') {
+                    result = 'Available commands: help, echo <text>, clear, date, loadedMenuItems, status';
+                } else if (cmd.startsWith('echo ')) {
+                    result = cmd.slice(5);
+                } else if (cmd === 'clear') {
+                    consoleOutput.textContent = '';
+                    return;
+                } else if (cmd === 'date') {
+                    result = new Date().toLocaleString();
+                } else if (cmd === 'loadedMenuItems') {
+                    result = JSON.stringify(loadedMenuItems, null, 2);
+                } else if (cmd === 'status') {
+                    result = statusMessage.textContent;
+                } else {
+                    result = 'Unknown command. Type help for options.';
+                }
+                consoleOutput.textContent += '> ' + cmd + '\n' + result + '\n';
+                consoleOutput.scrollTop = consoleOutput.scrollHeight;
+            } catch (err) {
+                consoleOutput.textContent += '> ' + cmd + '\nError: ' + err.message + '\n';
+            }
+        });
+    }
+    if (clearConsoleBtn && consoleOutput) {
+        clearConsoleBtn.addEventListener('click', () => {
+            consoleOutput.textContent = '';
+        });
+    }
 </body>
 </html>
