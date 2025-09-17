@@ -34,6 +34,33 @@
             <h1 class="text-3xl font-bold text-gray-900">Restaurant Admin Console</h1>
             <p class="text-gray-500">Manage your menu data in Firestore</p>
         </header>
+        <!-- Editable Restaurant Info Card -->
+        <div id="restaurantInfoCard" class="menu-card mb-8" style="max-width:700px;margin:auto;">
+            <div class="mb-4">
+                <input id="editRestaurantName" type="text" class="text-4xl font-extrabold text-gray-900 w-full mb-2 bg-gray-50 rounded px-2 py-1" placeholder="Restaurant Name" />
+            </div>
+            <div class="flex flex-col items-center mb-2">
+                <div class="hours-block w-full flex flex-col items-center">
+                    <div class="flex items-center mb-1">
+                        <span class="hours-icon">🕒</span>
+                        <span class="hours-title"><b>Hours:</b></span>
+                    </div>
+                    <div id="editHoursLines" class="hours-lines w-full flex flex-col items-center"></div>
+                </div>
+            </div>
+            <div class="mb-2">
+                <input id="editRestaurantAddress" type="text" class="block w-full text-lg text-gray-700 bg-gray-50 rounded px-2 py-1 mb-1" placeholder="Address" />
+                <input id="editRestaurantPhone" type="text" class="block w-full text-lg text-gray-700 bg-gray-50 rounded px-2 py-1" placeholder="Phone" />
+            </div>
+            <div class="mt-4">
+                <textarea id="editComboNote" class="w-full bg-yellow-50 border-l-4 border-yellow-400 rounded-lg p-2 mb-2 text-base text-red-700 font-semibold" rows="2" placeholder="Combo Plate Note"></textarea>
+                <textarea id="editLunchNote" class="w-full bg-yellow-50 border-l-4 border-yellow-400 rounded-lg p-2 text-base text-blue-700 font-semibold" rows="2" placeholder="Lunch Special Note"></textarea>
+            </div>
+            <div class="flex justify-end mt-4">
+                <button id="saveRestaurantInfoBtn" class="bg-blue-600 text-white font-bold py-2 px-6 rounded-full shadow hover:bg-blue-700">Save Info</button>
+            </div>
+            <div id="restaurantInfoStatus" class="mt-2 text-sm font-medium text-green-700"></div>
+        </div>
 
         <!-- Login Form -->
         <div id="loginCard" class="card">
@@ -94,6 +121,71 @@
     </div>
 
     <script type="module">
+
+    // --- Restaurant Info/Hours/Notes Editable Card Logic ---
+    const daysOfWeek = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
+    let restaurantInfoDoc = null;
+    function renderEditableHours(hours) {
+        const lines = daysOfWeek.map(day => {
+            const h = hours && hours[day] ? hours[day] : { open: '', close: '' };
+            return `<div class="flex items-center gap-2 mb-1 w-full justify-center">
+                <span class="w-20 text-right font-semibold text-gray-700">${day.slice(0,3)}:</span>
+                <input type="time" class="editHoursOpen bg-gray-50 rounded px-2 py-1 border w-28" data-day="${day}" value="${h.open || ''}">
+                <span class="mx-1">-</span>
+                <input type="time" class="editHoursClose bg-gray-50 rounded px-2 py-1 border w-28" data-day="${day}" value="${h.close || ''}">
+            </div>`;
+        }).join('');
+        document.getElementById('editHoursLines').innerHTML = lines;
+    }
+    async function loadRestaurantInfo() {
+        // Wait for Firebase to be ready
+        if (!window.db) { setTimeout(loadRestaurantInfo, 300); return; }
+        const { getDoc, doc } = await import('https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js');
+        const menuRef = window.db && window.db.constructor ? window.db : db;
+        const infoDocRef = doc(menuRef, `artifacts/${firebaseConfig.appId}/public/data/menu_data/_info`);
+        const infoSnap = await getDoc(infoDocRef);
+        restaurantInfoDoc = infoSnap.exists() ? infoSnap.data() : {};
+        document.getElementById('editRestaurantName').value = restaurantInfoDoc.restaurant?.name || '';
+        document.getElementById('editRestaurantAddress').value = restaurantInfoDoc.restaurant?.location || '';
+        document.getElementById('editRestaurantPhone').value = restaurantInfoDoc.restaurant?.phone || '';
+        renderEditableHours(restaurantInfoDoc.restaurant?.hours || {});
+        document.getElementById('editComboNote').value = restaurantInfoDoc.notes?.combination_plate || '';
+        document.getElementById('editLunchNote').value = restaurantInfoDoc.notes?.lunch_special || '';
+    }
+    async function saveRestaurantInfo() {
+        const { doc, setDoc } = await import('https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js');
+        const menuRef = window.db && window.db.constructor ? window.db : db;
+        const infoDocRef = doc(menuRef, `artifacts/${firebaseConfig.appId}/public/data/menu_data/_info`);
+        // Gather values
+        const name = document.getElementById('editRestaurantName').value;
+        const location = document.getElementById('editRestaurantAddress').value;
+        const phone = document.getElementById('editRestaurantPhone').value;
+        // Gather hours
+        const hours = {};
+        document.querySelectorAll('.editHoursOpen').forEach(input => {
+            const day = input.getAttribute('data-day');
+            hours[day] = hours[day] || {};
+            hours[day].open = input.value;
+        });
+        document.querySelectorAll('.editHoursClose').forEach(input => {
+            const day = input.getAttribute('data-day');
+            hours[day] = hours[day] || {};
+            hours[day].close = input.value;
+        });
+        // Notes
+        const combination_plate = document.getElementById('editComboNote').value;
+        const lunch_special = document.getElementById('editLunchNote').value;
+        // Compose doc
+        const newDoc = {
+            restaurant: { name, location, phone, hours },
+            notes: { combination_plate, lunch_special }
+        };
+        await setDoc(infoDocRef, newDoc);
+        document.getElementById('restaurantInfoStatus').textContent = 'Info saved!';
+        setTimeout(() => { document.getElementById('restaurantInfoStatus').textContent = ''; }, 2000);
+    }
+    document.getElementById('saveRestaurantInfoBtn').addEventListener('click', saveRestaurantInfo);
+    window.addEventListener('DOMContentLoaded', loadRestaurantInfo);
 
     // Clear console output functionality
     document.getElementById('clearConsoleBtn').addEventListener('click', () => {
