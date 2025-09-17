@@ -434,14 +434,14 @@
         // Login form submit
         loginForm.addEventListener('submit', function(e) {
             e.preventDefault();
+            const emailInput = document.getElementById('adminEmail');
+            const passwordInput = document.getElementById('adminPassword');
+            const email = emailInput.value;
+            const password = passwordInput.value;
+            loginStatus.textContent = 'Logging in...';
+            loginStatus.style.color = '#2563eb';
+            loginStatus.style.display = 'block';
             (async () => {
-                const emailInput = document.getElementById('adminEmail');
-                const passwordInput = document.getElementById('adminPassword');
-                const email = emailInput.value;
-                const password = passwordInput.value;
-                loginStatus.textContent = 'Logging in...';
-                loginStatus.style.color = '#2563eb';
-                loginStatus.style.display = 'block';
                 try {
                     await signInWithEmailAndPassword(auth, email, password);
                     loginStatus.textContent = 'Login successful!';
@@ -457,6 +457,7 @@
                     loginStatus.textContent = 'Login failed: ' + (error.message || error.code);
                     loginStatus.style.color = '#dc2626'; // red
                     loginStatus.style.display = 'block';
+                    // Do NOT clear fields on failure
                 }
             })();
         });
