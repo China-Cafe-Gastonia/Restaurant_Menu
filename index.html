@@ -25,6 +25,85 @@
             padding: 2rem;
             margin-bottom: 2rem;
         }
+        .category-header {
+            display: flex;
+            align-items: center;
+            font-size: 2rem;
+            font-weight: 800;
+            color: #1e293b;
+            background: linear-gradient(90deg, #fef9c3 0%, #f0fdf4 100%);
+            border-left: 8px solid #fbbf24;
+            border-radius: 0.5rem 0 0 0.5rem;
+            padding: 0.5rem 1rem;
+            margin-bottom: 0.5rem;
+            margin-top: -1rem;
+        }
+        .category-chinese {
+            font-size: 1.25rem;
+            color: #64748b;
+            margin-left: 1rem;
+            font-weight: 600;
+        }
+        .category-note {
+    margin-bottom: 0.5rem;
+    color: #2563eb;
+    font-size: 1rem;
+}
+#restaurantName {
+    font-size: 2.75rem;
+    font-weight: 900;
+    color: #be123c;
+    letter-spacing: 1px;
+    text-shadow: 0 2px 8px #fca5a5;
+}
+.hours-block {
+    display: flex;
+    align-items: flex-start;
+    margin-top: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+.hours-icon {
+    font-size: 1.3rem;
+    margin-right: 0.5rem;
+    margin-top: 0.1rem;
+}
+.hours-title {
+    font-weight: 900;
+    color: #2563eb;
+    margin-right: 0.5rem;
+}
+.hours-lines {
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+}
+        .important-note-box {
+            display: flex;
+            align-items: flex-start;
+            background: linear-gradient(90deg, #fef9c3 0%, #f0fdf4 100%);
+            border-left: 8px solid #fbbf24;
+            border-radius: 0.75rem;
+            padding: 1rem 1.25rem;
+            margin-bottom: 1rem;
+            font-size: 1.15rem;
+            font-weight: 600;
+            color: #b91c1c;
+            box-shadow: 0 2px 8px 0 #fbbf2433;
+        }
+        .important-note-icon {
+            font-size: 1.6rem;
+            margin-right: 0.75rem;
+            margin-top: 0.1rem;
+        }
+        .important-note-title {
+            color: #b91c1c;
+            font-weight: 900;
+            margin-right: 0.5rem;
+        }
+        .important-note-text {
+            color: #1e293b;
+            font-weight: 600;
+        }
     </style>
 </head>
 <body class="bg-gray-100 text-gray-800">
@@ -32,7 +111,7 @@
         <header class="text-center mb-8">
             <h1 id="restaurantName" class="text-4xl font-extrabold text-gray-900"></h1>
             <div id="restaurantInfo" class="text-lg text-gray-600 mt-2"></div>
-            <div id="restaurantNotes" class="text-base text-gray-500 mt-4"></div>
+            <div id="restaurantNotes" class="mt-4"></div>
         </header>
 
         <div id="loadingMessage" class="text-center text-gray-500 text-lg">
@@ -105,20 +184,78 @@
             const notesEl = document.getElementById('restaurantNotes');
             if (restaurant) {
                 nameEl.textContent = restaurant.name || '';
-                infoEl.innerHTML = [
-                    restaurant.location ? `<span class='block'><b>Address:</b> ${restaurant.location}</span>` : '',
-                    restaurant.phone ? `<span class='block'><b>Phone:</b> ${restaurant.phone}</span>` : '',
-                    restaurant.hours ? `<span class='block'><b>Hours:</b> ${restaurant.hours}</span>` : ''
-                ].filter(Boolean).join('');
+                    // Format hours if present (object or string)
+                    function formatHours(hours) {
+                        if (typeof hours === 'string') {
+                            // fallback for old format
+                            return `<span class='block'><b>Hours:</b> ${hours}</span>`;
+                        }
+                        // Group days by open/close times
+                        const days = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
+                        const groups = [];
+                        let last = null, group = [];
+                        for (const day of days) {
+                            const h = hours[day];
+                            const key = h && h.open && h.close ? `${h.open}-${h.close}` : "Closed";
+                            if (!last || last !== key) {
+                                if (group.length) groups.push({days: group, key: last});
+                                group = [day];
+                                last = key;
+                            } else {
+                                group.push(day);
+                            }
+                        }
+                        if (group.length) groups.push({days: group, key: last});
+                        // Format output
+                        return `<div class="hours-block">
+                            <span class="hours-icon">🕒</span>
+                            <span class="hours-title"><b>Hours:</b></span>
+                            <div class="hours-lines">
+                                ${groups.map(g => {
+                                    const label = g.days.length > 1
+                                        ? `${g.days[0].slice(0,3)} - ${g.days[g.days.length-1].slice(0,3)}`
+                                        : g.days[0].slice(0,3);
+                                    return `<div><b>${label}:</b> ${g.key === 'Closed' ? '<span style=\"color:#b91c1c\">Closed</span>' : g.key.replace('-', ' - ')}</div>`;
+                                }).join('')}
+                            </div>
+                        </div>`;
+                    }
+                    let formattedHours = '';
+                    if (restaurant.hours) {
+                        formattedHours = formatHours(restaurant.hours);
+                    }
+                    infoEl.innerHTML = [
+                        restaurant.location ? `<span class='block'><b>Address:</b> ${restaurant.location}</span>` : '',
+                        restaurant.phone ? `<span class='block'><b>Phone:</b> ${restaurant.phone}</span>` : '',
+                        formattedHours
+                    ].filter(Boolean).join('');
             } else {
                 nameEl.textContent = '';
                 infoEl.innerHTML = '';
             }
+    </style>
             if (notes) {
-                notesEl.innerHTML = [
-                    notes.combination_plate ? `<div class='mb-1'><b>Combo Plate:</b> ${notes.combination_plate}</div>` : '',
-                    notes.lunch_special ? `<div><b>Lunch Special:</b> ${notes.lunch_special}</div>` : ''
-                ].filter(Boolean).join('');
+                // Make Combo Plate and Lunch Special stand out
+                let notesHtml = '';
+                if (notes.combination_plate) {
+                    notesHtml += `
+                        <div class="important-note-box">
+                            <span class="important-note-icon">🍱</span>
+                            <span class="important-note-title">Combo Plate:</span>
+                            <span class="important-note-text">${notes.combination_plate}</span>
+                        </div>
+                    `;
+                }
+                if (notes.lunch_special) {
+                    notesHtml += `
+                        <div class="important-note-box">
+                            <span class="important-note-icon">⏰</span>
+                            <span class="important-note-title">Lunch Special:</span>
+                            <span class="important-note-text">${notes.lunch_special}</span>
+                        </div>
+                    `;
+                }
+                notesEl.innerHTML = notesHtml;
             } else {
                 notesEl.innerHTML = '';
             }
@@ -145,8 +282,16 @@
             for (const category in groupedMenu) {
                 const categoryCard = document.createElement('div');
                 categoryCard.classList.add('menu-card');
+                // Get meta info from first item in category
+                const firstItem = groupedMenu[category][0] || {};
+                const chineseName = firstItem.chinese_name || '';
+                const note = firstItem.note || '';
                 categoryCard.innerHTML = `
-                    <h2 class="text-2xl font-bold text-gray-900 mb-4">${category}</h2>
+                    <div class="category-header">
+                        ${category}
+                        ${chineseName ? `<span class='category-chinese'>${chineseName}</span>` : ''}
+                    </div>
+                    ${note ? `<div class='category-note'>${note}</div>` : ''}
                     <ul class="space-y-4">
                         ${groupedMenu[category].map(item => {
                             // Support price as string or number, or prices as object
