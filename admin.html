@@ -199,16 +199,6 @@
         }
     });
 
-    // Helper to log to both statusMessage and output area
-    function logStatus(msg) {
-        statusMessage.textContent = msg;
-        const statusOutput = document.getElementById('statusOutput');
-        if (statusOutput) {
-            statusOutput.textContent += msg + '\n';
-            statusOutput.scrollTop = statusOutput.scrollHeight;
-        }
-    }
-
     // Helper: Render menu edit table
     function renderMenuEditTable(menuItems) {
         const section = document.getElementById('menuEditSection');
