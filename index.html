@@ -216,8 +216,10 @@
                         if (group.length) groups.push({days: group, key: last});
                         // Format output
                         return `<div class="hours-block">
-                            <span class="hours-icon">🕒</span>
-                            <span class="hours-title"><b>Hours:</b></span>
+                            <div class="flex items-center mb-1">
+                                <span class="hours-icon">🕒</span>
+                                <span class="hours-title"><b>Hours:</b></span>
+                            </div>
                             <div class="hours-lines">
                                 ${groups.map(g => {
                                     const label = g.days.length > 1
