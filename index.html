@@ -87,11 +87,53 @@
         function renderMenu(menuItems) {
             const menuContainer = document.getElementById('menuContainer');
             menuContainer.innerHTML = '';
+            // Extract restaurant info and notes from the first item that has them
+            let restaurant = null;
+            let notes = null;
+            for (const item of menuItems) {
+                if (item.restaurant && !restaurant) restaurant = item.restaurant;
+                if (item.notes && !notes) notes = item.notes;
+                if (restaurant && notes) break;
+            }
+            // Render restaurant info
+            const nameEl = document.getElementById('restaurantName');
+            const infoEl = document.getElementById('restaurantInfo');
+            const notesEl = document.getElementById('restaurantNotes');
+            if (restaurant) {
+                nameEl.textContent = restaurant.name || '';
+                infoEl.innerHTML = [
+                    restaurant.location ? `<span class='block'><b>Address:</b> ${restaurant.location}</span>` : '',
+                    restaurant.phone ? `<span class='block'><b>Phone:</b> ${restaurant.phone}</span>` : '',
+                    restaurant.hours ? `<span class='block'><b>Hours:</b> ${restaurant.hours}</span>` : ''
+                ].filter(Boolean).join('');
+            } else {
+                nameEl.textContent = '';
+                infoEl.innerHTML = '';
+            }
+            if (notes) {
+                notesEl.innerHTML = [
+                    notes.combination_plate ? `<div class='mb-1'><b>Combo Plate:</b> ${notes.combination_plate}</div>` : '',
+                    notes.lunch_special ? `<div><b>Lunch Special:</b> ${notes.lunch_special}</div>` : ''
+                ].filter(Boolean).join('');
+            } else {
+                notesEl.innerHTML = '';
+            }
             if (!menuItems || menuItems.length === 0) {
                 menuContainer.innerHTML = '<div class="text-center text-gray-400 text-xl py-12">Menu not available or under maintenance.</div>';
                 return;
             }
-            // Group by category
+            // Sort menuItems by categoryOrder and itemOrder if present
+            menuItems = menuItems.slice();
+            menuItems.sort((a, b) => {
+                if (typeof a.categoryOrder === 'number' && typeof b.categoryOrder === 'number') {
+                    if (a.categoryOrder !== b.categoryOrder) return a.categoryOrder - b.categoryOrder;
+                    if (typeof a.itemOrder === 'number' && typeof b.itemOrder === 'number') {
+                        return a.itemOrder - b.itemOrder;
+                    }
+                }
+                return 0;
+            });
+            // Group by category (now in correct order)
             const groupedMenu = menuItems.reduce((acc, item) => {
                 (acc[item.category] = acc[item.category] || []).push(item);
                 return acc;

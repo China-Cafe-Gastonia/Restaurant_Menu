@@ -102,17 +102,33 @@
             section.innerHTML = '<div class="text-gray-500">No menu items loaded.</div>';
             return;
         }
-        // Group items by category
-        const groupedMenu = menuItems.reduce((acc, item, idx) => {
-            (acc[item.category] = acc[item.category] || []).push({ ...item, _idx: idx });
-            return acc;
-        }, {});
+        // Group items by category, and collect extra info (chinese_name, note)
+        const groupedMenu = {};
+        const categoryMeta = {};
+        menuItems.forEach((item, idx) => {
+            if (!groupedMenu[item.category]) groupedMenu[item.category] = [];
+            groupedMenu[item.category].push({ ...item, _idx: idx });
+            // Save meta info if present
+            if (item.category && (item.chinese_name || item.note)) {
+                categoryMeta[item.category] = categoryMeta[item.category] || {};
+                if (item.chinese_name) categoryMeta[item.category].chinese_name = item.chinese_name;
+                if (item.note) categoryMeta[item.category].note = item.note;
+            }
+        });
         let html = '';
+        const categoryColors = [
+            'bg-yellow-100', 'bg-green-100', 'bg-blue-100', 'bg-pink-100', 'bg-purple-100', 'bg-orange-100', 'bg-teal-100', 'bg-red-100', 'bg-indigo-100', 'bg-lime-100'
+        ];
+        let catIdx = 0;
         for (const category in groupedMenu) {
-            html += `<div class="menu-card mb-8">
-                <h2 class="text-2xl font-bold text-gray-900 mb-4 flex items-center">
+            const color = categoryColors[catIdx % categoryColors.length];
+            const meta = categoryMeta[category] || {};
+            html += `<div class="menu-card mb-8 ${color}">
+                <h2 class="text-2xl font-bold text-gray-900 mb-2 flex items-center">
                     <input type="text" value="${category}" data-category-edit="${category}" class="font-bold text-gray-900 bg-gray-100 rounded px-2 py-1 mr-2" style="min-width:120px;" />
+                    ${meta.chinese_name ? `<span class="ml-2 text-lg text-gray-500">${meta.chinese_name}</span>` : ''}
                 </h2>
+                ${meta.note ? `<div class="mb-2 text-sm text-blue-700">${meta.note}</div>` : ''}
                 <ul class="space-y-4">`;
             groupedMenu[category].forEach((item, idxInCat) => {
                 html += `
@@ -146,6 +162,7 @@
                 </div>
             </li>`;
             html += '</ul></div>';
+            catIdx++;
         }
         section.innerHTML = html;
     }
@@ -334,9 +351,16 @@
                     if (!Array.isArray(menuData)) {
                         // Try to extract and flatten from nested format
                         if (menuData.menu && Array.isArray(menuData.menu)) {
-                            // Flatten all items from all categories, preserving order
+                            // Flatten all items from all categories, preserving order and meta
                             menuData = menuData.menu.flatMap((cat, catIdx) =>
-                                (cat.items || []).map((item, itemIdx) => ({ ...item, category: cat.category, categoryOrder: catIdx, itemOrder: itemIdx }))
+                                (cat.items || []).map((item, itemIdx) => ({
+                                    ...item,
+                                    category: cat.category,
+                                    chinese_name: cat.chinese_name || '',
+                                    note: cat.note || '',
+                                    categoryOrder: catIdx,
+                                    itemOrder: itemIdx
+                                }))
                             );
                         } else {
                             logStatus('Error: The uploaded file is not a valid JSON array or menu format.');
