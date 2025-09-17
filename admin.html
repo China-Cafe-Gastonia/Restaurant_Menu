@@ -84,122 +84,123 @@
             </div>
             <div id="statusMessage" class="mt-6 text-sm font-medium"></div>
             <div id="menuEditSection" class="mt-8"></div>
-        // Helper: Render menu edit table
-        function renderMenuEditTable(menuItems) {
-            const section = document.getElementById('menuEditSection');
-            if (!menuItems || menuItems.length === 0) {
-                section.innerHTML = '<div class="text-gray-500">No menu items loaded.</div>';
-                return;
-            }
-            let html = `<table class="min-w-full text-sm"><thead><tr>
-                <th class="border-b p-2">Name</th>
-                <th class="border-b p-2">Description</th>
-                <th class="border-b p-2">Category</th>
-                <th class="border-b p-2">Price</th>
-                <th class="border-b p-2">Actions</th>
-            </tr></thead><tbody>`;
-            menuItems.forEach((item, idx) => {
-                html += `<tr>
-                    <td class="border-b p-2"><input type="text" class="w-full border rounded px-1" value="${item.name || ''}" data-field="name" data-idx="${idx}"></td>
-                    <td class="border-b p-2"><input type="text" class="w-full border rounded px-1" value="${item.description || ''}" data-field="description" data-idx="${idx}"></td>
-                    <td class="border-b p-2"><input type="text" class="w-full border rounded px-1" value="${item.category || ''}" data-field="category" data-idx="${idx}"></td>
-                    <td class="border-b p-2"><input type="number" step="0.01" class="w-full border rounded px-1" value="${item.price || ''}" data-field="price" data-idx="${idx}"></td>
-                    <td class="border-b p-2">
-                        <button class="bg-green-500 text-white px-2 py-1 rounded mr-2 saveMenuItemBtn" data-idx="${idx}">Save</button>
-                        <button class="bg-red-500 text-white px-2 py-1 rounded deleteMenuItemBtn" data-idx="${idx}">Delete</button>
-                    </td>
-                </tr>`;
-            });
-            // Add new item row
-            html += `<tr>
-                <td class="border-b p-2"><input type="text" class="w-full border rounded px-1" id="newName"></td>
-                <td class="border-b p-2"><input type="text" class="w-full border rounded px-1" id="newDescription"></td>
-                <td class="border-b p-2"><input type="text" class="w-full border rounded px-1" id="newCategory"></td>
-                <td class="border-b p-2"><input type="number" step="0.01" class="w-full border rounded px-1" id="newPrice"></td>
-                <td class="border-b p-2"><button class="bg-blue-500 text-white px-2 py-1 rounded" id="addMenuItemBtn">Add</button></td>
-            </tr>`;
-            html += '</tbody></table>';
-            section.innerHTML = html;
-        }
-
-        // Load menu from Firestore and render edit table
-        let loadedMenuItems = [];
-        document.getElementById('loadMenuButton').addEventListener('click', async () => {
-            statusMessage.textContent = 'Loading menu...';
-            try {
-                const menuRef = collection(db, `artifacts/${firebaseConfig.appId}/public/data/menu_data`);
-                const snapshot = await getDocs(menuRef);
-                loadedMenuItems = [];
-                snapshot.forEach(docSnap => {
-                    loadedMenuItems.push({ ...docSnap.data(), _id: docSnap.id });
-                });
-                renderMenuEditTable(loadedMenuItems);
-                statusMessage.textContent = 'Menu loaded.';
-            } catch (e) {
-                statusMessage.textContent = 'Error loading menu: ' + e.message;
-            }
-        });
-
-        // Delegate save/delete/add actions
-        document.getElementById('menuEditSection').addEventListener('click', async (e) => {
-            if (e.target.classList.contains('saveMenuItemBtn')) {
-                const idx = e.target.getAttribute('data-idx');
-                const item = loadedMenuItems[idx];
-                // Get updated values
-                const row = e.target.closest('tr');
-                item.name = row.querySelector('input[data-field="name"]').value;
-                item.description = row.querySelector('input[data-field="description"]').value;
-                item.category = row.querySelector('input[data-field="category"]').value;
-                item.price = parseFloat(row.querySelector('input[data-field="price"]').value) || 0;
-                // Save to Firestore
-                try {
-                    const menuRef = collection(db, `artifacts/${firebaseConfig.appId}/public/data/menu_data`);
-                    const docRef = doc(menuRef, item._id);
-                    await writeBatch(db).set(docRef, item).commit();
-                    statusMessage.textContent = 'Item saved.';
-                } catch (err) {
-                    statusMessage.textContent = 'Error saving item: ' + err.message;
-                }
-            } else if (e.target.classList.contains('deleteMenuItemBtn')) {
-                const idx = e.target.getAttribute('data-idx');
-                const item = loadedMenuItems[idx];
-                try {
-                    const menuRef = collection(db, `artifacts/${firebaseConfig.appId}/public/data/menu_data`);
-                    const docRef = doc(menuRef, item._id);
-                    await writeBatch(db).delete(docRef).commit();
-                    loadedMenuItems.splice(idx, 1);
-                    renderMenuEditTable(loadedMenuItems);
-                    statusMessage.textContent = 'Item deleted.';
-                } catch (err) {
-                    statusMessage.textContent = 'Error deleting item: ' + err.message;
-                }
-            } else if (e.target.id === 'addMenuItemBtn') {
-                // Add new item
-                const name = document.getElementById('newName').value;
-                const description = document.getElementById('newDescription').value;
-                const category = document.getElementById('newCategory').value;
-                const price = parseFloat(document.getElementById('newPrice').value) || 0;
-                if (!name || !category) {
-                    statusMessage.textContent = 'Name and category are required.';
-                    return;
-                }
-                try {
-                    const menuRef = collection(db, `artifacts/${firebaseConfig.appId}/public/data/menu_data`);
-                    const newDocRef = doc(menuRef);
-                    const newItem = { name, description, category, price };
-                    await writeBatch(db).set(newDocRef, newItem).commit();
-                    loadedMenuItems.push({ ...newItem, _id: newDocRef.id });
-                    renderMenuEditTable(loadedMenuItems);
-                    statusMessage.textContent = 'Item added.';
-                } catch (err) {
-                    statusMessage.textContent = 'Error adding item: ' + err.message;
-                }
-            }
-        });
         </div>
     </div>
 
     <script type="module">
+
+    // Helper: Render menu edit table
+    function renderMenuEditTable(menuItems) {
+        const section = document.getElementById('menuEditSection');
+        if (!menuItems || menuItems.length === 0) {
+            section.innerHTML = '<div class="text-gray-500">No menu items loaded.</div>';
+            return;
+        }
+        let html = `<table class="min-w-full text-sm"><thead><tr>
+            <th class="border-b p-2">Name</th>
+            <th class="border-b p-2">Description</th>
+            <th class="border-b p-2">Category</th>
+            <th class="border-b p-2">Price</th>
+            <th class="border-b p-2">Actions</th>
+        </tr></thead><tbody>`;
+        menuItems.forEach((item, idx) => {
+            html += `<tr>
+                <td class="border-b p-2"><input type="text" class="w-full border rounded px-1" value="${item.name || ''}" data-field="name" data-idx="${idx}"></td>
+                <td class="border-b p-2"><input type="text" class="w-full border rounded px-1" value="${item.description || ''}" data-field="description" data-idx="${idx}"></td>
+                <td class="border-b p-2"><input type="text" class="w-full border rounded px-1" value="${item.category || ''}" data-field="category" data-idx="${idx}"></td>
+                <td class="border-b p-2"><input type="number" step="0.01" class="w-full border rounded px-1" value="${item.price || ''}" data-field="price" data-idx="${idx}"></td>
+                <td class="border-b p-2">
+                    <button class="bg-green-500 text-white px-2 py-1 rounded mr-2 saveMenuItemBtn" data-idx="${idx}">Save</button>
+                    <button class="bg-red-500 text-white px-2 py-1 rounded deleteMenuItemBtn" data-idx="${idx}">Delete</button>
+                </td>
+            </tr>`;
+        });
+        // Add new item row
+        html += `<tr>
+            <td class="border-b p-2"><input type="text" class="w-full border rounded px-1" id="newName"></td>
+            <td class="border-b p-2"><input type="text" class="w-full border rounded px-1" id="newDescription"></td>
+            <td class="border-b p-2"><input type="text" class="w-full border rounded px-1" id="newCategory"></td>
+            <td class="border-b p-2"><input type="number" step="0.01" class="w-full border rounded px-1" id="newPrice"></td>
+            <td class="border-b p-2"><button class="bg-blue-500 text-white px-2 py-1 rounded" id="addMenuItemBtn">Add</button></td>
+        </tr>`;
+        html += '</tbody></table>';
+        section.innerHTML = html;
+    }
+
+    // Load menu from Firestore and render edit table
+    let loadedMenuItems = [];
+    document.getElementById('loadMenuButton').addEventListener('click', async () => {
+        statusMessage.textContent = 'Loading menu...';
+        try {
+            const menuRef = collection(db, `artifacts/${firebaseConfig.appId}/public/data/menu_data`);
+            const snapshot = await getDocs(menuRef);
+            loadedMenuItems = [];
+            snapshot.forEach(docSnap => {
+                loadedMenuItems.push({ ...docSnap.data(), _id: docSnap.id });
+            });
+            renderMenuEditTable(loadedMenuItems);
+            statusMessage.textContent = 'Menu loaded.';
+        } catch (e) {
+            statusMessage.textContent = 'Error loading menu: ' + e.message;
+        }
+    });
+
+    // Delegate save/delete/add actions
+    document.getElementById('menuEditSection').addEventListener('click', async (e) => {
+        if (e.target.classList.contains('saveMenuItemBtn')) {
+            const idx = e.target.getAttribute('data-idx');
+            const item = loadedMenuItems[idx];
+            // Get updated values
+            const row = e.target.closest('tr');
+            item.name = row.querySelector('input[data-field="name"]').value;
+            item.description = row.querySelector('input[data-field="description"]').value;
+            item.category = row.querySelector('input[data-field="category"]').value;
+            item.price = parseFloat(row.querySelector('input[data-field="price"]').value) || 0;
+            // Save to Firestore
+            try {
+                const menuRef = collection(db, `artifacts/${firebaseConfig.appId}/public/data/menu_data`);
+                const docRef = doc(menuRef, item._id);
+                await writeBatch(db).set(docRef, item).commit();
+                statusMessage.textContent = 'Item saved.';
+            } catch (err) {
+                statusMessage.textContent = 'Error saving item: ' + err.message;
+            }
+        } else if (e.target.classList.contains('deleteMenuItemBtn')) {
+            const idx = e.target.getAttribute('data-idx');
+            const item = loadedMenuItems[idx];
+            try {
+                const menuRef = collection(db, `artifacts/${firebaseConfig.appId}/public/data/menu_data`);
+                const docRef = doc(menuRef, item._id);
+                await writeBatch(db).delete(docRef).commit();
+                loadedMenuItems.splice(idx, 1);
+                renderMenuEditTable(loadedMenuItems);
+                statusMessage.textContent = 'Item deleted.';
+            } catch (err) {
+                statusMessage.textContent = 'Error deleting item: ' + err.message;
+            }
+        } else if (e.target.id === 'addMenuItemBtn') {
+            // Add new item
+            const name = document.getElementById('newName').value;
+            const description = document.getElementById('newDescription').value;
+            const category = document.getElementById('newCategory').value;
+            const price = parseFloat(document.getElementById('newPrice').value) || 0;
+            if (!name || !category) {
+                statusMessage.textContent = 'Name and category are required.';
+                return;
+            }
+            try {
+                const menuRef = collection(db, `artifacts/${firebaseConfig.appId}/public/data/menu_data`);
+                const newDocRef = doc(menuRef);
+                const newItem = { name, description, category, price };
+                await writeBatch(db).set(newDocRef, newItem).commit();
+                loadedMenuItems.push({ ...newItem, _id: newDocRef.id });
+                renderMenuEditTable(loadedMenuItems);
+                statusMessage.textContent = 'Item added.';
+            } catch (err) {
+                statusMessage.textContent = 'Error adding item: ' + err.message;
+            }
+        }
+    });
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-app.js";
     import { getFirestore, collection, getDocs, writeBatch, doc } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js";
     import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-auth.js";
