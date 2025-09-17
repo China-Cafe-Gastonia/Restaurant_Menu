@@ -167,11 +167,11 @@
         if (e.target.classList.contains('saveMenuItemBtn')) {
             const idx = e.target.getAttribute('data-idx');
             const item = loadedMenuItems[idx];
-            // Find the corresponding input fields in the DOM
-            const row = e.target.closest('li');
+            // Get updated values
+            const row = e.target.closest('tr');
             item.name = row.querySelector('input[data-field="name"]').value;
             item.description = row.querySelector('input[data-field="description"]').value;
-            // Category is not editable per item in new UI, so keep as is
+            item.category = row.querySelector('input[data-field="category"]').value;
             item.price = parseFloat(row.querySelector('input[data-field="price"]').value) || 0;
             // Save to Firestore
             try {
@@ -195,30 +195,12 @@
             } catch (err) {
                 statusMessage.textContent = 'Error deleting item: ' + err.message;
             }
-        } else if (e.target.classList.contains('addAboveMenuItemBtn') || e.target.classList.contains('addBelowMenuItemBtn')) {
-            // Insert a blank item above or below the clicked item
-            const idx = parseInt(e.target.getAttribute('data-idx'));
-            const refItem = loadedMenuItems[idx];
-            const newItem = {
-                name: '',
-                description: '',
-                category: refItem.category,
-                price: '',
-                // _id will be assigned when saved
-            };
-            if (e.target.classList.contains('addAboveMenuItemBtn')) {
-                loadedMenuItems.splice(idx, 0, newItem);
-            } else {
-                loadedMenuItems.splice(idx + 1, 0, newItem);
-            }
-            renderMenuEditTable(loadedMenuItems);
-            statusMessage.textContent = 'New item added. Fill in details and click Save.';
-        } else if (e.target.id && e.target.id.startsWith('addMenuItemBtn-')) {
-            // Add new item to category (bottom add)
-            const category = e.target.getAttribute('data-category');
-            const name = document.getElementById(`newName-${category}`).value;
-            const description = document.getElementById(`newDescription-${category}`).value;
-            const price = parseFloat(document.getElementById(`newPrice-${category}`).value) || 0;
+        } else if (e.target.id === 'addMenuItemBtn') {
+            // Add new item
+            const name = document.getElementById('newName').value;
+            const description = document.getElementById('newDescription').value;
+            const category = document.getElementById('newCategory').value;
+            const price = parseFloat(document.getElementById('newPrice').value) || 0;
             if (!name || !category) {
                 statusMessage.textContent = 'Name and category are required.';
                 return;
