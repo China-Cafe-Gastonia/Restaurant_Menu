@@ -438,11 +438,15 @@
                 const email = document.getElementById('adminEmail').value;
                 const password = document.getElementById('adminPassword').value;
                 loginStatus.textContent = 'Logging in...';
+                loginStatus.style.color = '#2563eb';
                 try {
                     await signInWithEmailAndPassword(auth, email, password);
-                    loginStatus.textContent = '';
+                    loginStatus.textContent = 'Login successful!';
+                    loginStatus.style.color = '#16a34a'; // green
+                    setTimeout(() => { loginStatus.textContent = ''; }, 1500);
                 } catch (error) {
                     loginStatus.textContent = 'Login failed: ' + (error.message || error.code);
+                    loginStatus.style.color = '#dc2626'; // red
                 }
             })();
         });
