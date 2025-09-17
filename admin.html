@@ -347,10 +347,15 @@
                         logStatus(`Error parsing JSON file: ${parseError.message}`);
                         return;
                     }
+                    let restaurantInfo = null;
+                    let notesInfo = null;
                     // Accept both flat array and nested format
                     if (!Array.isArray(menuData)) {
                         // Try to extract and flatten from nested format
                         if (menuData.menu && Array.isArray(menuData.menu)) {
+                            // Save restaurant and notes for special doc
+                            if (menuData.restaurant) restaurantInfo = menuData.restaurant;
+                            if (menuData.notes) notesInfo = menuData.notes;
                             // Flatten all items from all categories, preserving order and meta
                             menuData = menuData.menu.flatMap((cat, catIdx) =>
                                 (cat.items || []).map((item, itemIdx) => ({
@@ -381,8 +386,16 @@
                         });
                         await deleteBatch.commit();
 
-                        // Add new documents
+                        // Add special doc for restaurant info/notes if present
                         const newBatch = writeBatch(db);
+                        if (restaurantInfo || notesInfo) {
+                            const infoDocRef = doc(menuRef, '_info');
+                            newBatch.set(infoDocRef, {
+                                ...(restaurantInfo ? { restaurant: restaurantInfo } : {}),
+                                ...(notesInfo ? { notes: notesInfo } : {})
+                            });
+                        }
+                        // Add new menu item documents
                         menuData.forEach(item => {
                             const newDocRef = doc(menuRef);
                             newBatch.set(newDocRef, item);
