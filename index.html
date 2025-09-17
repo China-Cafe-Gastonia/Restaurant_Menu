@@ -68,8 +68,14 @@
             try {
                 const response = await fetch('./restaurant-data.json');
                 const data = await response.json();
-                document.getElementById('restaurantName').textContent = data.name;
-                document.getElementById('restaurantSlogan').textContent = data.slogan;
+                // Support both flat and nested formats
+                if (data.name && data.slogan) {
+                    document.getElementById('restaurantName').textContent = data.name;
+                    document.getElementById('restaurantSlogan').textContent = data.slogan;
+                } else if (data.restaurant) {
+                    document.getElementById('restaurantName').textContent = data.restaurant.name || '';
+                    document.getElementById('restaurantSlogan').textContent = data.restaurant.location || '';
+                }
             } catch (error) {
                 console.error("Error fetching restaurant data:", error);
             }
@@ -89,28 +95,37 @@
         function renderMenu(menuItems) {
             const menuContainer = document.getElementById('menuContainer');
             menuContainer.innerHTML = '';
-            
+            // Group by category
             const groupedMenu = menuItems.reduce((acc, item) => {
                 (acc[item.category] = acc[item.category] || []).push(item);
                 return acc;
             }, {});
-
             for (const category in groupedMenu) {
                 const categoryCard = document.createElement('div');
                 categoryCard.classList.add('menu-card');
-                
                 categoryCard.innerHTML = `
                     <h2 class="text-2xl font-bold text-gray-900 mb-4">${category}</h2>
                     <ul class="space-y-4">
-                        ${groupedMenu[category].map(item => `
+                        ${groupedMenu[category].map(item => {
+                            // Support price as string or number, or prices as object
+                            let price = '';
+                            if (typeof item.price !== 'undefined') {
+                                price = `$${parseFloat(item.price).toFixed(2)}`;
+                            } else if (item.prices && typeof item.prices === 'object') {
+                                price = Object.entries(item.prices).map(([k, v]) => `${k}: $${parseFloat(v).toFixed(2)}`).join('<br>');
+                            } else if (typeof item.prices === 'string' || typeof item.prices === 'number') {
+                                price = `$${parseFloat(item.prices).toFixed(2)}`;
+                            }
+                            return `
                             <li class="flex justify-between items-center border-b pb-2">
                                 <div class="flex-grow">
                                     <h3 class="text-lg font-semibold text-gray-800">${item.name}</h3>
-                                    <p class="text-sm text-gray-500">${item.description}</p>
+                                    <p class="text-sm text-gray-500">${item.description || ''}</p>
                                 </div>
-                                <span class="text-orange-600 text-lg ml-4 flex-shrink-0">$${item.price.toFixed(2)}</span>
+                                <span class="text-orange-600 text-lg ml-4 flex-shrink-0">${price}</span>
                             </li>
-                        `).join('')}
+                            `;
+                        }).join('')}
                     </ul>
                 `;
                 menuContainer.appendChild(categoryCard);
@@ -125,8 +140,8 @@
             }
 
             const menuRef = collection(db, `artifacts/${appId}/public/data/menu_data`);
-            
             onSnapshot(menuRef, (querySnapshot) => {
+                // If using Firestore, expect flat array, but support nested format for local JSON
                 const menuItems = [];
                 querySnapshot.forEach((doc) => {
                     menuItems.push(doc.data());
@@ -141,8 +156,29 @@
         
         window.onload = async () => {
             await initializeFirebase();
+            // Try to fetch local JSON menu if available, else use Firestore
+            let usedLocalMenu = false;
+            try {
+                const response = await fetch('./backup/09.16.2025.json');
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.menu && Array.isArray(data.menu)) {
+                        // Flatten all items from all categories
+                        const menuItems = data.menu.flatMap(cat =>
+                            (cat.items || []).map(item => ({ ...item, category: cat.category }))
+                        );
+                        renderMenu(menuItems);
+                        document.getElementById('loadingMessage').classList.add('hidden');
+                        usedLocalMenu = true;
+                    }
+                }
+            } catch (e) {
+                // Ignore and fallback to Firestore
+            }
             await fetchRestaurantData();
-            listenForMenuUpdates();
+            if (!usedLocalMenu) {
+                listenForMenuUpdates();
+            }
         };
     </script>
 </body>
