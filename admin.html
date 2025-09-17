@@ -62,7 +62,7 @@
                 </div>
             </div>
             <div class="mb-4">
-                <label for="jsonFile" class="block text-sm font-medium text-gray-700">Select Menu JSON File</label>
+                <label for="jsonFile" class="block text-sm font-medium text-gray-700">Select Menu: JSON File</label>
                 <input type="file" id="jsonFile" accept=".json" class="mt-1 block w-full text-sm text-gray-500
                     file:mr-4 file:py-2 file:px-4
                     file:rounded-full file:border-0
@@ -165,10 +165,10 @@
     document.getElementById('loadMenuButton').addEventListener('click', async () => {
         logStatus('Loading menu...');
         try {
-            // Use orderBy to fetch in order
+            // Use orderBy to fetch in category/item order
             const menuRef = collection(db, `artifacts/${firebaseConfig.appId}/public/data/menu_data`);
             const { query, orderBy, getDocs } = await import('https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js');
-            const q = query(menuRef, orderBy('order'));
+            const q = query(menuRef, orderBy('categoryOrder'), orderBy('itemOrder'));
             const snapshot = await getDocs(q);
             loadedMenuItems = [];
             snapshot.forEach(docSnap => {
@@ -336,15 +336,15 @@
                         if (menuData.menu && Array.isArray(menuData.menu)) {
                             // Flatten all items from all categories, preserving order
                             menuData = menuData.menu.flatMap((cat, catIdx) =>
-                                (cat.items || []).map((item, itemIdx) => ({ ...item, category: cat.category, order: (catIdx * 1000) + itemIdx }))
+                                (cat.items || []).map((item, itemIdx) => ({ ...item, category: cat.category, categoryOrder: catIdx, itemOrder: itemIdx }))
                             );
                         } else {
                             logStatus('Error: The uploaded file is not a valid JSON array or menu format.');
                             return;
                         }
                     } else {
-                        // Flat array: add order field based on array index
-                        menuData = menuData.map((item, idx) => ({ ...item, order: idx }));
+                        // Flat array: add order fields based on array index
+                        menuData = menuData.map((item, idx) => ({ ...item, categoryOrder: 0, itemOrder: idx }));
                     }
                     try {
                         // Reference to the collection
