@@ -121,15 +121,23 @@
                 const fileReader = new FileReader();
                 fileReader.onload = async (event) => {
                     try {
-                        const menuData = JSON.parse(event.target.result);
+                        let menuData = JSON.parse(event.target.result);
+                        // Accept both flat array and nested format
                         if (!Array.isArray(menuData)) {
-                            statusMessage.textContent = 'Error: The uploaded file is not a valid JSON array.';
-                            return;
+                            // Try to extract and flatten from nested format
+                            if (menuData.menu && Array.isArray(menuData.menu)) {
+                                // Flatten all items from all categories
+                                menuData = menuData.menu.flatMap(cat =>
+                                    (cat.items || []).map(item => ({ ...item, category: cat.category }))
+                                );
+                            } else {
+                                statusMessage.textContent = 'Error: The uploaded file is not a valid JSON array or menu format.';
+                                return;
+                            }
                         }
 
                         // Reference to the collection
                         const menuRef = collection(db, `artifacts/${firebaseConfig.appId}/public/data/menu_data`);
-                        
                         // Delete all existing documents
                         const existingDocs = await getDocs(menuRef);
                         const deleteBatch = writeBatch(db);
