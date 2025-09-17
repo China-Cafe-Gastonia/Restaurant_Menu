@@ -129,12 +129,13 @@
     </div>
 
     <script type="module">
-    // Output box toggle logic (slide down/up)
+    // Output box toggle logic (slide down/up) and logStatus helper
     window.addEventListener('DOMContentLoaded', () => {
         const outputBox = document.getElementById('outputBox');
         const toggleOutputBtn = document.getElementById('toggleOutputBtn');
         const outputArrow = document.getElementById('outputArrow');
         const floatingOutputArrow = document.getElementById('floatingOutputArrow');
+        const statusOutput = document.getElementById('statusOutput');
         let outputHidden = false;
         function showOutputBox() {
             outputBox.style.transform = 'translateY(0)';
@@ -146,6 +147,7 @@
             outputBox.style.transform = 'translateY(90%)';
             outputArrow.textContent = '▲';
             floatingOutputArrow.style.display = '';
+            outputHidden = true;
         }
         toggleOutputBtn.addEventListener('click', () => {
             if (outputHidden) {
@@ -157,6 +159,18 @@
         floatingOutputArrow.addEventListener('click', showOutputBox);
         // Ensure output box starts visible
         showOutputBox();
+
+        // logStatus helper: always append to output box
+        window.logStatus = function(msg) {
+            if (!statusOutput) return;
+            const now = new Date();
+            const time = now.toLocaleTimeString();
+            statusOutput.textContent += `[${time}] ${msg}\n`;
+            statusOutput.scrollTop = statusOutput.scrollHeight;
+            // Hide loading message if present
+            const loadingMsg = document.getElementById('loadingMessage');
+            if (loadingMsg) loadingMsg.style.display = 'none';
+        };
     });
 
     // --- All DOM-dependent logic must run after DOMContentLoaded ---
@@ -250,7 +264,7 @@
         });
 
         // Upload a JSON file to Firestore
-        uploadButton.addEventListener('click', async () => {
+    uploadButton.addEventListener('click', async () => {
             if (!db || !auth.currentUser) {
                 statusMessage.textContent = 'You must be logged in as admin.';
                 return;
@@ -347,6 +361,155 @@
 
         // Delete the entire menu from Firestore
         deleteButton.addEventListener('click', async () => {
+
+        // Hide loading message after menu loads (if menu is loaded elsewhere, this should be called after render)
+        function hideLoadingMessage() {
+            const loadingMsg = document.getElementById('loadingMessage');
+            if (loadingMsg) loadingMsg.style.display = 'none';
+        }
+
+        // --- MENU LOADING AND RENDERING LOGIC ---
+        document.getElementById('loadMenuButton').addEventListener('click', loadAndRenderMenu);
+
+        async function loadAndRenderMenu() {
+            const menuContainer = document.getElementById('menuContainer');
+            const loadingMsg = document.getElementById('loadingMessage');
+            if (loadingMsg) loadingMsg.style.display = '';
+            menuContainer.innerHTML = '';
+            // Clear editable fields
+            document.getElementById('editRestaurantName').value = '';
+            document.getElementById('editRestaurantAddress').value = '';
+            document.getElementById('editRestaurantPhone').value = '';
+            document.getElementById('editComboNote').value = '';
+            document.getElementById('editLunchNote').value = '';
+            document.getElementById('editHoursLines').innerHTML = '';
+
+            try {
+                const menuRef = collection(db, `artifacts/${firebaseConfig.appId}/public/data/menu_data`);
+                const snapshot = await getDocs(menuRef);
+                let menuItems = [];
+                let infoDoc = null;
+                snapshot.forEach(docSnap => {
+                    if (docSnap.id === '_info') {
+                        infoDoc = docSnap.data();
+                    } else {
+                        menuItems.push({ id: docSnap.id, ...docSnap.data() });
+                    }
+                });
+                // Sort menu items by categoryOrder, then itemOrder
+                menuItems.sort((a, b) => (a.categoryOrder - b.categoryOrder) || (a.itemOrder - b.itemOrder));
+
+                // Fill restaurant info and notes if present
+                if (infoDoc && infoDoc.restaurant) {
+                    document.getElementById('editRestaurantName').value = infoDoc.restaurant.name || '';
+                    document.getElementById('editRestaurantAddress').value = infoDoc.restaurant.address || '';
+                    document.getElementById('editRestaurantPhone').value = infoDoc.restaurant.phone || '';
+                    // Render hours
+                    const hoursLines = document.getElementById('editHoursLines');
+                    hoursLines.innerHTML = '';
+                    if (infoDoc.restaurant.hours && Array.isArray(infoDoc.restaurant.hours)) {
+                        infoDoc.restaurant.hours.forEach((line, idx) => {
+                            const input = document.createElement('input');
+                            input.type = 'text';
+                            input.className = 'block w-full text-base text-gray-700 bg-gray-50 rounded px-2 py-1 mb-1 max-w-xl';
+                            input.value = line;
+                            input.placeholder = 'Hours line';
+                            input.dataset.idx = idx;
+                            hoursLines.appendChild(input);
+                        });
+                    }
+                }
+                if (infoDoc && infoDoc.notes) {
+                    document.getElementById('editComboNote').value = infoDoc.notes.combo || '';
+                    document.getElementById('editLunchNote').value = infoDoc.notes.lunch || '';
+                }
+
+                // Group menu items by category
+                const categories = [];
+                menuItems.forEach(item => {
+                    let cat = categories.find(c => c.category === item.category && c.chinese_name === item.chinese_name);
+                    if (!cat) {
+                        cat = {
+                            category: item.category,
+                            chinese_name: item.chinese_name,
+                            note: item.note,
+                            items: []
+                        };
+                        categories.push(cat);
+                    }
+                    cat.items.push(item);
+                });
+
+                // Render categories and items (editable)
+                categories.forEach((cat, catIdx) => {
+                    const catDiv = document.createElement('div');
+                    catDiv.className = 'mb-8';
+                    // Category header
+                    const catHeader = document.createElement('div');
+                    catHeader.className = 'flex items-center gap-2 mb-2';
+                    const catInput = document.createElement('input');
+                    catInput.type = 'text';
+                    catInput.value = cat.category;
+                    catInput.className = 'text-2xl font-bold text-gray-800 bg-gray-50 rounded px-2 py-1';
+                    catHeader.appendChild(catInput);
+                    if (cat.chinese_name) {
+                        const catChinese = document.createElement('input');
+                        catChinese.type = 'text';
+                        catChinese.value = cat.chinese_name;
+                        catChinese.className = 'text-lg text-gray-500 bg-gray-50 rounded px-2 py-1';
+                        catHeader.appendChild(catChinese);
+                    }
+                    catDiv.appendChild(catHeader);
+                    // Category note
+                    if (cat.note) {
+                        const catNote = document.createElement('input');
+                        catNote.type = 'text';
+                        catNote.value = cat.note;
+                        catNote.className = 'w-full text-base text-yellow-700 bg-yellow-50 border-l-4 border-yellow-400 rounded-lg p-2 mb-2';
+                        catDiv.appendChild(catNote);
+                    }
+                    // Items table
+                    const table = document.createElement('table');
+                    table.className = 'w-full text-left mb-4';
+                    cat.items.forEach((item, itemIdx) => {
+                        const tr = document.createElement('tr');
+                        // Name
+                        const tdName = document.createElement('td');
+                        const nameInput = document.createElement('input');
+                        nameInput.type = 'text';
+                        nameInput.value = item.name || '';
+                        nameInput.className = 'w-full bg-gray-50 rounded px-2 py-1';
+                        tdName.appendChild(nameInput);
+                        tr.appendChild(tdName);
+                        // Price
+                        const tdPrice = document.createElement('td');
+                        const priceInput = document.createElement('input');
+                        priceInput.type = 'text';
+                        priceInput.value = item.price || '';
+                        priceInput.className = 'w-20 bg-gray-50 rounded px-2 py-1 ml-2';
+                        tdPrice.appendChild(priceInput);
+                        tr.appendChild(tdPrice);
+                        // Description
+                        const tdDesc = document.createElement('td');
+                        const descInput = document.createElement('input');
+                        descInput.type = 'text';
+                        descInput.value = item.description || '';
+                        descInput.className = 'w-full bg-gray-50 rounded px-2 py-1 ml-2';
+                        tdDesc.appendChild(descInput);
+                        tr.appendChild(tdDesc);
+                        table.appendChild(tr);
+                    });
+                    catDiv.appendChild(table);
+                    menuContainer.appendChild(catDiv);
+                });
+
+                hideLoadingMessage();
+                logStatus('Menu loaded.');
+            } catch (err) {
+                hideLoadingMessage();
+                logStatus('Error loading menu: ' + (err.message || err));
+            }
+        }
             if (!db || !auth.currentUser) {
                 statusMessage.textContent = 'You must be logged in as admin.';
                 return;
