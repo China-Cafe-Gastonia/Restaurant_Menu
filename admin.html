@@ -372,6 +372,7 @@
         document.getElementById('loadMenuButton').addEventListener('click', loadAndRenderMenu);
 
         async function loadAndRenderMenu() {
+            logStatus('Load Menu button clicked. Starting menu load...');
             const menuContainer = document.getElementById('menuContainer');
             const loadingMsg = document.getElementById('loadingMessage');
             if (loadingMsg) loadingMsg.style.display = '';
