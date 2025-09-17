@@ -429,17 +429,19 @@
         });
 
         // Login form submit
-        loginForm.addEventListener('submit', async (e) => {
+        loginForm.addEventListener('submit', function(e) {
             e.preventDefault();
-            const email = document.getElementById('adminEmail').value;
-            const password = document.getElementById('adminPassword').value;
-            loginStatus.textContent = 'Logging in...';
-            try {
-                await signInWithEmailAndPassword(auth, email, password);
-                loginStatus.textContent = '';
-            } catch (error) {
-                loginStatus.textContent = 'Login failed: ' + (error.message || error.code);
-            }
+            (async () => {
+                const email = document.getElementById('adminEmail').value;
+                const password = document.getElementById('adminPassword').value;
+                loginStatus.textContent = 'Logging in...';
+                try {
+                    await signInWithEmailAndPassword(auth, email, password);
+                    loginStatus.textContent = '';
+                } catch (error) {
+                    loginStatus.textContent = 'Login failed: ' + (error.message || error.code);
+                }
+            })();
         });
 
         // Logout button
