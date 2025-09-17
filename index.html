@@ -66,30 +66,11 @@
         let db;
 
         async function fetchRestaurantData() {
-            try {
-                // Try to fetch the backup menu file (with info and notes)
-                const response = await fetch('./backup/09.16.2025.json');
-                if (!response.ok) throw new Error('No local menu file');
-                const data = await response.json();
-                // Restaurant Info
-                if (data.restaurant) {
-                    document.getElementById('restaurantName').textContent = data.restaurant.name || '';
-                    let infoHtml = '';
-                    if (data.restaurant.location) infoHtml += `<div><span class='font-semibold'>Location:</span> ${data.restaurant.location}</div>`;
-                    if (data.restaurant.phone) infoHtml += `<div><span class='font-semibold'>Phone:</span> ${data.restaurant.phone}</div>`;
-                    if (data.restaurant.hours) infoHtml += `<div><span class='font-semibold'>Hours:</span> ${data.restaurant.hours}</div>`;
-                    document.getElementById('restaurantInfo').innerHTML = infoHtml;
-                }
-                // Notes
-                if (data.notes) {
-                    let notesHtml = '';
-                    if (data.notes.combination_plate) notesHtml += `<div><span class='font-semibold'>Combo Plate:</span> ${data.notes.combination_plate}</div>`;
-                    if (data.notes.lunch_special) notesHtml += `<div><span class='font-semibold'>Lunch Special:</span> ${data.notes.lunch_special}</div>`;
-                    document.getElementById('restaurantNotes').innerHTML = notesHtml;
-                }
-            } catch (error) {
-                console.error("Error fetching restaurant data:", error);
-            }
+            // Only fetch restaurant info/notes from Firestore in the future, or remove this if not needed
+            // For now, clear info/notes
+            document.getElementById('restaurantName').textContent = '';
+            document.getElementById('restaurantInfo').innerHTML = '';
+            document.getElementById('restaurantNotes').innerHTML = '';
         }
 
         async function initializeFirebase() {
@@ -152,7 +133,7 @@
 
             const menuRef = collection(db, `artifacts/${appId}/public/data/menu_data`);
             onSnapshot(menuRef, (querySnapshot) => {
-                // If using Firestore, expect flat array, but support nested format for local JSON
+                // If using Firestore, expect flat array
                 const menuItems = [];
                 querySnapshot.forEach((doc) => {
                     menuItems.push(doc.data());
@@ -164,32 +145,11 @@
                 document.getElementById('loadingMessage').textContent = 'Error fetching menu data.';
             });
         }
-        
+
         window.onload = async () => {
             await initializeFirebase();
-            // Try to fetch local JSON menu if available, else use Firestore
-            let usedLocalMenu = false;
-            try {
-                const response = await fetch('./backup/09.16.2025.json');
-                if (response.ok) {
-                    const data = await response.json();
-                    if (data.menu && Array.isArray(data.menu)) {
-                        // Flatten all items from all categories
-                        const menuItems = data.menu.flatMap(cat =>
-                            (cat.items || []).map(item => ({ ...item, category: cat.category }))
-                        );
-                        renderMenu(menuItems);
-                        document.getElementById('loadingMessage').classList.add('hidden');
-                        usedLocalMenu = true;
-                    }
-                }
-            } catch (e) {
-                // Ignore and fallback to Firestore
-            }
             await fetchRestaurantData();
-            if (!usedLocalMenu) {
-                listenForMenuUpdates();
-            }
+            listenForMenuUpdates();
         };
     </script>
 </body>

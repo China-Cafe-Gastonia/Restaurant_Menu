@@ -321,6 +321,8 @@
                         await newBatch.commit();
 
                         statusMessage.textContent = `Menu uploaded successfully! Added ${menuData.length} items.`;
+                        // Immediately reload menu edit table to reflect new data
+                        document.getElementById('loadMenuButton').click();
                     } catch (parseError) {
                         console.error("Error parsing JSON file:", parseError);
                         statusMessage.textContent = `Error parsing JSON file: ${parseError.message}`;
@@ -342,7 +344,6 @@
 
             try {
                 statusMessage.textContent = 'Deleting menu...';
-                //const menuRef = collection(db, `artifacts/${firebaseConfig.appId}/public/data/menu_data`);
                 const menuRef = collection(db, `artifacts/${appId}/public/data/menu_data`);
                 const existingDocs = await getDocs(menuRef);
                 const deleteBatch = writeBatch(db);
@@ -351,6 +352,8 @@
                 });
                 await deleteBatch.commit();
                 statusMessage.textContent = 'Menu deleted successfully!';
+                // Immediately reload menu edit table to reflect deletion
+                document.getElementById('loadMenuButton').click();
             } catch (error) {
                 console.error("Error deleting menu:", error);
                 statusMessage.textContent = `Error deleting menu: ${error.message}`;
