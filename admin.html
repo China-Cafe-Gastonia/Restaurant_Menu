@@ -393,7 +393,7 @@
                     if (docSnap.id === '_info') {
                         infoDoc = docSnap.data();
                     } else {
-                        menuItems.push({ id: docSnap.id, ...docSnap.data() });
+                        menuItems.push({ _id: docSnap.id, ...docSnap.data() });
                     }
                 });
                 // Sort menu items by categoryOrder, then itemOrder
@@ -402,7 +402,7 @@
                 // Fill restaurant info and notes if present
                 if (infoDoc && infoDoc.restaurant) {
                     document.getElementById('editRestaurantName').value = infoDoc.restaurant.name || '';
-                    document.getElementById('editRestaurantAddress').value = infoDoc.restaurant.address || '';
+                    document.getElementById('editRestaurantAddress').value = infoDoc.restaurant.address || infoDoc.restaurant.location || '';
                     document.getElementById('editRestaurantPhone').value = infoDoc.restaurant.phone || '';
                     // Render hours
                     const hoursLines = document.getElementById('editHoursLines');
@@ -420,88 +420,80 @@
                     }
                 }
                 if (infoDoc && infoDoc.notes) {
-                    document.getElementById('editComboNote').value = infoDoc.notes.combo || '';
-                    document.getElementById('editLunchNote').value = infoDoc.notes.lunch || '';
+                    document.getElementById('editComboNote').value = infoDoc.notes.combination_plate || infoDoc.notes.combo || '';
+                    document.getElementById('editLunchNote').value = infoDoc.notes.lunch_special || infoDoc.notes.lunch || '';
                 }
 
-                // Group menu items by category
-                const categories = [];
-                menuItems.forEach(item => {
-                    let cat = categories.find(c => c.category === item.category && c.chinese_name === item.chinese_name);
-                    if (!cat) {
-                        cat = {
-                            category: item.category,
-                            chinese_name: item.chinese_name,
-                            note: item.note,
-                            items: []
-                        };
-                        categories.push(cat);
-                    }
-                    cat.items.push(item);
-                });
+                // Group menu items by category (like index.html)
+                const groupedMenu = menuItems.reduce((acc, item) => {
+                    (acc[item.category] = acc[item.category] || []).push(item);
+                    return acc;
+                }, {});
 
-                // Render categories and items (editable)
-                categories.forEach((cat, catIdx) => {
-                    const catDiv = document.createElement('div');
-                    catDiv.className = 'mb-8';
+                // Render categories and items (card-based, index.html style, but editable)
+                for (const category in groupedMenu) {
+                    const items = groupedMenu[category];
+                    const firstItem = items[0] || {};
+                    const chineseName = firstItem.chinese_name || '';
+                    const note = firstItem.note || '';
+                    const card = document.createElement('div');
+                    card.className = 'menu-card mb-8';
                     // Category header
-                    const catHeader = document.createElement('div');
-                    catHeader.className = 'flex items-center gap-2 mb-2';
+                    const headerDiv = document.createElement('div');
+                    headerDiv.className = 'category-header flex items-center gap-2 mb-2';
                     const catInput = document.createElement('input');
                     catInput.type = 'text';
-                    catInput.value = cat.category;
+                    catInput.value = category;
                     catInput.className = 'text-2xl font-bold text-gray-800 bg-gray-50 rounded px-2 py-1';
-                    catHeader.appendChild(catInput);
-                    if (cat.chinese_name) {
+                    headerDiv.appendChild(catInput);
+                    if (chineseName) {
                         const catChinese = document.createElement('input');
                         catChinese.type = 'text';
-                        catChinese.value = cat.chinese_name;
+                        catChinese.value = chineseName;
                         catChinese.className = 'text-lg text-gray-500 bg-gray-50 rounded px-2 py-1';
-                        catHeader.appendChild(catChinese);
+                        headerDiv.appendChild(catChinese);
                     }
-                    catDiv.appendChild(catHeader);
+                    card.appendChild(headerDiv);
                     // Category note
-                    if (cat.note) {
+                    if (note) {
                         const catNote = document.createElement('input');
                         catNote.type = 'text';
-                        catNote.value = cat.note;
+                        catNote.value = note;
                         catNote.className = 'w-full text-base text-yellow-700 bg-yellow-50 border-l-4 border-yellow-400 rounded-lg p-2 mb-2';
-                        catDiv.appendChild(catNote);
+                        card.appendChild(catNote);
                     }
-                    // Items table
-                    const table = document.createElement('table');
-                    table.className = 'w-full text-left mb-4';
-                    cat.items.forEach((item, itemIdx) => {
-                        const tr = document.createElement('tr');
+                    // Items list (styled like index.html, but editable)
+                    const ul = document.createElement('ul');
+                    ul.className = 'space-y-4';
+                    items.forEach(item => {
+                        const li = document.createElement('li');
+                        li.className = 'border-b pb-2';
+                        const flexDiv = document.createElement('div');
+                        flexDiv.className = 'flex-grow';
                         // Name
-                        const tdName = document.createElement('td');
                         const nameInput = document.createElement('input');
                         nameInput.type = 'text';
                         nameInput.value = item.name || '';
-                        nameInput.className = 'w-full bg-gray-50 rounded px-2 py-1';
-                        tdName.appendChild(nameInput);
-                        tr.appendChild(tdName);
-                        // Price
-                        const tdPrice = document.createElement('td');
-                        const priceInput = document.createElement('input');
-                        priceInput.type = 'text';
-                        priceInput.value = item.price || '';
-                        priceInput.className = 'w-20 bg-gray-50 rounded px-2 py-1 ml-2';
-                        tdPrice.appendChild(priceInput);
-                        tr.appendChild(tdPrice);
+                        nameInput.className = 'text-lg font-semibold text-gray-800 bg-gray-50 rounded px-2 py-1 mb-1 w-full';
+                        flexDiv.appendChild(nameInput);
                         // Description
-                        const tdDesc = document.createElement('td');
                         const descInput = document.createElement('input');
                         descInput.type = 'text';
                         descInput.value = item.description || '';
-                        descInput.className = 'w-full bg-gray-50 rounded px-2 py-1 ml-2';
-                        tdDesc.appendChild(descInput);
-                        tr.appendChild(tdDesc);
-                        table.appendChild(tr);
+                        descInput.className = 'text-sm text-gray-500 bg-gray-50 rounded px-2 py-1 mb-1 w-full';
+                        flexDiv.appendChild(descInput);
+                        // Price
+                        const priceInput = document.createElement('input');
+                        priceInput.type = 'text';
+                        priceInput.value = item.price || '';
+                        priceInput.className = 'w-24 bg-gray-50 rounded px-2 py-1 ml-2 text-orange-600 font-semibold';
+                        flexDiv.appendChild(priceInput);
+                        li.appendChild(flexDiv);
+                        ul.appendChild(li);
                     });
-                    catDiv.appendChild(table);
-                    menuContainer.appendChild(catDiv);
-                });
+                    card.appendChild(ul);
+                    menuContainer.appendChild(card);
+                }
 
                 hideLoadingMessage();
                 logStatus('Menu loaded.');
