@@ -28,18 +28,40 @@
     </style>
 </head>
 <body class="bg-gray-100 text-gray-800">
+
     <div class="container mt-12">
         <header class="text-center mb-8">
             <h1 class="text-3xl font-bold text-gray-900">Restaurant Admin Console</h1>
             <p class="text-gray-500">Manage your menu data in Firestore</p>
         </header>
 
-        <div class="card">
-            <h2 class="text-2xl font-semibold mb-4">Menu Management</h2>
-            <p class="mb-4 text-gray-600">
-                Upload a JSON file to update your menu or delete the entire menu from Firestore.
-            </p>
+        <!-- Login Form -->
+        <div id="loginCard" class="card">
+            <h2 class="text-2xl font-semibold mb-4">Admin Login</h2>
+            <form id="loginForm" class="space-y-4">
+                <div>
+                    <label for="adminEmail" class="block text-sm font-medium text-gray-700">Email</label>
+                    <input type="email" id="adminEmail" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50">
+                </div>
+                <div>
+                    <label for="adminPassword" class="block text-sm font-medium text-gray-700">Password</label>
+                    <input type="password" id="adminPassword" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50">
+                </div>
+                <button type="submit" class="bg-blue-600 text-white font-semibold py-2 px-6 rounded-full shadow-md hover:bg-blue-700 transition-colors w-full">Login</button>
+            </form>
+            <div id="loginStatus" class="mt-4 text-sm font-medium"></div>
+        </div>
 
+        <!-- Admin UI (hidden until logged in) -->
+        <div id="adminCard" class="card" style="display:none;">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-2xl font-semibold">Menu Management</h2>
+                <button id="logoutButton" class="bg-gray-300 text-gray-800 font-semibold py-1 px-4 rounded-full shadow hover:bg-gray-400">Logout</button>
+            </div>
+            <p class="mb-4 text-gray-600">
+                Upload a JSON file to update your menu or delete the entire menu from Firestore.<br>
+                Or edit menu items below.
+            </p>
             <div class="mb-4">
                 <label for="jsonFile" class="block text-sm font-medium text-gray-700">Select Menu JSON File</label>
                 <input type="file" id="jsonFile" accept=".json" class="mt-1 block w-full text-sm text-gray-500
@@ -49,24 +71,138 @@
                     file:bg-blue-50 file:text-blue-700
                     hover:file:bg-blue-100">
             </div>
-
-            <div class="flex space-x-4">
+            <div class="flex space-x-4 mb-4">
                 <button id="uploadButton" class="bg-orange-500 text-white font-semibold py-2 px-6 rounded-full shadow-md hover:bg-orange-600 transition-colors">
                     Upload Menu
                 </button>
                 <button id="deleteButton" class="bg-red-500 text-white font-semibold py-2 px-6 rounded-full shadow-md hover:bg-red-600 transition-colors">
                     Delete Menu
                 </button>
+                <button id="loadMenuButton" class="bg-blue-500 text-white font-semibold py-2 px-6 rounded-full shadow-md hover:bg-blue-600 transition-colors">
+                    Load Menu
+                </button>
             </div>
-            
             <div id="statusMessage" class="mt-6 text-sm font-medium"></div>
+            <div id="menuEditSection" class="mt-8"></div>
+        // Helper: Render menu edit table
+        function renderMenuEditTable(menuItems) {
+            const section = document.getElementById('menuEditSection');
+            if (!menuItems || menuItems.length === 0) {
+                section.innerHTML = '<div class="text-gray-500">No menu items loaded.</div>';
+                return;
+            }
+            let html = `<table class="min-w-full text-sm"><thead><tr>
+                <th class="border-b p-2">Name</th>
+                <th class="border-b p-2">Description</th>
+                <th class="border-b p-2">Category</th>
+                <th class="border-b p-2">Price</th>
+                <th class="border-b p-2">Actions</th>
+            </tr></thead><tbody>`;
+            menuItems.forEach((item, idx) => {
+                html += `<tr>
+                    <td class="border-b p-2"><input type="text" class="w-full border rounded px-1" value="${item.name || ''}" data-field="name" data-idx="${idx}"></td>
+                    <td class="border-b p-2"><input type="text" class="w-full border rounded px-1" value="${item.description || ''}" data-field="description" data-idx="${idx}"></td>
+                    <td class="border-b p-2"><input type="text" class="w-full border rounded px-1" value="${item.category || ''}" data-field="category" data-idx="${idx}"></td>
+                    <td class="border-b p-2"><input type="number" step="0.01" class="w-full border rounded px-1" value="${item.price || ''}" data-field="price" data-idx="${idx}"></td>
+                    <td class="border-b p-2">
+                        <button class="bg-green-500 text-white px-2 py-1 rounded mr-2 saveMenuItemBtn" data-idx="${idx}">Save</button>
+                        <button class="bg-red-500 text-white px-2 py-1 rounded deleteMenuItemBtn" data-idx="${idx}">Delete</button>
+                    </td>
+                </tr>`;
+            });
+            // Add new item row
+            html += `<tr>
+                <td class="border-b p-2"><input type="text" class="w-full border rounded px-1" id="newName"></td>
+                <td class="border-b p-2"><input type="text" class="w-full border rounded px-1" id="newDescription"></td>
+                <td class="border-b p-2"><input type="text" class="w-full border rounded px-1" id="newCategory"></td>
+                <td class="border-b p-2"><input type="number" step="0.01" class="w-full border rounded px-1" id="newPrice"></td>
+                <td class="border-b p-2"><button class="bg-blue-500 text-white px-2 py-1 rounded" id="addMenuItemBtn">Add</button></td>
+            </tr>`;
+            html += '</tbody></table>';
+            section.innerHTML = html;
+        }
+
+        // Load menu from Firestore and render edit table
+        let loadedMenuItems = [];
+        document.getElementById('loadMenuButton').addEventListener('click', async () => {
+            statusMessage.textContent = 'Loading menu...';
+            try {
+                const menuRef = collection(db, `artifacts/${firebaseConfig.appId}/public/data/menu_data`);
+                const snapshot = await getDocs(menuRef);
+                loadedMenuItems = [];
+                snapshot.forEach(docSnap => {
+                    loadedMenuItems.push({ ...docSnap.data(), _id: docSnap.id });
+                });
+                renderMenuEditTable(loadedMenuItems);
+                statusMessage.textContent = 'Menu loaded.';
+            } catch (e) {
+                statusMessage.textContent = 'Error loading menu: ' + e.message;
+            }
+        });
+
+        // Delegate save/delete/add actions
+        document.getElementById('menuEditSection').addEventListener('click', async (e) => {
+            if (e.target.classList.contains('saveMenuItemBtn')) {
+                const idx = e.target.getAttribute('data-idx');
+                const item = loadedMenuItems[idx];
+                // Get updated values
+                const row = e.target.closest('tr');
+                item.name = row.querySelector('input[data-field="name"]').value;
+                item.description = row.querySelector('input[data-field="description"]').value;
+                item.category = row.querySelector('input[data-field="category"]').value;
+                item.price = parseFloat(row.querySelector('input[data-field="price"]').value) || 0;
+                // Save to Firestore
+                try {
+                    const menuRef = collection(db, `artifacts/${firebaseConfig.appId}/public/data/menu_data`);
+                    const docRef = doc(menuRef, item._id);
+                    await writeBatch(db).set(docRef, item).commit();
+                    statusMessage.textContent = 'Item saved.';
+                } catch (err) {
+                    statusMessage.textContent = 'Error saving item: ' + err.message;
+                }
+            } else if (e.target.classList.contains('deleteMenuItemBtn')) {
+                const idx = e.target.getAttribute('data-idx');
+                const item = loadedMenuItems[idx];
+                try {
+                    const menuRef = collection(db, `artifacts/${firebaseConfig.appId}/public/data/menu_data`);
+                    const docRef = doc(menuRef, item._id);
+                    await writeBatch(db).delete(docRef).commit();
+                    loadedMenuItems.splice(idx, 1);
+                    renderMenuEditTable(loadedMenuItems);
+                    statusMessage.textContent = 'Item deleted.';
+                } catch (err) {
+                    statusMessage.textContent = 'Error deleting item: ' + err.message;
+                }
+            } else if (e.target.id === 'addMenuItemBtn') {
+                // Add new item
+                const name = document.getElementById('newName').value;
+                const description = document.getElementById('newDescription').value;
+                const category = document.getElementById('newCategory').value;
+                const price = parseFloat(document.getElementById('newPrice').value) || 0;
+                if (!name || !category) {
+                    statusMessage.textContent = 'Name and category are required.';
+                    return;
+                }
+                try {
+                    const menuRef = collection(db, `artifacts/${firebaseConfig.appId}/public/data/menu_data`);
+                    const newDocRef = doc(menuRef);
+                    const newItem = { name, description, category, price };
+                    await writeBatch(db).set(newDocRef, newItem).commit();
+                    loadedMenuItems.push({ ...newItem, _id: newDocRef.id });
+                    renderMenuEditTable(loadedMenuItems);
+                    statusMessage.textContent = 'Item added.';
+                } catch (err) {
+                    statusMessage.textContent = 'Error adding item: ' + err.message;
+                }
+            }
+        });
         </div>
     </div>
 
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-app.js";
-        import { getFirestore, collection, getDocs, writeBatch, doc } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js";
-        import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-auth.js";
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-app.js";
+    import { getFirestore, collection, getDocs, writeBatch, doc } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js";
+    import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-auth.js";
 
         // IMPORTANT: REPLACE WITH YOUR OWN FIREBASE CONFIGURATION
         const firebaseConfig = {
@@ -83,29 +219,58 @@
         // Initialize Firebase
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
+
         const auth = getAuth(app);
-        
         // UI elements
+        const loginCard = document.getElementById('loginCard');
+        const loginForm = document.getElementById('loginForm');
+        const loginStatus = document.getElementById('loginStatus');
+        const adminCard = document.getElementById('adminCard');
         const uploadButton = document.getElementById('uploadButton');
         const deleteButton = document.getElementById('deleteButton');
+        const logoutButton = document.getElementById('logoutButton');
         const statusMessage = document.getElementById('statusMessage');
         const jsonFile = document.getElementById('jsonFile');
 
-        let userId = null;
+        // Auth state observer
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                // Show admin UI
+                loginCard.style.display = 'none';
+                adminCard.style.display = '';
+                statusMessage.textContent = 'Firebase initialized. Ready.';
+            } else {
+                // Show login UI
+                loginCard.style.display = '';
+                adminCard.style.display = 'none';
+                loginStatus.textContent = '';
+                statusMessage.textContent = '';
+            }
+        });
 
-        // Sign in anonymously to get a user ID
-        signInAnonymously(auth).then((userCredential) => {
-            userId = userCredential.user.uid;
-            statusMessage.textContent = 'Firebase initialized. Ready.';
-        }).catch((error) => {
-            console.error("Authentication Error:", error);
-            statusMessage.textContent = `Authentication Error: ${error.message}`;
+        // Login form submit
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('adminEmail').value;
+            const password = document.getElementById('adminPassword').value;
+            loginStatus.textContent = 'Logging in...';
+            try {
+                await signInWithEmailAndPassword(auth, email, password);
+                loginStatus.textContent = '';
+            } catch (error) {
+                loginStatus.textContent = 'Login failed: ' + (error.message || error.code);
+            }
+        });
+
+        // Logout button
+        logoutButton.addEventListener('click', async () => {
+            await signOut(auth);
         });
 
         // Upload a JSON file to Firestore
         uploadButton.addEventListener('click', async () => {
-            if (!db || !userId) {
-                statusMessage.textContent = 'Firebase is not initialized. Please wait.';
+            if (!db || !auth.currentUser) {
+                statusMessage.textContent = 'You must be logged in as admin.';
                 return;
             }
 
@@ -169,8 +334,8 @@
 
         // Delete the entire menu from Firestore
         deleteButton.addEventListener('click', async () => {
-            if (!db || !userId) {
-                statusMessage.textContent = 'Firebase is not initialized. Please wait.';
+            if (!db || !auth.currentUser) {
+                statusMessage.textContent = 'You must be logged in as admin.';
                 return;
             }
 
