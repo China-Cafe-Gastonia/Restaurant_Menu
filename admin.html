@@ -56,12 +56,11 @@
         <div id="adminCard" class="card" style="display:none;">
             <div class="flex justify-between items-center mb-4">
                 <h2 class="text-2xl font-semibold">Menu Management</h2>
-                <button id="logoutButton" class="bg-gray-300 text-gray-800 font-semibold py-1 px-4 rounded-full shadow hover:bg-gray-400">Logout</button>
+                <div class="flex gap-2 items-center">
+                    <button id="deleteButton" class="bg-red-500 text-white font-semibold py-1 px-4 rounded-full shadow hover:bg-red-600">Reset</button>
+                    <button id="logoutButton" class="bg-gray-300 text-gray-800 font-semibold py-1 px-4 rounded-full shadow hover:bg-gray-400">Logout</button>
+                </div>
             </div>
-            <p class="mb-4 text-gray-600">
-                Upload a JSON file to update your menu or delete the entire menu from Firestore.<br>
-                Or edit menu items below.
-            </p>
             <div class="mb-4">
                 <label for="jsonFile" class="block text-sm font-medium text-gray-700">Select Menu JSON File</label>
                 <input type="file" id="jsonFile" accept=".json" class="mt-1 block w-full text-sm text-gray-500
@@ -74,9 +73,6 @@
             <div class="flex space-x-4 mb-4">
                 <button id="uploadButton" class="bg-orange-500 text-white font-semibold py-2 px-6 rounded-full shadow-md hover:bg-orange-600 transition-colors">
                     Upload Menu
-                </button>
-                <button id="deleteButton" class="bg-red-500 text-white font-semibold py-2 px-6 rounded-full shadow-md hover:bg-red-600 transition-colors">
-                    Delete Menu
                 </button>
                 <button id="loadMenuButton" class="bg-blue-500 text-white font-semibold py-2 px-6 rounded-full shadow-md hover:bg-blue-600 transition-colors">
                     Load Menu
@@ -169,8 +165,11 @@
     document.getElementById('loadMenuButton').addEventListener('click', async () => {
         logStatus('Loading menu...');
         try {
+            // Use orderBy to fetch in order
             const menuRef = collection(db, `artifacts/${firebaseConfig.appId}/public/data/menu_data`);
-            const snapshot = await getDocs(menuRef);
+            const { query, orderBy, getDocs } = await import('https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js');
+            const q = query(menuRef, orderBy('order'));
+            const snapshot = await getDocs(q);
             loadedMenuItems = [];
             snapshot.forEach(docSnap => {
                 loadedMenuItems.push({ ...docSnap.data(), _id: docSnap.id });
@@ -335,14 +334,17 @@
                     if (!Array.isArray(menuData)) {
                         // Try to extract and flatten from nested format
                         if (menuData.menu && Array.isArray(menuData.menu)) {
-                            // Flatten all items from all categories
-                            menuData = menuData.menu.flatMap(cat =>
-                                (cat.items || []).map(item => ({ ...item, category: cat.category }))
+                            // Flatten all items from all categories, preserving order
+                            menuData = menuData.menu.flatMap((cat, catIdx) =>
+                                (cat.items || []).map((item, itemIdx) => ({ ...item, category: cat.category, order: (catIdx * 1000) + itemIdx }))
                             );
                         } else {
                             logStatus('Error: The uploaded file is not a valid JSON array or menu format.');
                             return;
                         }
+                    } else {
+                        // Flat array: add order field based on array index
+                        menuData = menuData.map((item, idx) => ({ ...item, order: idx }));
                     }
                     try {
                         // Reference to the collection
