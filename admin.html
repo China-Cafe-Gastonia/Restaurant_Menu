@@ -114,14 +114,18 @@
 
         <!-- Field/Form 3: Output Box (always visible, toggle with arrow) -->
         <div id="outputBox" class="card" style="position:fixed;left:0;right:0;bottom:0;z-index:50;margin:0 auto;max-width:900px;box-shadow:0 -2px 16px 0 #0001;transition:transform 0.3s cubic-bezier(.4,0,.2,1);">
-            <div class="flex items-center justify-between mb-2">
+            <div class="flex items-center justify-between mb-2 relative">
                 <h2 class="text-xl font-semibold mb-0">Output</h2>
-                <button id="toggleOutputBtn" class="text-gray-500 hover:text-gray-800 text-2xl focus:outline-none" title="Show/Hide Output">
+                <button id="toggleOutputBtn" class="absolute top-1/2 right-0 -translate-y-1/2 bg-white rounded-full shadow px-2 py-1 text-gray-500 hover:text-gray-800 text-2xl focus:outline-none border border-gray-200" style="z-index:51;" title="Show/Hide Output">
                     <span id="outputArrow">▼</span>
                 </button>
             </div>
             <div id="statusOutput" class="bg-gray-100 border rounded p-2 font-mono text-sm text-gray-700" style="white-space:pre-wrap; max-height:160px; overflow-y:auto;"></div>
         </div>
+        <!-- Floating outputArrow for when output box is hidden -->
+        <button id="floatingOutputArrow" class="fixed right-4 bottom-2 bg-white rounded-full shadow px-2 py-1 text-gray-500 hover:text-gray-800 text-2xl focus:outline-none border border-gray-200" style="z-index:100;display:none;" title="Show Output">
+            <span>▲</span>
+        </button>
     </div>
 
     <script type="module">
@@ -130,19 +134,29 @@
         const outputBox = document.getElementById('outputBox');
         const toggleOutputBtn = document.getElementById('toggleOutputBtn');
         const outputArrow = document.getElementById('outputArrow');
+        const floatingOutputArrow = document.getElementById('floatingOutputArrow');
         let outputHidden = false;
+        function showOutputBox() {
+            outputBox.style.transform = 'translateY(0)';
+            outputArrow.textContent = '▼';
+            floatingOutputArrow.style.display = 'none';
+            outputHidden = false;
+        }
+        function hideOutputBox() {
+            outputBox.style.transform = 'translateY(90%)';
+            outputArrow.textContent = '▲';
+            floatingOutputArrow.style.display = '';
+        }
         toggleOutputBtn.addEventListener('click', () => {
-            outputHidden = !outputHidden;
             if (outputHidden) {
-                outputBox.style.transform = 'translateY(90%)';
-                outputArrow.textContent = '▲';
+                showOutputBox();
             } else {
-                outputBox.style.transform = 'translateY(0)';
-                outputArrow.textContent = '▼';
+                hideOutputBox();
             }
         });
+        floatingOutputArrow.addEventListener('click', showOutputBox);
         // Ensure output box starts visible
-        outputBox.style.transform = 'translateY(0)';
+        showOutputBox();
     });
 
     // --- All DOM-dependent logic must run after DOMContentLoaded ---
