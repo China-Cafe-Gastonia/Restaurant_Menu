@@ -30,21 +30,23 @@
 <body class="bg-gray-100 text-gray-800">
 
 
-    <!-- Login Form -->
-    <div id="loginCard" class="card">
-        <h2 class="text-2xl font-semibold mb-4">Admin Login</h2>
-        <form id="loginForm" class="space-y-4">
-            <div>
-                <label for="adminEmail" class="block text-sm font-medium text-gray-700">Email</label>
-                <input type="email" id="adminEmail" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50">
-            </div>
-            <div>
-                <label for="adminPassword" class="block text-sm font-medium text-gray-700">Password</label>
-                <input type="password" id="adminPassword" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50">
-            </div>
-            <button type="submit" class="bg-blue-600 text-white font-semibold py-2 px-6 rounded-full shadow-md hover:bg-blue-700 transition-colors w-full">Login</button>
-        </form>
-        <div id="loginStatus" class="mt-4 text-sm font-medium"></div>
+    <!-- Login Form (centered vertically) -->
+    <div id="loginContainer" class="flex items-center justify-center min-h-screen" style="min-height:100vh;">
+        <div id="loginCard" class="card">
+            <h2 class="text-2xl font-semibold mb-4">Admin Login</h2>
+            <form id="loginForm" class="space-y-4">
+                <div>
+                    <label for="adminEmail" class="block text-sm font-medium text-gray-700">Email</label>
+                    <input type="email" id="adminEmail" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50">
+                </div>
+                <div>
+                    <label for="adminPassword" class="block text-sm font-medium text-gray-700">Password</label>
+                    <input type="password" id="adminPassword" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50">
+                </div>
+                <button type="submit" class="bg-blue-600 text-white font-semibold py-2 px-6 rounded-full shadow-md hover:bg-blue-700 transition-colors w-full">Login</button>
+            </form>
+            <div id="loginStatus" class="mt-4 text-sm font-medium"></div>
+        </div>
     </div>
 
     <!-- Admin UI (hidden until logged in) -->
@@ -102,255 +104,258 @@
 
     <script type="module">
 
-    // --- Restaurant Info/Hours/Notes Editable Card Logic ---
-    const daysOfWeek = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
-    let restaurantInfoDoc = null;
-    function renderEditableHours(hours) {
-        const lines = daysOfWeek.map(day => {
-            const h = hours && hours[day] ? hours[day] : { open: '', close: '' };
-            return `<div class="flex items-center gap-2 mb-1 w-full justify-center">
-                <span class="w-20 text-right font-semibold text-gray-700">${day.slice(0,3)}:</span>
-                <input type="time" class="editHoursOpen bg-gray-50 rounded px-2 py-1 border w-28" data-day="${day}" value="${h.open || ''}">
-                <span class="mx-1">-</span>
-                <input type="time" class="editHoursClose bg-gray-50 rounded px-2 py-1 border w-28" data-day="${day}" value="${h.close || ''}">
-            </div>`;
-        }).join('');
-        document.getElementById('editHoursLines').innerHTML = lines;
-    }
-    async function loadRestaurantInfo() {
-        // Wait for Firebase to be ready
-        if (!window.db) { setTimeout(loadRestaurantInfo, 300); return; }
-        const { getDoc, doc } = await import('https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js');
-        const menuRef = window.db && window.db.constructor ? window.db : db;
-        const infoDocRef = doc(menuRef, `artifacts/${firebaseConfig.appId}/public/data/menu_data/_info`);
-        const infoSnap = await getDoc(infoDocRef);
-        restaurantInfoDoc = infoSnap.exists() ? infoSnap.data() : {};
-        document.getElementById('editRestaurantName').value = restaurantInfoDoc.restaurant?.name || '';
-        document.getElementById('editRestaurantAddress').value = restaurantInfoDoc.restaurant?.location || '';
-        document.getElementById('editRestaurantPhone').value = restaurantInfoDoc.restaurant?.phone || '';
-        renderEditableHours(restaurantInfoDoc.restaurant?.hours || {});
-        document.getElementById('editComboNote').value = restaurantInfoDoc.notes?.combination_plate || '';
-        document.getElementById('editLunchNote').value = restaurantInfoDoc.notes?.lunch_special || '';
-    }
-    async function saveRestaurantInfo() {
-        const { doc, setDoc } = await import('https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js');
-        const menuRef = window.db && window.db.constructor ? window.db : db;
-        const infoDocRef = doc(menuRef, `artifacts/${firebaseConfig.appId}/public/data/menu_data/_info`);
-        // Gather values
-        const name = document.getElementById('editRestaurantName').value;
-        const location = document.getElementById('editRestaurantAddress').value;
-        const phone = document.getElementById('editRestaurantPhone').value;
-        // Gather hours
-        const hours = {};
-        document.querySelectorAll('.editHoursOpen').forEach(input => {
-            const day = input.getAttribute('data-day');
-            hours[day] = hours[day] || {};
-            hours[day].open = input.value;
-        });
-        document.querySelectorAll('.editHoursClose').forEach(input => {
-            const day = input.getAttribute('data-day');
-            hours[day] = hours[day] || {};
-            hours[day].close = input.value;
-        });
-        // Notes
-        const combination_plate = document.getElementById('editComboNote').value;
-        const lunch_special = document.getElementById('editLunchNote').value;
-        // Compose doc
-        const newDoc = {
-            restaurant: { name, location, phone, hours },
-            notes: { combination_plate, lunch_special }
-        };
-        await setDoc(infoDocRef, newDoc);
-        document.getElementById('restaurantInfoStatus').textContent = 'Info saved!';
-        setTimeout(() => { document.getElementById('restaurantInfoStatus').textContent = ''; }, 2000);
-    }
-    document.getElementById('saveRestaurantInfoBtn').addEventListener('click', saveRestaurantInfo);
-    window.addEventListener('DOMContentLoaded', loadRestaurantInfo);
-
-
-    // Show/hide output area
-    const toggleStatusBtn = document.getElementById('toggleStatusBtn');
-    const statusOutputCard = document.getElementById('statusOutputCard');
-    toggleStatusBtn.addEventListener('click', () => {
-        if (statusOutputCard.style.display === 'none') {
-            statusOutputCard.style.display = '';
-            toggleStatusBtn.textContent = 'Hide Output';
-        } else {
-            statusOutputCard.style.display = 'none';
-            toggleStatusBtn.textContent = 'Show Output';
+    // --- All DOM-dependent logic must run after DOMContentLoaded ---
+    window.addEventListener('DOMContentLoaded', () => {
+        // --- Restaurant Info/Hours/Notes Editable Card Logic ---
+        const daysOfWeek = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
+        let restaurantInfoDoc = null;
+        function renderEditableHours(hours) {
+            const lines = daysOfWeek.map(day => {
+                const h = hours && hours[day] ? hours[day] : { open: '', close: '' };
+                return `<div class="flex items-center gap-2 mb-1 w-full justify-center">
+                    <span class="w-20 text-right font-semibold text-gray-700">${day.slice(0,3)}:</span>
+                    <input type="time" class="editHoursOpen bg-gray-50 rounded px-2 py-1 border w-28" data-day="${day}" value="${h.open || ''}">
+                    <span class="mx-1">-</span>
+                    <input type="time" class="editHoursClose bg-gray-50 rounded px-2 py-1 border w-28" data-day="${day}" value="${h.close || ''}">
+                </div>`;
+            }).join('');
+            document.getElementById('editHoursLines').innerHTML = lines;
         }
-    });
-
-    // Helper: Render menu edit table
-    function renderMenuEditTable(menuItems) {
-        const section = document.getElementById('menuEditSection');
-        if (!menuItems || menuItems.length === 0) {
-            section.innerHTML = '<div class="text-gray-500">No menu items loaded.</div>';
-            return;
+        async function loadRestaurantInfo() {
+            // Wait for Firebase to be ready
+            if (!window.db) { setTimeout(loadRestaurantInfo, 300); return; }
+            const { getDoc, doc } = await import('https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js');
+            const menuRef = window.db && window.db.constructor ? window.db : db;
+            const infoDocRef = doc(menuRef, `artifacts/${firebaseConfig.appId}/public/data/menu_data/_info`);
+            const infoSnap = await getDoc(infoDocRef);
+            restaurantInfoDoc = infoSnap.exists() ? infoSnap.data() : {};
+            document.getElementById('editRestaurantName').value = restaurantInfoDoc.restaurant?.name || '';
+            document.getElementById('editRestaurantAddress').value = restaurantInfoDoc.restaurant?.location || '';
+            document.getElementById('editRestaurantPhone').value = restaurantInfoDoc.restaurant?.phone || '';
+            renderEditableHours(restaurantInfoDoc.restaurant?.hours || {});
+            document.getElementById('editComboNote').value = restaurantInfoDoc.notes?.combination_plate || '';
+            document.getElementById('editLunchNote').value = restaurantInfoDoc.notes?.lunch_special || '';
         }
-        // Group items by category, and collect extra info (chinese_name, note)
-        const groupedMenu = {};
-        const categoryMeta = {};
-        menuItems.forEach((item, idx) => {
-            if (!groupedMenu[item.category]) groupedMenu[item.category] = [];
-            groupedMenu[item.category].push({ ...item, _idx: idx });
-            // Save meta info if present
-            if (item.category && (item.chinese_name || item.note)) {
-                categoryMeta[item.category] = categoryMeta[item.category] || {};
-                if (item.chinese_name) categoryMeta[item.category].chinese_name = item.chinese_name;
-                if (item.note) categoryMeta[item.category].note = item.note;
-            }
-        });
-        let html = '';
-        for (const category in groupedMenu) {
-            const meta = categoryMeta[category] || {};
-            html += `<div class="menu-card mb-8">
-                <div class="category-header">
-                    <input type="text" value="${category}" data-category-edit="${category}" class="font-bold text-gray-900 bg-gray-100 rounded px-2 py-1 mr-2" style="min-width:120px;" />
-                    ${meta.chinese_name ? `<span class='category-chinese'>${meta.chinese_name}</span>` : ''}
-                </div>
-                ${meta.note ? `<div class='category-note'>${meta.note}</div>` : ''}
-                <ul class="space-y-4">
-                    ${groupedMenu[category].map(item => {
-                        let detailsHtml = '';
-                        if (item.unit && typeof item.unit === 'object' && !Array.isArray(item.unit)) {
-                            for (const unitKey in item.unit) {
-                                const value = item.unit[unitKey];
-                                if (typeof value === 'string' || typeof value === 'number') {
-                                    detailsHtml += `<div class="flex items-center gap-2"><input type="text" class="text-sm text-gray-700 bg-gray-50 rounded px-2 py-1 w-32" value="${unitKey}" data-field="unitKey" data-idx="${item._idx}"/><input type="number" step="0.01" class="text-orange-600 text-sm bg-gray-50 rounded px-2 py-1 w-20" value="${value}" data-field="unitValue" data-idx="${item._idx}"/></div>`;
-                                } else if (typeof value === 'object') {
-                                    detailsHtml += `<div class="font-semibold text-gray-700 mt-1">${unitKey}</div>`;
-                                    for (const opt in value) {
-                                        detailsHtml += `<div class="flex items-center gap-2 pl-4"><input type="text" class="text-xs text-gray-500 bg-gray-50 rounded px-2 py-1 w-32" value="${opt}" data-field="unitOptKey" data-idx="${item._idx}"/><input type="number" step="0.01" class="text-orange-600 text-xs bg-gray-50 rounded px-2 py-1 w-16" value="${value[opt]}" data-field="unitOptValue" data-idx="${item._idx}"/></div>`;
-                                    }
-                                }
-                            }
-                        } else if (Array.isArray(item.unit)) {
-                            detailsHtml += item.unit.map((u, i) => `<input type="text" class="text-sm text-gray-700 bg-gray-50 rounded px-2 py-1 w-24" value="${u}" data-field="unitArr" data-idx="${item._idx}">`).join(', ');
-                        } else if (typeof item.unit === 'string' || typeof item.unit === 'number') {
-                            detailsHtml += `<input type="text" class="text-sm text-gray-700 bg-gray-50 rounded px-2 py-1 w-24" value="${item.unit}" data-field="unit" data-idx="${item._idx}">`;
-                        }
-                        if (!detailsHtml) {
-                            if (typeof item.price !== 'undefined') {
-                                detailsHtml = `<input type="number" step="0.01" class="text-orange-600 text-lg bg-gray-50 rounded px-2 py-1 w-24 mb-1" value="${item.price}" data-field="price" data-idx="${item._idx}">`;
-                            } else if (item.prices && typeof item.prices === 'object') {
-                                detailsHtml = Object.entries(item.prices).map(([k, v]) => `<div class="flex items-center gap-2"><input type="text" class="text-xs text-gray-500 bg-gray-50 rounded px-2 py-1 w-32" value="${k}" data-field="pricesKey" data-idx="${item._idx}"/><input type="number" step="0.01" class="text-orange-600 text-xs bg-gray-50 rounded px-2 py-1 w-16" value="${v}" data-field="pricesValue" data-idx="${item._idx}"/></div>`).join('');
-                            } else if (typeof item.prices === 'string' || typeof item.prices === 'number') {
-                                detailsHtml = `<input type="number" step="0.01" class="text-orange-600 text-lg bg-gray-50 rounded px-2 py-1 w-24 mb-1" value="${item.prices}" data-field="prices" data-idx="${item._idx}">`;
-                            }
-                        }
-                        return `
-                        <li class="border-b pb-2">
-                            <div class="flex-grow">
-                                <input type="text" class="text-lg font-semibold text-gray-800 bg-gray-50 rounded px-2 py-1 mb-1 w-full" value="${item.name || ''}" data-field="name" data-idx="${item._idx}">
-                                <input type="text" class="text-sm text-gray-500 bg-gray-50 rounded px-2 py-1 w-full" value="${item.description || ''}" data-field="description" data-idx="${item._idx}">
-                                <div class="space-y-1">${detailsHtml}</div>
-                            </div>
-                            <div class="flex flex-col items-end ml-4">
-                                <div class="flex gap-1">
-                                    <button class="bg-green-500 text-white px-2 py-1 rounded saveMenuItemBtn" data-idx="${item._idx}">Save</button>
-                                    <button class="bg-red-500 text-white px-2 py-1 rounded deleteMenuItemBtn" data-idx="${item._idx}">Delete</button>
-                                </div>
-                                <div class="flex gap-1 mt-1">
-                                    <button class="bg-blue-200 text-blue-800 px-2 py-1 rounded addAboveMenuItemBtn" data-idx="${item._idx}">Add Above</button>
-                                    <button class="bg-blue-200 text-blue-800 px-2 py-1 rounded addBelowMenuItemBtn" data-idx="${item._idx}">Add Below</button>
-                                </div>
-                            </div>
-                        </li>
-                        `;
-                    }).join('')}
-                </ul>
-            </div>`;
-        }
-        section.innerHTML = html;
-    }
-
-    // Load menu from Firestore and render edit table
-    let loadedMenuItems = [];
-    // Helper to log to both statusMessage and consoleOutput
-    function logStatus(msg) {
-        statusMessage.textContent = msg;
-        const consoleOutput = document.getElementById('consoleOutput');
-        if (consoleOutput) {
-            consoleOutput.textContent += msg + '\n';
-            consoleOutput.scrollTop = consoleOutput.scrollHeight;
-        }
-    }
-
-    document.getElementById('loadMenuButton').addEventListener('click', async () => {
-        logStatus('Loading menu...');
-        try {
-            // Use orderBy to fetch in category/item order
-            const menuRef = collection(db, `artifacts/${firebaseConfig.appId}/public/data/menu_data`);
-            const { query, orderBy, getDocs } = await import('https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js');
-            const q = query(menuRef, orderBy('categoryOrder'), orderBy('itemOrder'));
-            const snapshot = await getDocs(q);
-            loadedMenuItems = [];
-            snapshot.forEach(docSnap => {
-                loadedMenuItems.push({ ...docSnap.data(), _id: docSnap.id });
+        async function saveRestaurantInfo() {
+            const { doc, setDoc } = await import('https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js');
+            const menuRef = window.db && window.db.constructor ? window.db : db;
+            const infoDocRef = doc(menuRef, `artifacts/${firebaseConfig.appId}/public/data/menu_data/_info`);
+            // Gather values
+            const name = document.getElementById('editRestaurantName').value;
+            const location = document.getElementById('editRestaurantAddress').value;
+            const phone = document.getElementById('editRestaurantPhone').value;
+            // Gather hours
+            const hours = {};
+            document.querySelectorAll('.editHoursOpen').forEach(input => {
+                const day = input.getAttribute('data-day');
+                hours[day] = hours[day] || {};
+                hours[day].open = input.value;
             });
-            renderMenuEditTable(loadedMenuItems);
-            logStatus('Menu loaded.');
-        } catch (e) {
-            logStatus('Error loading menu: ' + e.message);
+            document.querySelectorAll('.editHoursClose').forEach(input => {
+                const day = input.getAttribute('data-day');
+                hours[day] = hours[day] || {};
+                hours[day].close = input.value;
+            });
+            // Notes
+            const combination_plate = document.getElementById('editComboNote').value;
+            const lunch_special = document.getElementById('editLunchNote').value;
+            // Compose doc
+            const newDoc = {
+                restaurant: { name, location, phone, hours },
+                notes: { combination_plate, lunch_special }
+            };
+            await setDoc(infoDocRef, newDoc);
+            document.getElementById('restaurantInfoStatus').textContent = 'Info saved!';
+            setTimeout(() => { document.getElementById('restaurantInfoStatus').textContent = ''; }, 2000);
         }
-    });
+        document.getElementById('saveRestaurantInfoBtn').addEventListener('click', saveRestaurantInfo);
+        loadRestaurantInfo();
 
-    // Delegate save/delete/add actions
-    document.getElementById('menuEditSection').addEventListener('click', async (e) => {
-        if (e.target.classList.contains('saveMenuItemBtn')) {
-            const idx = e.target.getAttribute('data-idx');
-            const item = loadedMenuItems[idx];
-            // Get updated values
-            const row = e.target.closest('tr');
-            item.name = row.querySelector('input[data-field="name"]').value;
-            item.description = row.querySelector('input[data-field="description"]').value;
-            item.category = row.querySelector('input[data-field="category"]').value;
-            item.price = parseFloat(row.querySelector('input[data-field="price"]').value) || 0;
-            // Save to Firestore
-            try {
-                const menuRef = collection(db, `artifacts/${firebaseConfig.appId}/public/data/menu_data`);
-                const docRef = doc(menuRef, item._id);
-                await writeBatch(db).set(docRef, item).commit();
-                statusMessage.textContent = 'Item saved.';
-            } catch (err) {
-                statusMessage.textContent = 'Error saving item: ' + err.message;
+        // Show/hide output area
+        const toggleStatusBtn = document.getElementById('toggleStatusBtn');
+        const statusOutputCard = document.getElementById('statusOutputCard');
+        toggleStatusBtn.addEventListener('click', () => {
+            if (statusOutputCard.style.display === 'none') {
+                statusOutputCard.style.display = '';
+                toggleStatusBtn.textContent = 'Hide Output';
+            } else {
+                statusOutputCard.style.display = 'none';
+                toggleStatusBtn.textContent = 'Show Output';
             }
-        } else if (e.target.classList.contains('deleteMenuItemBtn')) {
-            const idx = e.target.getAttribute('data-idx');
-            const item = loadedMenuItems[idx];
-            try {
-                const menuRef = collection(db, `artifacts/${firebaseConfig.appId}/public/data/menu_data`);
-                const docRef = doc(menuRef, item._id);
-                await writeBatch(db).delete(docRef).commit();
-                loadedMenuItems.splice(idx, 1);
-                renderMenuEditTable(loadedMenuItems);
-                statusMessage.textContent = 'Item deleted.';
-            } catch (err) {
-                statusMessage.textContent = 'Error deleting item: ' + err.message;
-            }
-        } else if (e.target.id === 'addMenuItemBtn') {
-            // Add new item
-            const name = document.getElementById('newName').value;
-            const description = document.getElementById('newDescription').value;
-            const category = document.getElementById('newCategory').value;
-            const price = parseFloat(document.getElementById('newPrice').value) || 0;
-            if (!name || !category) {
-                statusMessage.textContent = 'Name and category are required.';
+        });
+
+        // Helper: Render menu edit table
+        function renderMenuEditTable(menuItems) {
+            const section = document.getElementById('menuEditSection');
+            if (!menuItems || menuItems.length === 0) {
+                section.innerHTML = '<div class="text-gray-500">No menu items loaded.</div>';
                 return;
             }
-            try {
-                const menuRef = collection(db, `artifacts/${firebaseConfig.appId}/public/data/menu_data`);
-                const newDocRef = doc(menuRef);
-                const newItem = { name, description, category, price };
-                await writeBatch(db).set(newDocRef, newItem).commit();
-                loadedMenuItems.push({ ...newItem, _id: newDocRef.id });
-                renderMenuEditTable(loadedMenuItems);
-                statusMessage.textContent = 'Item added.';
-            } catch (err) {
-                statusMessage.textContent = 'Error adding item: ' + err.message;
+            // Group items by category, and collect extra info (chinese_name, note)
+            const groupedMenu = {};
+            const categoryMeta = {};
+            menuItems.forEach((item, idx) => {
+                if (!groupedMenu[item.category]) groupedMenu[item.category] = [];
+                groupedMenu[item.category].push({ ...item, _idx: idx });
+                // Save meta info if present
+                if (item.category && (item.chinese_name || item.note)) {
+                    categoryMeta[item.category] = categoryMeta[item.category] || {};
+                    if (item.chinese_name) categoryMeta[item.category].chinese_name = item.chinese_name;
+                    if (item.note) categoryMeta[item.category].note = item.note;
+                }
+            });
+            let html = '';
+            for (const category in groupedMenu) {
+                const meta = categoryMeta[category] || {};
+                html += `<div class="menu-card mb-8">
+                    <div class="category-header">
+                        <input type="text" value="${category}" data-category-edit="${category}" class="font-bold text-gray-900 bg-gray-100 rounded px-2 py-1 mr-2" style="min-width:120px;" />
+                        ${meta.chinese_name ? `<span class='category-chinese'>${meta.chinese_name}</span>` : ''}
+                    </div>
+                    ${meta.note ? `<div class='category-note'>${meta.note}</div>` : ''}
+                    <ul class="space-y-4">
+                        ${groupedMenu[category].map(item => {
+                            let detailsHtml = '';
+                            if (item.unit && typeof item.unit === 'object' && !Array.isArray(item.unit)) {
+                                for (const unitKey in item.unit) {
+                                    const value = item.unit[unitKey];
+                                    if (typeof value === 'string' || typeof value === 'number') {
+                                        detailsHtml += `<div class="flex items-center gap-2"><input type="text" class="text-sm text-gray-700 bg-gray-50 rounded px-2 py-1 w-32" value="${unitKey}" data-field="unitKey" data-idx="${item._idx}"/><input type="number" step="0.01" class="text-orange-600 text-sm bg-gray-50 rounded px-2 py-1 w-20" value="${value}" data-field="unitValue" data-idx="${item._idx}"/></div>`;
+                                    } else if (typeof value === 'object') {
+                                        detailsHtml += `<div class="font-semibold text-gray-700 mt-1">${unitKey}</div>`;
+                                        for (const opt in value) {
+                                            detailsHtml += `<div class="flex items-center gap-2 pl-4"><input type="text" class="text-xs text-gray-500 bg-gray-50 rounded px-2 py-1 w-32" value="${opt}" data-field="unitOptKey" data-idx="${item._idx}"/><input type="number" step="0.01" class="text-orange-600 text-xs bg-gray-50 rounded px-2 py-1 w-16" value="${value[opt]}" data-field="unitOptValue" data-idx="${item._idx}"/></div>`;
+                                        }
+                                    }
+                                }
+                            } else if (Array.isArray(item.unit)) {
+                                detailsHtml += item.unit.map((u, i) => `<input type="text" class="text-sm text-gray-700 bg-gray-50 rounded px-2 py-1 w-24" value="${u}" data-field="unitArr" data-idx="${item._idx}">`).join(', ');
+                            } else if (typeof item.unit === 'string' || typeof item.unit === 'number') {
+                                detailsHtml += `<input type="text" class="text-sm text-gray-700 bg-gray-50 rounded px-2 py-1 w-24" value="${item.unit}" data-field="unit" data-idx="${item._idx}">`;
+                            }
+                            if (!detailsHtml) {
+                                if (typeof item.price !== 'undefined') {
+                                    detailsHtml = `<input type="number" step="0.01" class="text-orange-600 text-lg bg-gray-50 rounded px-2 py-1 w-24 mb-1" value="${item.price}" data-field="price" data-idx="${item._idx}">`;
+                                } else if (item.prices && typeof item.prices === 'object') {
+                                    detailsHtml = Object.entries(item.prices).map(([k, v]) => `<div class="flex items-center gap-2"><input type="text" class="text-xs text-gray-500 bg-gray-50 rounded px-2 py-1 w-32" value="${k}" data-field="pricesKey" data-idx="${item._idx}"/><input type="number" step="0.01" class="text-orange-600 text-xs bg-gray-50 rounded px-2 py-1 w-16" value="${v}" data-field="pricesValue" data-idx="${item._idx}"/></div>`).join('');
+                                } else if (typeof item.prices === 'string' || typeof item.prices === 'number') {
+                                    detailsHtml = `<input type="number" step="0.01" class="text-orange-600 text-lg bg-gray-50 rounded px-2 py-1 w-24 mb-1" value="${item.prices}" data-field="prices" data-idx="${item._idx}">`;
+                                }
+                            }
+                            return `
+                            <li class="border-b pb-2">
+                                <div class="flex-grow">
+                                    <input type="text" class="text-lg font-semibold text-gray-800 bg-gray-50 rounded px-2 py-1 mb-1 w-full" value="${item.name || ''}" data-field="name" data-idx="${item._idx}">
+                                    <input type="text" class="text-sm text-gray-500 bg-gray-50 rounded px-2 py-1 w-full" value="${item.description || ''}" data-field="description" data-idx="${item._idx}">
+                                    <div class="space-y-1">${detailsHtml}</div>
+                                </div>
+                                <div class="flex flex-col items-end ml-4">
+                                    <div class="flex gap-1">
+                                        <button class="bg-green-500 text-white px-2 py-1 rounded saveMenuItemBtn" data-idx="${item._idx}">Save</button>
+                                        <button class="bg-red-500 text-white px-2 py-1 rounded deleteMenuItemBtn" data-idx="${item._idx}">Delete</button>
+                                    </div>
+                                    <div class="flex gap-1 mt-1">
+                                        <button class="bg-blue-200 text-blue-800 px-2 py-1 rounded addAboveMenuItemBtn" data-idx="${item._idx}">Add Above</button>
+                                        <button class="bg-blue-200 text-blue-800 px-2 py-1 rounded addBelowMenuItemBtn" data-idx="${item._idx}">Add Below</button>
+                                    </div>
+                                </div>
+                            </li>
+                            `;
+                        }).join('')}
+                    </ul>
+                </div>`;
+            }
+            section.innerHTML = html;
+        }
+
+        // Load menu from Firestore and render edit table
+        let loadedMenuItems = [];
+        // Helper to log to both statusMessage and consoleOutput
+        function logStatus(msg) {
+            statusMessage.textContent = msg;
+            const consoleOutput = document.getElementById('consoleOutput');
+            if (consoleOutput) {
+                consoleOutput.textContent += msg + '\n';
+                consoleOutput.scrollTop = consoleOutput.scrollHeight;
             }
         }
+
+        document.getElementById('loadMenuButton').addEventListener('click', async () => {
+            logStatus('Loading menu...');
+            try {
+                // Use orderBy to fetch in category/item order
+                const menuRef = collection(db, `artifacts/${firebaseConfig.appId}/public/data/menu_data`);
+                const { query, orderBy, getDocs } = await import('https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js');
+                const q = query(menuRef, orderBy('categoryOrder'), orderBy('itemOrder'));
+                const snapshot = await getDocs(q);
+                loadedMenuItems = [];
+                snapshot.forEach(docSnap => {
+                    loadedMenuItems.push({ ...docSnap.data(), _id: docSnap.id });
+                });
+                renderMenuEditTable(loadedMenuItems);
+                logStatus('Menu loaded.');
+            } catch (e) {
+                logStatus('Error loading menu: ' + e.message);
+            }
+        });
+
+        // Delegate save/delete/add actions
+        document.getElementById('menuEditSection').addEventListener('click', async (e) => {
+            if (e.target.classList.contains('saveMenuItemBtn')) {
+                const idx = e.target.getAttribute('data-idx');
+                const item = loadedMenuItems[idx];
+                // Get updated values
+                const row = e.target.closest('tr');
+                item.name = row.querySelector('input[data-field="name"]').value;
+                item.description = row.querySelector('input[data-field="description"]').value;
+                item.category = row.querySelector('input[data-field="category"]').value;
+                item.price = parseFloat(row.querySelector('input[data-field="price"]').value) || 0;
+                // Save to Firestore
+                try {
+                    const menuRef = collection(db, `artifacts/${firebaseConfig.appId}/public/data/menu_data`);
+                    const docRef = doc(menuRef, item._id);
+                    await writeBatch(db).set(docRef, item).commit();
+                    statusMessage.textContent = 'Item saved.';
+                } catch (err) {
+                    statusMessage.textContent = 'Error saving item: ' + err.message;
+                }
+            } else if (e.target.classList.contains('deleteMenuItemBtn')) {
+                const idx = e.target.getAttribute('data-idx');
+                const item = loadedMenuItems[idx];
+                try {
+                    const menuRef = collection(db, `artifacts/${firebaseConfig.appId}/public/data/menu_data`);
+                    const docRef = doc(menuRef, item._id);
+                    await writeBatch(db).delete(docRef).commit();
+                    loadedMenuItems.splice(idx, 1);
+                    renderMenuEditTable(loadedMenuItems);
+                    statusMessage.textContent = 'Item deleted.';
+                } catch (err) {
+                    statusMessage.textContent = 'Error deleting item: ' + err.message;
+                }
+            } else if (e.target.id === 'addMenuItemBtn') {
+                // Add new item
+                const name = document.getElementById('newName').value;
+                const description = document.getElementById('newDescription').value;
+                const category = document.getElementById('newCategory').value;
+                const price = parseFloat(document.getElementById('newPrice').value) || 0;
+                if (!name || !category) {
+                    statusMessage.textContent = 'Name and category are required.';
+                    return;
+                }
+                try {
+                    const menuRef = collection(db, `artifacts/${firebaseConfig.appId}/public/data/menu_data`);
+                    const newDocRef = doc(menuRef);
+                    const newItem = { name, description, category, price };
+                    await writeBatch(db).set(newDocRef, newItem).commit();
+                    loadedMenuItems.push({ ...newItem, _id: newDocRef.id });
+                    renderMenuEditTable(loadedMenuItems);
+                    statusMessage.textContent = 'Item added.';
+                } catch (err) {
+                    statusMessage.textContent = 'Error adding item: ' + err.message;
+                }
+            }
+        });
+        // ...existing code...
     });
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-app.js";
     import { getFirestore, collection, getDocs, writeBatch, doc } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js";
@@ -389,14 +394,14 @@
             const infoCard = document.getElementById('restaurantInfoCard');
             if (user) {
                 // Show admin UI and info card
-                loginCard.style.display = 'none';
-                adminCard.style.display = '';
+                document.getElementById('loginContainer').style.display = 'none';
+                document.getElementById('adminMain').style.display = '';
                 infoCard.style.display = '';
                 statusMessage.textContent = 'Firebase initialized. Ready.';
             } else {
                 // Show login UI only
-                loginCard.style.display = '';
-                adminCard.style.display = 'none';
+                document.getElementById('loginContainer').style.display = '';
+                document.getElementById('adminMain').style.display = 'none';
                 infoCard.style.display = 'none';
                 loginStatus.textContent = '';
                 statusMessage.textContent = '';
