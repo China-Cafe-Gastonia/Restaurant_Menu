@@ -233,32 +233,31 @@
                 nameEl.textContent = '';
                 infoEl.innerHTML = '';
             }
-    </style>
-            if (notes) {
-                // Make Combo Plate and Lunch Special stand out
-                let notesHtml = '';
-                if (notes.combination_plate) {
-                    notesHtml += `
-                        <div class="important-note-box">
-                            <span class="important-note-icon">🍱</span>
-                            <span class="important-note-title">Combo Plate:</span>
-                            <span class="important-note-text">${notes.combination_plate}</span>
-                        </div>
-                    `;
-                }
-                if (notes.lunch_special) {
-                    notesHtml += `
-                        <div class="important-note-box">
-                            <span class="important-note-icon">⏰</span>
-                            <span class="important-note-title">Lunch Special:</span>
-                            <span class="important-note-text">${notes.lunch_special}</span>
-                        </div>
-                    `;
-                }
-                notesEl.innerHTML = notesHtml;
-            } else {
-                notesEl.innerHTML = '';
-            }
+    if (notes) {
+        // Make Combo Plate and Lunch Special stand out
+        let notesHtml = '';
+        if (notes.combination_plate) {
+            notesHtml += `
+                <div class="important-note-box">
+                    <span class="important-note-icon">🍱</span>
+                    <span class="important-note-title">Combo Plate:</span>
+                    <span class="important-note-text">${notes.combination_plate}</span>
+                </div>
+            `;
+        }
+        if (notes.lunch_special) {
+            notesHtml += `
+                <div class="important-note-box">
+                    <span class="important-note-icon">⏰</span>
+                    <span class="important-note-title">Lunch Special:</span>
+                    <span class="important-note-text">${notes.lunch_special}</span>
+                </div>
+            `;
+        }
+        notesEl.innerHTML = notesHtml;
+    } else {
+        notesEl.innerHTML = '';
+    }
             if (!menuDocs || menuDocs.length === 0) {
                 menuContainer.innerHTML = '<div class="text-center text-gray-400 text-xl py-12">Menu not available or under maintenance.</div>';
                 return;
