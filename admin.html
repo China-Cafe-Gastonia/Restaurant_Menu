@@ -35,7 +35,7 @@
             <p class="text-gray-500">Manage your menu data in Firestore</p>
         </header>
         <!-- Editable Restaurant Info Card -->
-        <div id="restaurantInfoCard" class="menu-card mb-8" style="max-width:700px;margin:auto;">
+    <div id="restaurantInfoCard" class="menu-card mb-8" style="max-width:700px;margin:auto; display:none;">
             <div class="mb-4">
                 <input id="editRestaurantName" type="text" class="text-4xl font-extrabold text-gray-900 w-full mb-2 bg-gray-50 rounded px-2 py-1" placeholder="Restaurant Name" />
             </div>
@@ -414,15 +414,18 @@
 
         // Auth state observer
         onAuthStateChanged(auth, (user) => {
+            const infoCard = document.getElementById('restaurantInfoCard');
             if (user) {
-                // Show admin UI
+                // Show admin UI and info card
                 loginCard.style.display = 'none';
                 adminCard.style.display = '';
+                infoCard.style.display = '';
                 statusMessage.textContent = 'Firebase initialized. Ready.';
             } else {
-                // Show login UI
+                // Show login UI only
                 loginCard.style.display = '';
                 adminCard.style.display = 'none';
+                infoCard.style.display = 'none';
                 loginStatus.textContent = '';
                 statusMessage.textContent = '';
             }
