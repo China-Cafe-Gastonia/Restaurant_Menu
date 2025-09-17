@@ -217,6 +217,7 @@
                 document.getElementById('adminMain').style.display = '';
                 if (infoCard) infoCard.style.display = '';
                 statusMessage.textContent = 'Firebase initialized. Ready.';
+                if (typeof logStatus === 'function') logStatus('Firebase initialized. Ready.');
             } else {
                 // Show login UI only
                 document.getElementById('loginContainer').style.display = '';
@@ -224,6 +225,7 @@
                 if (infoCard) infoCard.style.display = 'none';
                 loginStatus.textContent = '';
                 statusMessage.textContent = '';
+                if (typeof logStatus === 'function') logStatus('Logged out or not authenticated.');
             }
         });
 
@@ -237,12 +239,14 @@
             loginStatus.textContent = 'Logging in...';
             loginStatus.style.color = '#2563eb';
             loginStatus.style.display = 'block';
+            if (typeof logStatus === 'function') logStatus('Logging in...');
             (async () => {
                 try {
                     await signInWithEmailAndPassword(auth, email, password);
                     loginStatus.textContent = 'Login successful!';
                     loginStatus.style.color = '#16a34a'; // green
                     loginStatus.style.display = 'block';
+                    if (typeof logStatus === 'function') logStatus('Login successful!');
                     // Only clear fields on success
                     setTimeout(() => {
                         loginStatus.textContent = '';
@@ -253,6 +257,7 @@
                     loginStatus.textContent = 'Login failed: ' + (error.message || error.code);
                     loginStatus.style.color = '#dc2626'; // red
                     loginStatus.style.display = 'block';
+                    if (typeof logStatus === 'function') logStatus('Login failed: ' + (error.message || error.code));
                     // Do NOT clear fields on failure
                 }
             })();
