@@ -107,15 +107,13 @@
             </div>
             <div id="statusMessage" class="mt-6 text-sm font-medium"></div>
             <div id="menuEditSection" class="mt-8"></div>
-        <!-- Console Section -->
-        <div id="consoleCard" class="card mt-8" style="position:fixed; left:0; right:0; bottom:0; z-index:50; max-width:600px; margin:auto; box-shadow:0 -2px 8px rgba(0,0,0,0.08);">
-            <h2 class="text-xl font-semibold mb-2">Console</h2>
-            <textarea id="consoleInput" rows="2" class="w-full border rounded p-2 mb-2 font-mono text-sm" placeholder="Enter command or message..."></textarea>
-            <div class="flex gap-2 mb-2">
-                <button id="runConsoleBtn" class="bg-blue-600 text-white px-4 py-1 rounded">Run</button>
-                <button id="clearConsoleBtn" class="bg-gray-300 text-gray-800 px-4 py-1 rounded">Clear</button>
-            </div>
-            <div id="consoleOutput" class="bg-gray-100 border rounded p-2 font-mono text-sm text-gray-700" style="white-space:pre-wrap; max-height:160px; overflow-y:auto;"></div>
+        <!-- Output/Status Section with Show/Hide -->
+        <div class="flex justify-end mt-2">
+            <button id="toggleStatusBtn" class="bg-gray-200 text-gray-800 px-3 py-1 rounded shadow hover:bg-gray-300 text-sm">Show Output</button>
+        </div>
+        <div id="statusOutputCard" class="card mt-2" style="display:none;">
+            <h2 class="text-xl font-semibold mb-2">Output</h2>
+            <div id="statusOutput" class="bg-gray-100 border rounded p-2 font-mono text-sm text-gray-700" style="white-space:pre-wrap; max-height:160px; overflow-y:auto;"></div>
         </div>
         </div>
     </div>
@@ -187,11 +185,29 @@
     document.getElementById('saveRestaurantInfoBtn').addEventListener('click', saveRestaurantInfo);
     window.addEventListener('DOMContentLoaded', loadRestaurantInfo);
 
-    // Clear console output functionality
-    document.getElementById('clearConsoleBtn').addEventListener('click', () => {
-        const consoleOutput = document.getElementById('consoleOutput');
-        if (consoleOutput) consoleOutput.textContent = '';
+
+    // Show/hide output area
+    const toggleStatusBtn = document.getElementById('toggleStatusBtn');
+    const statusOutputCard = document.getElementById('statusOutputCard');
+    toggleStatusBtn.addEventListener('click', () => {
+        if (statusOutputCard.style.display === 'none') {
+            statusOutputCard.style.display = '';
+            toggleStatusBtn.textContent = 'Hide Output';
+        } else {
+            statusOutputCard.style.display = 'none';
+            toggleStatusBtn.textContent = 'Show Output';
+        }
     });
+
+    // Helper to log to both statusMessage and output area
+    function logStatus(msg) {
+        statusMessage.textContent = msg;
+        const statusOutput = document.getElementById('statusOutput');
+        if (statusOutput) {
+            statusOutput.textContent += msg + '\n';
+            statusOutput.scrollTop = statusOutput.scrollHeight;
+        }
+    }
 
     // Helper: Render menu edit table
     function renderMenuEditTable(menuItems) {
