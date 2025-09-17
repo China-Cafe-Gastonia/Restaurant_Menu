@@ -137,14 +137,43 @@
                 ${meta.note ? `<div class="mb-2 text-sm text-blue-700">${meta.note}</div>` : ''}
                 <ul class="space-y-4">`;
             groupedMenu[category].forEach((item, idxInCat) => {
+                // Render new unit/price structure for editing
+                let unitHtml = '';
+                if (item.unit && typeof item.unit === 'object' && !Array.isArray(item.unit)) {
+                    for (const unitKey in item.unit) {
+                        const value = item.unit[unitKey];
+                        if (typeof value === 'string' || typeof value === 'number') {
+                            unitHtml += `<div class="flex items-center gap-2"><span class="text-sm text-gray-700">${unitKey}</span><input type="number" step="0.01" class="text-orange-600 text-sm bg-gray-50 rounded px-2 py-1 w-20" value="${value}" data-field="unit-${unitKey}" data-idx="${item._idx}"></div>`;
+                        } else if (typeof value === 'object') {
+                            unitHtml += `<div class="font-semibold text-gray-700 mt-1">${unitKey}</div>`;
+                            for (const opt in value) {
+                                unitHtml += `<div class="flex items-center gap-2 pl-4"><span class="text-xs text-gray-500">${opt}</span><input type="number" step="0.01" class="text-orange-600 text-xs bg-gray-50 rounded px-2 py-1 w-16" value="${value[opt]}" data-field="unit-${unitKey}-${opt}" data-idx="${item._idx}"></div>`;
+                            }
+                        }
+                    }
+                } else if (Array.isArray(item.unit)) {
+                    unitHtml += item.unit.map((u, i) => `<input type="text" class="text-sm text-gray-700 bg-gray-50 rounded px-2 py-1 w-24" value="${u}" data-field="unit-${i}" data-idx="${item._idx}">`).join(', ');
+                } else if (typeof item.unit === 'string' || typeof item.unit === 'number') {
+                    unitHtml += `<input type="text" class="text-sm text-gray-700 bg-gray-50 rounded px-2 py-1 w-24" value="${item.unit}" data-field="unit" data-idx="${item._idx}">`;
+                }
+                // Fallback for price/prices
+                if (!unitHtml) {
+                    if (typeof item.price !== 'undefined') {
+                        unitHtml = `<input type="number" step="0.01" class="text-orange-600 text-lg bg-gray-50 rounded px-2 py-1 w-24 mb-1" value="${item.price}" data-field="price" data-idx="${item._idx}">`;
+                    } else if (item.prices && typeof item.prices === 'object') {
+                        unitHtml = Object.entries(item.prices).map(([k, v]) => `<div class="flex items-center gap-2"><span class="text-xs text-gray-500">${k}</span><input type="number" step="0.01" class="text-orange-600 text-xs bg-gray-50 rounded px-2 py-1 w-16" value="${v}" data-field="prices-${k}" data-idx="${item._idx}"></div>`).join('');
+                    } else if (typeof item.prices === 'string' || typeof item.prices === 'number') {
+                        unitHtml = `<input type="number" step="0.01" class="text-orange-600 text-lg bg-gray-50 rounded px-2 py-1 w-24 mb-1" value="${item.prices}" data-field="prices" data-idx="${item._idx}">`;
+                    }
+                }
                 html += `
                 <li class="flex justify-between items-center border-b pb-2">
                     <div class="flex-grow flex flex-col gap-1">
                         <input type="text" class="text-lg font-semibold text-gray-800 bg-gray-50 rounded px-2 py-1 mb-1 w-full" value="${item.name || ''}" data-field="name" data-idx="${item._idx}">
                         <input type="text" class="text-sm text-gray-500 bg-gray-50 rounded px-2 py-1 w-full" value="${item.description || ''}" data-field="description" data-idx="${item._idx}">
+                        <div class="flex flex-col gap-1">${unitHtml}</div>
                     </div>
                     <div class="flex flex-col items-end ml-4">
-                        <input type="number" step="0.01" class="text-orange-600 text-lg bg-gray-50 rounded px-2 py-1 w-24 mb-1" value="${item.price || ''}" data-field="price" data-idx="${item._idx}">
                         <div class="flex gap-1">
                             <button class="bg-green-500 text-white px-2 py-1 rounded saveMenuItemBtn" data-idx="${item._idx}">Save</button>
                             <button class="bg-red-500 text-white px-2 py-1 rounded deleteMenuItemBtn" data-idx="${item._idx}">Delete</button>

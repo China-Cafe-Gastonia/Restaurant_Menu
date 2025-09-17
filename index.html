@@ -59,8 +59,16 @@
         .hours-block {
             display: flex;
             align-items: flex-start;
+            justify-content: center;
             margin-top: 0.5rem;
             margin-bottom: 0.5rem;
+            width: 100%;
+        }
+        .hours-lines {
+            display: flex;
+            flex-direction: column;
+            gap: 0.1rem;
+            align-items: center;
         }
         .hours-icon {
             font-size: 1.3rem;
@@ -293,22 +301,46 @@
                     ${note ? `<div class='category-note'>${note}</div>` : ''}
                     <ul class="space-y-4">
                         ${groupedMenu[category].map(item => {
-                            // Support price as string or number, or prices as object
-                            let price = '';
-                            if (typeof item.price !== 'undefined') {
-                                price = `$${parseFloat(item.price).toFixed(2)}`;
-                            } else if (item.prices && typeof item.prices === 'object') {
-                                price = Object.entries(item.prices).map(([k, v]) => `${k}: $${parseFloat(v).toFixed(2)}`).join('<br>');
-                            } else if (typeof item.prices === 'string' || typeof item.prices === 'number') {
-                                price = `$${parseFloat(item.prices).toFixed(2)}`;
+                            // Render new unit/price structure
+                            let detailsHtml = '';
+                            if (item.unit && typeof item.unit === 'object' && !Array.isArray(item.unit)) {
+                                // unit is an object: could be {size: price} or {size: {option: price}}
+                                for (const unitKey in item.unit) {
+                                    const value = item.unit[unitKey];
+                                    if (typeof value === 'string' || typeof value === 'number') {
+                                        // Simple: {size: price}
+                                        detailsHtml += `<div class="flex justify-between"><span class="text-sm text-gray-700">${unitKey}</span><span class="text-orange-600 font-semibold">$${parseFloat(value).toFixed(2)}</span></div>`;
+                                    } else if (typeof value === 'object') {
+                                        // Nested: {size: {option: price}}
+                                        detailsHtml += `<div class="font-semibold text-gray-700 mt-1">${unitKey}</div>`;
+                                        for (const opt in value) {
+                                            detailsHtml += `<div class="flex justify-between pl-4"><span class="text-sm text-gray-500">${opt}</span><span class="text-orange-600">$${parseFloat(value[opt]).toFixed(2)}</span></div>`;
+                                        }
+                                    }
+                                }
+                            } else if (Array.isArray(item.unit)) {
+                                // Array of units (rare)
+                                detailsHtml += item.unit.map(u => `<span class="text-sm text-gray-700">${u}</span>`).join(', ');
+                            } else if (typeof item.unit === 'string' || typeof item.unit === 'number') {
+                                detailsHtml += `<span class="text-sm text-gray-700">${item.unit}</span>`;
+                            }
+                            // Fallback for price/prices
+                            if (!detailsHtml) {
+                                if (typeof item.price !== 'undefined') {
+                                    detailsHtml = `<span class="text-orange-600 font-semibold">$${parseFloat(item.price).toFixed(2)}</span>`;
+                                } else if (item.prices && typeof item.prices === 'object') {
+                                    detailsHtml = Object.entries(item.prices).map(([k, v]) => `<div class="flex justify-between"><span class="text-sm text-gray-500">${k}</span><span class="text-orange-600">$${parseFloat(v).toFixed(2)}</span></div>`).join('');
+                                } else if (typeof item.prices === 'string' || typeof item.prices === 'number') {
+                                    detailsHtml = `<span class="text-orange-600 font-semibold">$${parseFloat(item.prices).toFixed(2)}</span>`;
+                                }
                             }
                             return `
-                            <li class="flex justify-between items-center border-b pb-2">
+                            <li class="border-b pb-2">
                                 <div class="flex-grow">
                                     <h3 class="text-lg font-semibold text-gray-800">${item.name}</h3>
-                                    <p class="text-sm text-gray-500">${item.description || ''}</p>
+                                    <p class="text-sm text-gray-500 mb-1">${item.description || ''}</p>
+                                    ${detailsHtml ? `<div class="space-y-1">${detailsHtml}</div>` : ''}
                                 </div>
-                                <span class="text-orange-600 text-lg ml-4 flex-shrink-0">${price}</span>
                             </li>
                             `;
                         }).join('')}

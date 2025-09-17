@@ -25,43 +25,41 @@
         {
           "name": "Pork Egg Roll",
           "description": "A deep-fried roll filled with pork and vegetables.",
-          "prices": {
-            "1 Roll": "2.10",
-            "2 Roll": "3.85"
+          "unit": {
+            "(1 Roll)": "2.10",
+            "(2 Roll)": "3.85"
           }
         },
         {
           "name": "Shrimp Egg Roll",
           "description": "A deep-fried roll filled with shrimp and vegetables.",
-          "prices": {
-            "1 Roll": "2.40",
-            "2 Roll": "4.05"
+          "unit": {
+            "(1 Roll)": "2.40",
+            "(2 Roll)": "4.05"
           }
         },
         {
           "name": "Spring Egg Roll",
           "description": "A light and crispy roll filled with vegetables.",
-          "prices": {
-            "1 Roll": "2",
-            "2 Roll": "3.45"
+          "unit": {
+            "(1 Roll)": "2.00",
+            "(2 Roll)": "3.45"
           }
         },
         {
           "name": "Steamed Dumplings",
           "description": "Eight steamed dumplings filled with a mixture of pork and vegetables.",
-          "unit": "(8)",
-          "price": "7.20"
+          "unit": {"(8)": "7.20"}
         },
         {
           "name": "Pan Fried Dumplings",
           "description": "Eight pan-fried dumplings with a crispy bottom and a pork and vegetable filling.",
-          "unit": "(8)",
-          "price": "8.20"
+          "unit": {"(8)": "8.20"}
         },
         {
           "name": "BBQ Boneless Ribs",
           "description": "Tender boneless ribs marinated in a sweet barbecue sauce.",
-          "prices": {
+          "unit": {
             "S": "7.20",
             "L": "12.20"
           }
@@ -69,7 +67,7 @@
         {
           "name": "Chicken on a Sticks",
           "description": "Skewers of grilled chicken marinated in a flavorful sauce.",
-          "prices": {
+          "unit": {
             "(4)": "7.20",
             "(8)": "12.20"
           }
@@ -77,13 +75,12 @@
         {
           "name": "Fried Pork Wontons",
           "description": "Ten crispy fried wontons filled with a savory pork mixture.",
-          "unit": "(10)",
-          "price": "6.00"
+          "unit": {"(10)": "6.00"}
         },
         {
           "name": "Crab Rangoon (aka Cream Cheese Wontons)",
           "description": "Crispy wontons filled with a minced imitation crab and cream cheese blend.",
-          "prices": {
+          "unit": {
             "(8)": "7.20",
             "(15)": "10.70"
           }
@@ -91,8 +88,7 @@
         {
           "name": "Chinese Donuts(Sugar Donuts)",
           "description": "Ten light and fluffy fried dough pieces coated in sugar, perfect for a sweet treat.",
-          "unit": "(10)",
-          "price": "6.20"
+          "unit": {"(10)": "6.20"}
         }
       ]
     },
@@ -104,58 +100,58 @@
         {
           "name": "Wonton Soup",
           "description": "Savory broth with pork wontons.",
-          "prices": {
-            "Pint": "3.60",
-            "Quart": "6.50"
-          }
+            "unit": {
+              "Pint (16 oz)": "3.60",
+              "Quart (32 oz)": "6.50"
+            }
         },
         {
           "name": "Egg Drop Soup",
           "description": "A classic broth with ribbons of whipped egg.",
-          "prices": {
-            "Pint": "3.20",
-            "Quart": "6.00"
-          }
+            "unit": {
+              "Pint (16 oz)": "3.20",
+              "Quart (32 oz)": "6.00"
+            }
         },
         {
           "name": "Wonton Egg Drop Soup",
           "description": "A combination of pork wontons and egg drop soup.",
-          "prices": {
-            "Pint": "4.00",
-            "Quart": "7.00"
-          }
+            "unit": {
+              "Pint (16 oz)": "4.00",
+              "Quart (32 oz)": "7.00"
+            }
         },
         {
           "name": "Vegetable Soup",
           "description": "A light soup with a variety of vegetables.",
-          "prices": {
-            "Pint": "3.60",
-            "Quart": "6.50"
-          }
+            "unit": {
+              "Pint (16 oz)": "3.60",
+              "Quart (32 oz)": "6.50"
+            }
         },
         {
           "name": "Hot & Sour Soup",
           "description": "A spicy and tangy soup with mushrooms, tofu, and bamboo shoots.",
-          "prices": {
-            "Pint": "4.00",
-            "Quart": "7.00"
-          }
+            "unit": {
+              "Pint (16 oz)": "4.00",
+              "Quart (32 oz)": "7.00"
+            }
         },
         {
           "name": "Chicken Noodle Soup",
           "description": "A soup with chicken and soft noodles.",
-          "prices": {
-            "Pint": "3.60",
-            "Quart": "6.50"
-          }
+            "unit": {
+              "Pint (16 oz)": "3.60",
+              "Quart (32 oz)": "6.50"
+            }
         },
         {
           "name": "Chicken Rice Soup",
           "description": "A soup with chicken and rice in a savory broth.",
-          "prices": {
-            "Pint": "3.60",
-            "Quart": "6.50"
-          }
+            "unit": {
+              "Pint (16 oz)": "3.60",
+              "Quart (32 oz)": "6.50"
+            }
         }
       ]
     },
@@ -166,96 +162,106 @@
         {
           "name": "Fried Chicken Nuggets",
           "description": "Crispy fried chicken nuggets, golden and delicious.",
-          "unit": "(10)",
-          "prices": {
-            "(Plain)": "4.90",
-            "(with Fried Rice/White Rice)": "6.40",
-            "(with French Fries)": "6.90",
-            "(with Chicken Fried Rice)": "6.90",
-            "(with Pork Fried Rice)": "6.90",
-            "(with Shrimp Fried Rice)": "7.40",
-            "(with Beef Fried Rice)": "7.40"
-          }
+            "unit": {
+              "10 Nuggets": {
+                "Plain/Only Nugget": "4.90",
+                "w. Fried Rice/White Rice": "6.40",
+                "w. French Fries": "6.90",
+                "w. Chicken Fried Rice": "6.90",
+                "w. Pork Fried Rice": "6.90",
+                "w. Shrimp Fried Rice": "7.40",
+                "w. Beef Fried Rice": "7.40"
+              }
+            }
         },
         {
           "name": "Fried Scallops",
           "description": "Crispy fried scallops, golden and delicious.",
-          "unit": "(12)",
-          "prices": {
-            "(Plain)": "6.00",
-            "(with Fried Rice/White Rice)": "7.50",
-            "(with French Fries)": "8.00",
-            "(with Chicken Fried Rice)": "8.00",
-            "(with Pork Fried Rice)": "8.00",
-            "(with Shrimp Fried Rice)": "8.70",
-            "(with Beef Fried Rice)": "8.70"
-          }
+            "unit": {
+              "12 Scallops": {
+                "Plain/Only Scallop": "6.00",
+                "w. Fried Rice/White Rice": "7.50",
+                "w. French Fries": "8.00",
+                "w. Chicken Fried Rice": "8.00",
+                "w. Pork Fried Rice": "8.00",
+                "w. Shrimp Fried Rice": "8.70",
+                "w. Beef Fried Rice": "8.70"
+              }
+            }
         },
         {
           "name": "Fried Butterfly Shrimp",
           "description": "Crispy fried shrimp, golden and delicious.",
-          "prices": {
-            "(Plain)": "7.00",
-            "(with Fried Rice/White Rice)": "8.00",
-            "(with French Fries)": "9.00",
-            "(with Chicken Fried Rice)": "9.00",
-            "(with Pork Fried Rice)": "9.00",
-            "(with Shrimp Fried Rice)": "9.60",
-            "(with Beef Fried Rice)": "9.60"
-          }
+            "unit": {
+              "8 Shrimp": {
+                "Plain/Only Shrimp": "7.00",
+                "w. Fried Rice/White Rice": "8.00",
+                "w. French Fries": "9.00",
+                "w. Chicken Fried Rice": "9.00",
+                "w. Pork Fried Rice": "9.00",
+                "w. Shrimp Fried Rice": "9.60",
+                "w. Beef Fried Rice": "9.60"
+              }
+            }
         },
         {
           "name": "Fried Wings",
           "description": "Crispy fried chicken wings.",
-          "prices": {
-            "(4 Wings)": "8.70",
-            "(4 Wings w. Fried Rice/White Rice)": "10.20",
-            "(4 Wings w. French Fries)": "11.10",
-            "(4 Wings w. Chicken Fried Rice)": "11.10",
-            "(4 Wings w. Pork Fried Rice)": "11.10",
-            "(4 Wings w. Shrimp Fried Rice)": "11.70",
-            "(4 Wings w. Beef Fried Rice)": "11.70",
-            "(4 Wings w. House Fried Rice)": "12.50",
-            "(4 Wings w. Lo Mein)": "12.50",
-            "(4 Wings w. Vegetable Lo Mein)": "13.50",
-            "(6 Wings)": "12.50",
-            "(6 Wings w. Fried Rice/White Rice)": "14.00",
-            "(6 Wings w. French Fries)": "15.00",
-            "(6 Wings w. Chicken Fried Rice)": "15.00",
-            "(6 Wings w. Pork Fried Rice)": "15.50",
-            "(6 Wings w. Shrimp Fried Rice)": "15.50",
-            "(6 Wings w. Beef Fried Rice)": "15.50",
-            "(6 Wings w. House Fried Rice)": "16.00",
-            "(6 Wings w. Lo Mein)": "16.00",
-            "(6 Wings w. Vegetable Lo Mein)": "17.00"
-
-          }
+            "unit": {
+              "4 Wings": {
+                "Plain/Only Wing": "8.70",
+                "w. Fried Rice/White Rice": "10.20",
+                "w. French Fries": "11.10",
+                "w. Chicken Fried Rice": "11.10",
+                "w. Pork Fried Rice": "11.10",
+                "w. Shrimp Fried Rice": "11.70",
+                "w. Beef Fried Rice": "11.70",
+                "w. House Fried Rice": "12.50",
+                "w. Lo Mein": "12.50",
+                "w. Vegetable Lo Mein": "13.50"
+              },
+              "6 Wings": {
+                "Plain/Only Wing": "12.50",
+                "w. Fried Rice/White Rice": "14.00",
+                "w. French Fries": "15.00",
+                "w. Chicken Fried Rice": "15.00",
+                "w. Pork Fried Rice": "15.50",
+                "w. Shrimp Fried Rice": "15.50",
+                "w. Beef Fried Rice": "15.50",
+                "w. House Fried Rice": "16.00",
+                "w. Lo Mein": "16.00",
+                "w. Vegetable Lo Mein": "17.00"
+              }
+            }
         },
         {
           "name": "Spicy Buffalo Wings",
           "description": "Crispy fried chicken wings tossed in a spicy buffalo sauce.",
-          "prices": {
-            "(4 Wings)": "10.20",
-            "(4 Wings w. Fried Rice/White Rice)": "11.70",
-            "(4 Wings w. French Fries)": "12.80",
-            "(4 Wings w. Chicken Fried Rice)": "12.80",
-            "(4 Wings w. Pork Fried Rice)": "12.80",
-            "(4 Wings w. Shrimp Fried Rice)": "13.30",
-            "(4 Wings w. Beef Fried Rice)": "13.30",
-
-            "(6 Wings)": "",
-            "(6 Wings w. Fried Rice/White Rice)": "",
-            "(6 Wings w. French Fries)": "",
-            "(6 Wings w. Chicken Fried Rice)": "",
-            "(6 Wings w. Pork Fried Rice)": "",
-            "(6 Wings w. Shrimp Fried Rice)": "",
-            "(6 Wings w. Beef Fried Rice)": ""
-          }
+            "unit": {
+              "4 Wings": {
+                "Plain/Only Wing": "10.20",
+                "w. Fried Rice/White Rice": "11.70",
+                "w. French Fries": "12.80",
+                "w. Chicken Fried Rice": "12.80",
+                "w. Pork Fried Rice": "12.80",
+                "w. Shrimp Fried Rice": "13.30",
+                "w. Beef Fried Rice": "13.30"
+              },
+              "6 Wings": {
+                "Plain/Only Wing": "",
+                "w. Fried Rice/White Rice": "",
+                "w. French Fries": "",
+                "w. Chicken Fried Rice": "",
+                "w. Pork Fried Rice": "",
+                "w. Shrimp Fried Rice": "",
+                "w. Beef Fried Rice": ""
+              }
+            }
         },
         {
           "name": "Plain French Fries",
           "description": "Crispy and golden French fries.",
-          "price": {
+          "unit": {
             "S": "3.50",
             "L": "5.70"
           }
@@ -269,42 +275,42 @@
         {
           "name": "Plain Fried Rice",
           "description": "Classic fried rice stir-fried with no vegetables.",
-          "price": "7.2"
+          "unit": {"Large": "7.20"}
         },
         {
           "name": "Regular Fried Rice",
           "description": "Classic fried rice stir-fried with peas, onions, and carrots.",
-          "price": "7.2"
+          "unit": {"Large": "7.20"}
         },
         {
           "name": "Vegetable Fried Rice",
           "description": "Fried rice with a mix of vegetables.",
-          "price": "9.70"
+          "unit": {"Large": "9.70"}
         },
         {
           "name": "Pork Fried Rice",
           "description": "Savory fried rice with roasted pork.",
-          "price": "10.40"
+          "unit": {"Large": "10.40"}
         },
         {
           "name": "Chicken Fried Rice",
           "description": "Classic fried rice with chicken.",
-          "price": "10.40"
+          "unit": {"Large": "10.40"}
         },
         {
           "name": "Shrimp Fried Rice",
           "description": "Fried rice with tender shrimp.",
-          "price": "10.70"
+          "unit": {"Large": "10.70"}
         },
         {
           "name": "Beef Fried Rice",
           "description": "Fried rice with sliced beef.",
-          "price": "10.70"
+          "unit": {"Large": "10.70"}
         },
         {
           "name": "House Special Fried Rice",
           "description": "A combination of chicken, pork, and shrimp with fried rice.",
-          "price": "11.00"
+          "unit": {"Large": "11.00"}
         }
       ]
     },
@@ -316,40 +322,44 @@
         {
           "name": "Plain",
           "description": "Soft noodles with no vegetables.",
-          "price": "7.20"
+          "unit": {"Large": "7.20"}
         },
         {
           "name": "Regular",
           "description": "Soft noodles with cabbages, onions, and carrots.",
-          "price": "7.20"
+          "unit": {"Large": "7.20"}
         },
         {
           "name": "Vegetable Lo Mein",
           "description": "Soft noodles tossed with a mix of vegetables in a savory sauce.",
-          "price": "9.70"
+          "unit": {
+            "Large": "9.70",
+            "Lunch": "8.80",
+            "Combo": "10.20"
+          }
         },
         {
           "name": "Pork Lo Mein",
           "description": "Roast pork and soft noodles tossed in a savory sauce.",
-          "prices": {
-            "Large": "10.4",
-            "Lunch": "8.8",
-            "Combo": "10.2"
+          "unit": {
+            "Large": "10.40",
+            "Lunch": "8.80",
+            "Combo": "10.20"
           }
         },
         {
           "name": "Chicken Lo Mein",
           "description": "Sliced chicken and soft noodles tossed in a savory sauce.",
-          "prices": {
+          "unit": {
             "Large": "10.40",
-            "Lunch": "8.8",
-            "Combo": "10.2"
+            "Lunch": "8.80",
+            "Combo": "10.20"
           }
         },
         {
           "name": "Shrimp Lo Mein",
           "description": "Baby shrimp and soft noodles tossed in a savory sauce.",
-          "prices": {
+          "unit": {
             "Large": "10.70",
             "Lunch": "8.8",
             "Combo": "10.20"
@@ -358,7 +368,7 @@
         {
           "name": "Beef Lo Mein",
           "description": "Sliced beef and soft noodles tossed in a savory sauce.",
-          "prices": {
+          "unit": {
             "Large": "10.70",
             "Lunch": "8.8",
             "Combo": "10.2"
@@ -367,7 +377,7 @@
         {
           "name": "House Special Lo Mein",
           "description": "A combination of chicken, pork, and shrimp with soft noodles.",
-          "prices": {
+          "unit": {
             "Large": "11",
             "Lunch": "8.8",
             "Combo": "10.2"
@@ -383,37 +393,37 @@
         {
           "name": "Vegetable Mei Fun",
           "description": "Thin rice noodles stir-fried with a mix of vegetables.",
-          "price": "10.00"
+          "unit": {"Large": "10.00"}
         },
         {
           "name": "Chicken Mei Fun",
           "description": "Thin rice noodles stir-fried with sliced chicken and vegetables.",
-          "prices":  "10.50"
+          "unit": {"Large": "10.50"}
         },
         {
           "name": "Pork Mei Fun",
           "description": "Thin rice noodles stir-fried with roast pork and vegetables.",
-          "prices":  "10.50"
+          "unit": {"Large": "10.50"}
         },
         {
           "name": "Beef Mei Fun",
           "description": "Thin rice noodles stir-fried with sliced beef and vegetables.",
-          "prices":  "11.00"
+          "unit": {"Large": "11.00"}
         },
         {
           "name": "Shrimp Mei Fun",
           "description": "Thin rice noodles stir-fried with tender shrimp and vegetables.",
-          "prices":  "11.00"
+          "unit": {"Large": "11.00"}
         },
         {
           "name": "House Special Mei Fun",
           "description": "A combination of chicken, pork, and shrimp with thin rice noodles and vegetables.",
-          "prices":  "11.50"
+          "unit": {"Large": "11.50"}
         },
         {
           "name": "Singapore Mei Fun",
           "description": "Thin rice noodles stir-fried with curry powder, shrimp, BBQ pork, and vegetables.",
-          "prices":  "11.50"
+          "unit": {"Large": "11.50"}
         }
       ]
     },
@@ -482,87 +492,87 @@
         {
           "name": "Dragon & Phoenix",
           "description": "A combination of spicy General Tso's Chicken and spicy stir-fried shrimp with mixed vegetables.",
-          "price": "13.60"
+          "unit": {"Large": "13.60"}
         },
         {
           "name": "Beef & Scallop House Special Sauce",
           "description": "Tender beef and delicate scallops stir-fried in our chef's special savory sauce.",
-          "price": "14.20"
+          "unit": {"Large": "14.20"}
         },
         {
           "name": "Shrimp & Scallop with Garlic Sauce",
           "description": "Succulent shrimp and scallops stir-fried in a sweet and sour garlic sauce.",
-          "price": "14.20"
+          "unit": {"Large": "14.20"}
         },
         {
           "name": "Four Seasons",
           "description": "A delightful medley of chicken, beef, jumbo shrimp, and pork with fresh broccoli, carrots, mushrooms, onions, snow peas, and zucchini in a savory brown sauce.",
-          "price": "13.70"
+          "unit": {"Large": "13.70"}
         },
         {
           "name": "Happy Family",
           "description": "A generous combination of chicken, beef, jumbo shrimp, and vegetables in a savory sauce.",
-          "price": "14.20"
+          "unit": {"Large": "14.20"}
         },
         {
           "name": "Sesame Beef",
           "description": "Crispy slices of beef tossed in a sweet and savory sesame sauce, topped with sesame seeds.",
-          "price": "13.50"
+          "unit": {"Large": "13.50"}
         },
         {
           "name": "Orange Flavored Beef",
           "description": "Crispy beef with a sweet and tangy orange glaze, a delightful citrus twist on a classic.",
-          "price": "13.50"
+          "unit": {"Large": "13.50"}
         },
         {
           "name": "General Tso's Shrimp",
           "description": "Crispy jumbo shrimp in our signature sweet and spicy General Tso's sauce.",
-          "price": "13.50"
+          "unit": {"Large": "13.50"}
         },
         {
           "name": "Mongolian Chicken",
           "description": "Tender chicken with green and white onions in a rich, savory soy sauce.",
-          "price": "12.70"
+          "unit": {"Large": "12.70"}
         },
         {
           "name": "Mongolian Beef",
           "description": "Slices of beef stir-fried with green and white onions in a rich, savory soy sauce.",
-          "price": "13.50"
+          "unit": {"Large": "13.50"}
         },
         {
           "name": "Triple Delight",
           "description": "A stir-fry featuring chicken, beef, and shrimp with broccoli, carrots, mushrooms, onions, snow peas, and zucchini.",
-          "price": "13.70"
+          "unit": {"Large": "13.70"}
         },
         {
           "name": "Hunan Triple",
           "description": "A spicy dish with chicken, beef, and shrimp, along with broccoli, carrots, green peppers, onions, water chestnuts, and zucchini in a bold Hunan sauce.",
-          "price": "13.70"
+          "unit": {"Large": "13.70"}
         },
         {
           "name": "Szechuan Triple",
           "description": "Chicken, beef, and shrimp with a variety of vegetables in a spicy Szechuan sauce.",
-          "price": "13.70"
+          "unit": {"Large": "13.70"}
         },
         {
           "name": "Sa Cha Triple",
           "description": "Chicken, beef, and shrimp stir-fried with vegetables in a savory and spicy Sa Cha sauce.",
-          "price": "13.70"
+          "unit": {"Large": "13.70"}
         },
         {
           "name": "Curry Triple",
           "description": "A fragrant and spicy curry sauce with chicken, beef, shrimp, and vegetables.",
-          "price": "13.90"
+          "unit": {"Large": "13.90"}
         },
         {
           "name": "Mongolian Triple",
           "description": "A stir-fry with chicken, beef, and shrimp, along with green and white onions in a savory soy sauce.",
-          "price": "13.70"
+          "unit": {"Large": "13.70"}
         },
         {
           "name": "Seafood Triple",
           "description": "A bountiful dish with shrimp, scallops, and mixed vegetables in white sauce.",
-          "price": "14"
+          "unit": {"Large": "14.00"}
         }
       ]
     },
@@ -574,9 +584,9 @@
         {
           "name": "Chicken Broccoli",
           "description": "Tender slices of chicken and fresh broccoli in a classic brown sauce.",
-          "prices": {
+          "unit": {
             "Regular": "8.70",
-            "Large": "11.7",
+            "Large": "11.70",
             "Lunch": "8.80",
             "Combo": "10.20"
           }
@@ -584,9 +594,9 @@
         {
           "name": "Chicken Mixed Veg",
           "description": "Chicken with a colorful mix of baby corn, broccoli, carrot, mushroom, onion, snow peas, water chestnut, and zucchini.",
-          "prices": {
+          "unit": {
             "Regular": "8.70",
-            "Large": "11.7",
+            "Large": "11.70",
             "Lunch": "8.80",
             "Combo": "10.20"
           }
@@ -594,9 +604,9 @@
         {
           "name": "Chicken Mushroom",
           "description": "Tender sliced chicken and fresh mushrooms stir-fried in a savory sauce.",
-          "prices": {
+          "unit": {
             "Regular": "8.70",
-            "Large": "11.7",
+            "Large": "11.70",
             "Lunch": "8.80",
             "Combo": "10.20"
           }
@@ -604,9 +614,9 @@
         {
           "name": "Sa Cha Chicken",
           "description": "Chicken with vegetables in a savory and spicy Sa Cha sauce.",
-          "prices": {
+          "unit": {
             "Regular": "8.70",
-            "Large": "11.7",
+            "Large": "11.70",
             "Lunch": "8.80",
             "Combo": "10.20"
           }
@@ -614,9 +624,9 @@
         {
           "name": "Chicken Cashew Nuts",
           "description": "Tender chicken with crunchy cashew nuts and mixed vegetables in a light sauce.",
-          "prices": {
+          "unit": {
             "Regular": "8.70",
-            "Large": "11.7",
+            "Large": "11.70",
             "Lunch": "8.80",
             "Combo": "10.20"
           }
@@ -624,9 +634,9 @@
         {
           "name": "Hunan Chicken",
           "description": "Slices of chicken with broccoli, carrots, green peppers, onions, water chestnuts, and zucchini in a spicy Hunan sauce.",
-          "prices": {
+          "unit": {
             "Regular": "8.70",
-            "Large": "11.7",
+            "Large": "11.70",
             "Lunch": "8.80",
             "Combo": "10.20"
           }
@@ -634,9 +644,9 @@
         {
           "name": "Szechuan Chicken",
           "description": "Chicken with a variety of vegetables in a spicy Szechuan sauce.",
-          "prices": {
-            "Regular": "8.7",
-            "Large": "11.7",
+          "unit": {
+            "Regular": "8.70",
+            "Large": "11.70",
             "Lunch": "8.80",
             "Combo": "10.20"
           }
@@ -644,9 +654,9 @@
         {
           "name": "Chicken & Garlic Sauce",
           "description": "Sliced chicken with a variety of vegetables in a sweet and sour garlic sauce.",
-          "prices": {
-            "Regular": "8.7",
-            "Large": "11.7",
+          "unit": {
+            "Regular": "8.70",
+            "Large": "11.70",
             "Lunch": "8.80",
             "Combo": "10.20"
           }
@@ -654,9 +664,9 @@
         {
           "name": "Kung Po Chicken",
           "description": "Diced chicken stir-fried with peanuts, carrots, green peppers, mushrooms, water chestnuts, and zucchini in a spicy sauce.",
-          "prices": {
-            "Regular": "8.7",
-            "Large": "11.7",
+          "unit": {
+            "Regular": "8.70",
+            "Large": "11.70",
             "Lunch": "8.80",
             "Combo": "10.20"
           }
@@ -664,9 +674,9 @@
         {
           "name": "General Tso's Chicken",
           "description": "Crispy, breaded chicken pieces in a sweet and spicy sauce.",
-          "prices": {
-            "Regular": "8.7",
-            "Large": "11.7",
+          "unit": {
+            "Regular": "8.70",
+            "Large": "11.70",
             "Lunch": "8.80",
             "Combo": "10.20"
           }
@@ -674,9 +684,9 @@
         {
           "name": "Sesame Chicken",
           "description": "Crispy, breaded chicken pieces in a sweet and savory sesame sauce, topped with sesame seeds.",
-          "prices": {
-            "Regular": "8.7",
-            "Large": "11.7",
+          "unit": {
+            "Regular": "8.70",
+            "Large": "11.70",
             "Lunch": "8.80",
             "Combo": "10.20"
           }
@@ -684,9 +694,9 @@
         {
           "name": "Orange Flavored Chicken",
           "description": "Crispy, breaded chicken pieces in a  and tangy orange glaze.",
-          "prices": {
-            "Regular": "8.7",
-            "Large": "11.7",
+          "unit": {
+            "Regular": "8.70",
+            "Large": "11.70",
             "Lunch": "8.80",
             "Combo": "10.20"
           }
@@ -694,9 +704,9 @@
         {
           "name": "Honey Chicken",
           "description": "Crispy, breaded chicken in a sweet honey sauce.",
-          "prices": {
-            "Regular": "8.7",
-            "Large": "11.7",
+          "unit": {
+            "Regular": "8.70",
+            "Large": "11.70",
             "Lunch": "8.80",
             "Combo": "10.20"
           }
@@ -704,9 +714,9 @@
         {
           "name": "Crispy Onion Chicken",
           "description": "Crispy chicken with white and green onions in a sweet and savory onion glaze.",
-          "prices": {
-            "Regular": "8.7",
-            "Large": "11.7",
+          "unit": {
+            "Regular": "8.70",
+            "Large": "11.70",
             "Lunch": "8.80",
             "Combo": "10.20"
           }
@@ -714,9 +724,9 @@
         {
           "name": "Moo Goo Gai Pan",
           "description": "Slices of chicken with a mix of fresh bamboo, carrots, mushrooms, onion, snow peas, water chestnuts, and zucchini in a light white sauce.",
-          "prices": {
+          "unit": {
             "Regular": "8.70",
-            "Large": "11.7",
+            "Large": "11.70",
             "Lunch": "8.80",
             "Combo": "10.20"
           }
@@ -1027,42 +1037,42 @@
         {
           "name": "Steamed Mixed Vegetables",
           "description": "A light and healthy combination of steamed baby corn, broccoli, carrots, mushrooms, onions, snow peas, water chestnuts, and zucchini.",
-          "price": "10.00"
+          "unit": {"Large": "10.00"}
         },
         {
           "name": "Steamed Chicken Broccoli",
           "description": "Steamed chicken and broccoli, perfect for a healthy meal. Served with brown sauce on the side.",
-          "price": "11.70"
+          "unit": {"Large": "11.70"}
         },
         {
           "name": "Steamed Chicken Mixed Veg",
           "description": "Steamed chicken and a variety of mixed vegetables, served with brown sauce on the side.",
-          "price": "11.70"
+          "unit": {"Large": "11.70"}
         },
         {
           "name": "Steamed Shrimp Broccoli",
           "description": "Steamed shrimp and broccoli, served with brown sauce on the side.",
-          "price": "12.70"
+          "unit": {"Large": "12.70"}
         },
         {
           "name": "Steamed Shrimp Mixed Veg",
           "description": "Steamed shrimp and mixed vegetables, served with brown sauce on the side.",
-          "price": "12.70"
+          "unit": {"Large": "12.70"}
         },
         {
           "name": "Steamed Chicken & Shrimp Broccoli",
           "description": "A healthy steamed duo of chicken and shrimp with broccoli, served with brown sauce on the side.",
-          "price": "12.70"
+          "unit": {"Large": "12.70"}
         },
         {
           "name": "Steamed Chicken & Shrimp Mixed Vegetables",
           "description": "A light and healthy combination of steamed chicken, shrimp, and mixed vegetables, served with brown sauce on the side.",
-          "price": "12.70"
+          "unit": {"Large": "12.70"}
         },
         {
           "name": "Steamed Chicken, Beef & Shrimp Mixed Vegetables",
           "description": "A nutritious trio of steamed chicken, beef, and shrimp with mixed vegetables, served with brown sauce on the side.",
-          "price": "12.70"
+          "unit": {"Large": "12.70"}
         }
       ]
     }
