@@ -29,58 +29,28 @@
 </head>
 <body class="bg-gray-100 text-gray-800">
 
-    <div class="container mt-12">
-        <header class="text-center mb-8">
-            <h1 class="text-3xl font-bold text-gray-900">Restaurant Admin Console</h1>
-            <p class="text-gray-500">Manage your menu data in Firestore</p>
-        </header>
-        <!-- Editable Restaurant Info Card -->
-    <div id="restaurantInfoCard" class="menu-card mb-8" style="max-width:700px;margin:auto; display:none;">
-            <div class="mb-4">
-                <input id="editRestaurantName" type="text" class="text-4xl font-extrabold text-gray-900 w-full mb-2 bg-gray-50 rounded px-2 py-1" placeholder="Restaurant Name" />
-            </div>
-            <div class="flex flex-col items-center mb-2">
-                <div class="hours-block w-full flex flex-col items-center">
-                    <div class="flex items-center mb-1">
-                        <span class="hours-icon">🕒</span>
-                        <span class="hours-title"><b>Hours:</b></span>
-                    </div>
-                    <div id="editHoursLines" class="hours-lines w-full flex flex-col items-center"></div>
-                </div>
-            </div>
-            <div class="mb-2">
-                <input id="editRestaurantAddress" type="text" class="block w-full text-lg text-gray-700 bg-gray-50 rounded px-2 py-1 mb-1" placeholder="Address" />
-                <input id="editRestaurantPhone" type="text" class="block w-full text-lg text-gray-700 bg-gray-50 rounded px-2 py-1" placeholder="Phone" />
-            </div>
-            <div class="mt-4">
-                <textarea id="editComboNote" class="w-full bg-yellow-50 border-l-4 border-yellow-400 rounded-lg p-2 mb-2 text-base text-red-700 font-semibold" rows="2" placeholder="Combo Plate Note"></textarea>
-                <textarea id="editLunchNote" class="w-full bg-yellow-50 border-l-4 border-yellow-400 rounded-lg p-2 text-base text-blue-700 font-semibold" rows="2" placeholder="Lunch Special Note"></textarea>
-            </div>
-            <div class="flex justify-end mt-4">
-                <button id="saveRestaurantInfoBtn" class="bg-blue-600 text-white font-bold py-2 px-6 rounded-full shadow hover:bg-blue-700">Save Info</button>
-            </div>
-            <div id="restaurantInfoStatus" class="mt-2 text-sm font-medium text-green-700"></div>
-        </div>
 
-        <!-- Login Form -->
-        <div id="loginCard" class="card">
-            <h2 class="text-2xl font-semibold mb-4">Admin Login</h2>
-            <form id="loginForm" class="space-y-4">
-                <div>
-                    <label for="adminEmail" class="block text-sm font-medium text-gray-700">Email</label>
-                    <input type="email" id="adminEmail" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50">
-                </div>
-                <div>
-                    <label for="adminPassword" class="block text-sm font-medium text-gray-700">Password</label>
-                    <input type="password" id="adminPassword" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50">
-                </div>
-                <button type="submit" class="bg-blue-600 text-white font-semibold py-2 px-6 rounded-full shadow-md hover:bg-blue-700 transition-colors w-full">Login</button>
-            </form>
-            <div id="loginStatus" class="mt-4 text-sm font-medium"></div>
-        </div>
+    <!-- Login Form -->
+    <div id="loginCard" class="card">
+        <h2 class="text-2xl font-semibold mb-4">Admin Login</h2>
+        <form id="loginForm" class="space-y-4">
+            <div>
+                <label for="adminEmail" class="block text-sm font-medium text-gray-700">Email</label>
+                <input type="email" id="adminEmail" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50">
+            </div>
+            <div>
+                <label for="adminPassword" class="block text-sm font-medium text-gray-700">Password</label>
+                <input type="password" id="adminPassword" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50">
+            </div>
+            <button type="submit" class="bg-blue-600 text-white font-semibold py-2 px-6 rounded-full shadow-md hover:bg-blue-700 transition-colors w-full">Login</button>
+        </form>
+        <div id="loginStatus" class="mt-4 text-sm font-medium"></div>
+    </div>
 
-        <!-- Admin UI (hidden until logged in) -->
-        <div id="adminCard" class="card" style="display:none;">
+    <!-- Admin UI (hidden until logged in) -->
+    <div id="adminMain" style="display:none;">
+        <!-- Field/Form 1: Menu Management Controls -->
+        <div id="adminControls" class="card mb-4">
             <div class="flex justify-between items-center mb-4">
                 <h2 class="text-2xl font-semibold">Menu Management</h2>
                 <div class="flex gap-2 items-center">
@@ -106,15 +76,27 @@
                 </button>
             </div>
             <div id="statusMessage" class="mt-6 text-sm font-medium"></div>
-            <div id="menuEditSection" class="mt-8"></div>
-        <!-- Output/Status Section with Show/Hide -->
-        <div class="flex justify-end mt-2">
-            <button id="toggleStatusBtn" class="bg-gray-200 text-gray-800 px-3 py-1 rounded shadow hover:bg-gray-300 text-sm">Show Output</button>
         </div>
-        <div id="statusOutputCard" class="card mt-2" style="display:none;">
-            <h2 class="text-xl font-semibold mb-2">Output</h2>
+
+        <!-- Field/Form 2: Editable Menu UI (like index.html, but editable) -->
+        <div id="adminEditableMenu" class="mb-4">
+            <!-- Will be filled by script with editable restaurant info, hours, notes, and menu data -->
+        </div>
+
+        <!-- Save Menu Button (hidden by default, shown when menu is edited) -->
+        <div class="flex justify-end mb-4" id="saveMenuBtnRow" style="display:none;">
+            <button id="saveMenuBtn" class="bg-green-600 text-white font-bold py-2 px-8 rounded-full shadow hover:bg-green-700">Save Menu</button>
+        </div>
+
+        <!-- Field/Form 3: Output Box (always visible, toggle with arrow) -->
+        <div id="outputBox" class="card mt-2" style="position:sticky;bottom:0;z-index:10;">
+            <div class="flex items-center justify-between mb-2">
+                <h2 class="text-xl font-semibold mb-0">Output</h2>
+                <button id="toggleOutputBtn" class="text-gray-500 hover:text-gray-800 text-2xl focus:outline-none" title="Show/Hide Output">
+                    <span id="outputArrow">▼</span>
+                </button>
+            </div>
             <div id="statusOutput" class="bg-gray-100 border rounded p-2 font-mono text-sm text-gray-700" style="white-space:pre-wrap; max-height:160px; overflow-y:auto;"></div>
-        </div>
         </div>
     </div>
 
