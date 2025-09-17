@@ -122,82 +122,65 @@
             }
         });
         let html = '';
-        const categoryColors = [
-            'bg-yellow-100', 'bg-green-100', 'bg-blue-100', 'bg-pink-100', 'bg-purple-100', 'bg-orange-100', 'bg-teal-100', 'bg-red-100', 'bg-indigo-100', 'bg-lime-100'
-        ];
-        let catIdx = 0;
         for (const category in groupedMenu) {
-            const color = categoryColors[catIdx % categoryColors.length];
             const meta = categoryMeta[category] || {};
-            html += `<div class="menu-card mb-8 ${color}">
-                <h2 class="text-2xl font-bold text-gray-900 mb-2 flex items-center">
+            html += `<div class="menu-card mb-8">
+                <div class="category-header">
                     <input type="text" value="${category}" data-category-edit="${category}" class="font-bold text-gray-900 bg-gray-100 rounded px-2 py-1 mr-2" style="min-width:120px;" />
-                    ${meta.chinese_name ? `<span class="ml-2 text-lg text-gray-500">${meta.chinese_name}</span>` : ''}
-                </h2>
-                ${meta.note ? `<div class="mb-2 text-sm text-blue-700">${meta.note}</div>` : ''}
-                <ul class="space-y-4">`;
-            groupedMenu[category].forEach((item, idxInCat) => {
-                // Render new unit/price structure for editing
-                let unitHtml = '';
-                if (item.unit && typeof item.unit === 'object' && !Array.isArray(item.unit)) {
-                    for (const unitKey in item.unit) {
-                        const value = item.unit[unitKey];
-                        if (typeof value === 'string' || typeof value === 'number') {
-                            unitHtml += `<div class="flex items-center gap-2"><span class="text-sm text-gray-700">${unitKey}</span><input type="number" step="0.01" class="text-orange-600 text-sm bg-gray-50 rounded px-2 py-1 w-20" value="${value}" data-field="unit-${unitKey}" data-idx="${item._idx}"></div>`;
-                        } else if (typeof value === 'object') {
-                            unitHtml += `<div class="font-semibold text-gray-700 mt-1">${unitKey}</div>`;
-                            for (const opt in value) {
-                                unitHtml += `<div class="flex items-center gap-2 pl-4"><span class="text-xs text-gray-500">${opt}</span><input type="number" step="0.01" class="text-orange-600 text-xs bg-gray-50 rounded px-2 py-1 w-16" value="${value[opt]}" data-field="unit-${unitKey}-${opt}" data-idx="${item._idx}"></div>`;
+                    ${meta.chinese_name ? `<span class='category-chinese'>${meta.chinese_name}</span>` : ''}
+                </div>
+                ${meta.note ? `<div class='category-note'>${meta.note}</div>` : ''}
+                <ul class="space-y-4">
+                    ${groupedMenu[category].map(item => {
+                        let detailsHtml = '';
+                        if (item.unit && typeof item.unit === 'object' && !Array.isArray(item.unit)) {
+                            for (const unitKey in item.unit) {
+                                const value = item.unit[unitKey];
+                                if (typeof value === 'string' || typeof value === 'number') {
+                                    detailsHtml += `<div class="flex items-center gap-2"><input type="text" class="text-sm text-gray-700 bg-gray-50 rounded px-2 py-1 w-32" value="${unitKey}" data-field="unitKey" data-idx="${item._idx}"/><input type="number" step="0.01" class="text-orange-600 text-sm bg-gray-50 rounded px-2 py-1 w-20" value="${value}" data-field="unitValue" data-idx="${item._idx}"/></div>`;
+                                } else if (typeof value === 'object') {
+                                    detailsHtml += `<div class="font-semibold text-gray-700 mt-1">${unitKey}</div>`;
+                                    for (const opt in value) {
+                                        detailsHtml += `<div class="flex items-center gap-2 pl-4"><input type="text" class="text-xs text-gray-500 bg-gray-50 rounded px-2 py-1 w-32" value="${opt}" data-field="unitOptKey" data-idx="${item._idx}"/><input type="number" step="0.01" class="text-orange-600 text-xs bg-gray-50 rounded px-2 py-1 w-16" value="${value[opt]}" data-field="unitOptValue" data-idx="${item._idx}"/></div>`;
+                                    }
+                                }
+                            }
+                        } else if (Array.isArray(item.unit)) {
+                            detailsHtml += item.unit.map((u, i) => `<input type="text" class="text-sm text-gray-700 bg-gray-50 rounded px-2 py-1 w-24" value="${u}" data-field="unitArr" data-idx="${item._idx}">`).join(', ');
+                        } else if (typeof item.unit === 'string' || typeof item.unit === 'number') {
+                            detailsHtml += `<input type="text" class="text-sm text-gray-700 bg-gray-50 rounded px-2 py-1 w-24" value="${item.unit}" data-field="unit" data-idx="${item._idx}">`;
+                        }
+                        if (!detailsHtml) {
+                            if (typeof item.price !== 'undefined') {
+                                detailsHtml = `<input type="number" step="0.01" class="text-orange-600 text-lg bg-gray-50 rounded px-2 py-1 w-24 mb-1" value="${item.price}" data-field="price" data-idx="${item._idx}">`;
+                            } else if (item.prices && typeof item.prices === 'object') {
+                                detailsHtml = Object.entries(item.prices).map(([k, v]) => `<div class="flex items-center gap-2"><input type="text" class="text-xs text-gray-500 bg-gray-50 rounded px-2 py-1 w-32" value="${k}" data-field="pricesKey" data-idx="${item._idx}"/><input type="number" step="0.01" class="text-orange-600 text-xs bg-gray-50 rounded px-2 py-1 w-16" value="${v}" data-field="pricesValue" data-idx="${item._idx}"/></div>`).join('');
+                            } else if (typeof item.prices === 'string' || typeof item.prices === 'number') {
+                                detailsHtml = `<input type="number" step="0.01" class="text-orange-600 text-lg bg-gray-50 rounded px-2 py-1 w-24 mb-1" value="${item.prices}" data-field="prices" data-idx="${item._idx}">`;
                             }
                         }
-                    }
-                } else if (Array.isArray(item.unit)) {
-                    unitHtml += item.unit.map((u, i) => `<input type="text" class="text-sm text-gray-700 bg-gray-50 rounded px-2 py-1 w-24" value="${u}" data-field="unit-${i}" data-idx="${item._idx}">`).join(', ');
-                } else if (typeof item.unit === 'string' || typeof item.unit === 'number') {
-                    unitHtml += `<input type="text" class="text-sm text-gray-700 bg-gray-50 rounded px-2 py-1 w-24" value="${item.unit}" data-field="unit" data-idx="${item._idx}">`;
-                }
-                // Fallback for price/prices
-                if (!unitHtml) {
-                    if (typeof item.price !== 'undefined') {
-                        unitHtml = `<input type="number" step="0.01" class="text-orange-600 text-lg bg-gray-50 rounded px-2 py-1 w-24 mb-1" value="${item.price}" data-field="price" data-idx="${item._idx}">`;
-                    } else if (item.prices && typeof item.prices === 'object') {
-                        unitHtml = Object.entries(item.prices).map(([k, v]) => `<div class="flex items-center gap-2"><span class="text-xs text-gray-500">${k}</span><input type="number" step="0.01" class="text-orange-600 text-xs bg-gray-50 rounded px-2 py-1 w-16" value="${v}" data-field="prices-${k}" data-idx="${item._idx}"></div>`).join('');
-                    } else if (typeof item.prices === 'string' || typeof item.prices === 'number') {
-                        unitHtml = `<input type="number" step="0.01" class="text-orange-600 text-lg bg-gray-50 rounded px-2 py-1 w-24 mb-1" value="${item.prices}" data-field="prices" data-idx="${item._idx}">`;
-                    }
-                }
-                html += `
-                <li class="flex justify-between items-center border-b pb-2">
-                    <div class="flex-grow flex flex-col gap-1">
-                        <input type="text" class="text-lg font-semibold text-gray-800 bg-gray-50 rounded px-2 py-1 mb-1 w-full" value="${item.name || ''}" data-field="name" data-idx="${item._idx}">
-                        <input type="text" class="text-sm text-gray-500 bg-gray-50 rounded px-2 py-1 w-full" value="${item.description || ''}" data-field="description" data-idx="${item._idx}">
-                        <div class="flex flex-col gap-1">${unitHtml}</div>
-                    </div>
-                    <div class="flex flex-col items-end ml-4">
-                        <div class="flex gap-1">
-                            <button class="bg-green-500 text-white px-2 py-1 rounded saveMenuItemBtn" data-idx="${item._idx}">Save</button>
-                            <button class="bg-red-500 text-white px-2 py-1 rounded deleteMenuItemBtn" data-idx="${item._idx}">Delete</button>
-                        </div>
-                        <div class="flex gap-1 mt-1">
-                            <button class="bg-blue-200 text-blue-800 px-2 py-1 rounded addAboveMenuItemBtn" data-idx="${item._idx}">Add Above</button>
-                            <button class="bg-blue-200 text-blue-800 px-2 py-1 rounded addBelowMenuItemBtn" data-idx="${item._idx}">Add Below</button>
-                        </div>
-                    </div>
-                </li>`;
-            });
-            // Add new item to this category
-            html += `<li class="flex justify-between items-center pt-4">
-                <div class="flex-grow flex flex-col gap-1">
-                    <input type="text" class="text-lg font-semibold text-gray-800 bg-gray-50 rounded px-2 py-1 mb-1 w-full" id="newName-${category}">
-                    <input type="text" class="text-sm text-gray-500 bg-gray-50 rounded px-2 py-1 w-full" id="newDescription-${category}">
-                </div>
-                <div class="flex flex-col items-end ml-4">
-                    <input type="number" step="0.01" class="text-orange-600 text-lg bg-gray-50 rounded px-2 py-1 w-24 mb-1" id="newPrice-${category}">
-                    <button class="bg-blue-500 text-white px-2 py-1 rounded" data-category="${category}" id="addMenuItemBtn-${category}">Add</button>
-                </div>
-            </li>`;
-            html += '</ul></div>';
-            catIdx++;
+                        return `
+                        <li class="border-b pb-2">
+                            <div class="flex-grow">
+                                <input type="text" class="text-lg font-semibold text-gray-800 bg-gray-50 rounded px-2 py-1 mb-1 w-full" value="${item.name || ''}" data-field="name" data-idx="${item._idx}">
+                                <input type="text" class="text-sm text-gray-500 bg-gray-50 rounded px-2 py-1 w-full" value="${item.description || ''}" data-field="description" data-idx="${item._idx}">
+                                <div class="space-y-1">${detailsHtml}</div>
+                            </div>
+                            <div class="flex flex-col items-end ml-4">
+                                <div class="flex gap-1">
+                                    <button class="bg-green-500 text-white px-2 py-1 rounded saveMenuItemBtn" data-idx="${item._idx}">Save</button>
+                                    <button class="bg-red-500 text-white px-2 py-1 rounded deleteMenuItemBtn" data-idx="${item._idx}">Delete</button>
+                                </div>
+                                <div class="flex gap-1 mt-1">
+                                    <button class="bg-blue-200 text-blue-800 px-2 py-1 rounded addAboveMenuItemBtn" data-idx="${item._idx}">Add Above</button>
+                                    <button class="bg-blue-200 text-blue-800 px-2 py-1 rounded addBelowMenuItemBtn" data-idx="${item._idx}">Add Below</button>
+                                </div>
+                            </div>
+                        </li>
+                        `;
+                    }).join('')}
+                </ul>
+            </div>`;
         }
         section.innerHTML = html;
     }
