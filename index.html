@@ -31,7 +31,8 @@
     <div class="container mt-12">
         <header class="text-center mb-8">
             <h1 id="restaurantName" class="text-4xl font-extrabold text-gray-900"></h1>
-            <p id="restaurantSlogan" class="text-xl text-gray-500"></p>
+            <div id="restaurantInfo" class="text-lg text-gray-600 mt-2"></div>
+            <div id="restaurantNotes" class="text-base text-gray-500 mt-4"></div>
         </header>
 
         <div id="loadingMessage" class="text-center text-gray-500 text-lg">
@@ -66,15 +67,25 @@
 
         async function fetchRestaurantData() {
             try {
-                const response = await fetch('./restaurant-data.json');
+                // Try to fetch the backup menu file (with info and notes)
+                const response = await fetch('./backup/09.16.2025.json');
+                if (!response.ok) throw new Error('No local menu file');
                 const data = await response.json();
-                // Support both flat and nested formats
-                if (data.name && data.slogan) {
-                    document.getElementById('restaurantName').textContent = data.name;
-                    document.getElementById('restaurantSlogan').textContent = data.slogan;
-                } else if (data.restaurant) {
+                // Restaurant Info
+                if (data.restaurant) {
                     document.getElementById('restaurantName').textContent = data.restaurant.name || '';
-                    document.getElementById('restaurantSlogan').textContent = data.restaurant.location || '';
+                    let infoHtml = '';
+                    if (data.restaurant.location) infoHtml += `<div><span class='font-semibold'>Location:</span> ${data.restaurant.location}</div>`;
+                    if (data.restaurant.phone) infoHtml += `<div><span class='font-semibold'>Phone:</span> ${data.restaurant.phone}</div>`;
+                    if (data.restaurant.hours) infoHtml += `<div><span class='font-semibold'>Hours:</span> ${data.restaurant.hours}</div>`;
+                    document.getElementById('restaurantInfo').innerHTML = infoHtml;
+                }
+                // Notes
+                if (data.notes) {
+                    let notesHtml = '';
+                    if (data.notes.combination_plate) notesHtml += `<div><span class='font-semibold'>Combo Plate:</span> ${data.notes.combination_plate}</div>`;
+                    if (data.notes.lunch_special) notesHtml += `<div><span class='font-semibold'>Lunch Special:</span> ${data.notes.lunch_special}</div>`;
+                    document.getElementById('restaurantNotes').innerHTML = notesHtml;
                 }
             } catch (error) {
                 console.error("Error fetching restaurant data:", error);
