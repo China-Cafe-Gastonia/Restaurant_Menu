@@ -214,18 +214,18 @@
                             }
                         }
                         if (group.length) groups.push({days: group, key: last});
-                        // Format output
-                        return `<div class="hours-block">
-                            <div class="flex items-center mb-1">
+                        // Centered, stacked format
+                        return `<div class="flex flex-col items-center justify-center mt-2 mb-2">
+                            <div class="flex items-center justify-center mb-1">
                                 <span class="hours-icon">🕒</span>
-                                <span class="hours-title"><b>Hours:</b></span>
+                                <span class="hours-title text-lg" style="font-size:1.2rem;"><b>Hours:</b></span>
                             </div>
-                            <div class="hours-lines">
+                            <div class="flex flex-col items-center">
                                 ${groups.map(g => {
                                     const label = g.days.length > 1
-                                        ? `${g.days[0].slice(0,3)} - ${g.days[g.days.length-1].slice(0,3)}`
-                                        : g.days[0].slice(0,3);
-                                    return `<div><b>${label}:</b> ${g.key === 'Closed' ? '<span style=\"color:#b91c1c\">Closed</span>' : g.key.replace('-', ' - ')}</div>`;
+                                        ? `<b>${g.days[0].slice(0,3)} - ${g.days[g.days.length-1].slice(0,3)}:</b>`
+                                        : `<b>${g.days[0].slice(0,3)}:</b>`;
+                                    return `<div class="text-base" style="margin-bottom:2px;">${label} ${g.key === 'Closed' ? '<span style=\"color:#b91c1c;font-weight:600;\">Closed</span>' : g.key.replace('-', ' - ')}</div>`;
                                 }).join('')}
                             </div>
                         </div>`;
@@ -234,18 +234,16 @@
                     if (restaurant.hours) {
                         formattedHours = formatHours(restaurant.hours);
                     }
-                    // Move Hours: label above the grouped hours lines
                     infoEl.innerHTML = [
-                        formattedHours,
                         restaurant.location ? `<span class='block'><b>Address:</b> ${restaurant.location}</span>` : '',
-                        restaurant.phone ? `<span class='block'><b>Phone:</b> ${restaurant.phone}</span>` : ''
+                        restaurant.phone ? `<span class='block'><b>Phone:</b> ${restaurant.phone}</span>` : '',
+                        formattedHours
                     ].filter(Boolean).join('');
             } else {
                 nameEl.textContent = '';
                 infoEl.innerHTML = '';
             }
     if (notes) {
-        // Make Combo Plate and Lunch Special stand out
         let notesHtml = '';
         if (notes.combination_plate) {
             notesHtml += `
