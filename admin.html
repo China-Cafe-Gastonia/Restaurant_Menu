@@ -435,18 +435,28 @@
         loginForm.addEventListener('submit', function(e) {
             e.preventDefault();
             (async () => {
-                const email = document.getElementById('adminEmail').value;
-                const password = document.getElementById('adminPassword').value;
+                const emailInput = document.getElementById('adminEmail');
+                const passwordInput = document.getElementById('adminPassword');
+                const email = emailInput.value;
+                const password = passwordInput.value;
                 loginStatus.textContent = 'Logging in...';
                 loginStatus.style.color = '#2563eb';
+                loginStatus.style.display = 'block';
                 try {
                     await signInWithEmailAndPassword(auth, email, password);
                     loginStatus.textContent = 'Login successful!';
                     loginStatus.style.color = '#16a34a'; // green
-                    setTimeout(() => { loginStatus.textContent = ''; }, 1500);
+                    loginStatus.style.display = 'block';
+                    // Only clear fields on success
+                    setTimeout(() => {
+                        loginStatus.textContent = '';
+                        emailInput.value = '';
+                        passwordInput.value = '';
+                    }, 1500);
                 } catch (error) {
                     loginStatus.textContent = 'Login failed: ' + (error.message || error.code);
                     loginStatus.style.color = '#dc2626'; // red
+                    loginStatus.style.display = 'block';
                 }
             })();
         });
