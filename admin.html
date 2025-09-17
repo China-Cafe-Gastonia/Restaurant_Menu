@@ -215,13 +215,13 @@
                 // Show admin UI and info card
                 document.getElementById('loginContainer').style.display = 'none';
                 document.getElementById('adminMain').style.display = '';
-                infoCard.style.display = '';
+                if (infoCard) infoCard.style.display = '';
                 statusMessage.textContent = 'Firebase initialized. Ready.';
             } else {
                 // Show login UI only
                 document.getElementById('loginContainer').style.display = '';
                 document.getElementById('adminMain').style.display = 'none';
-                infoCard.style.display = 'none';
+                if (infoCard) infoCard.style.display = 'none';
                 loginStatus.textContent = '';
                 statusMessage.textContent = '';
             }
