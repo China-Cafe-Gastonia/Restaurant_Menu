@@ -432,7 +432,7 @@
         });
 
         // Login form submit
-        loginForm.addEventListener('submit', function(e) {
+        loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const emailInput = document.getElementById('adminEmail');
             const passwordInput = document.getElementById('adminPassword');
