@@ -10,8 +10,8 @@
 	  "Thursday":  { "open": "11:00 am", "close": "9:00 pm" },
 	  "Friday":    { "open": "11:00 am", "close": "9:30 pm" },
 	  "Saturday":  { "open": "11:00 am", "close": "9:30 pm" },
-	  "Sunday":    { "open": null, "close": null } // Closed
-	}
+    "Sunday":    { "open": null, "close": null }
+    }
   },
   "notes": {
     "combination_plate": "Dinner Combo, Served All Day with Fried Rice, Egg Roll. Extra $1.25 for a Fountain Drink Per Order",
