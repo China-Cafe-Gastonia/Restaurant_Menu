@@ -234,10 +234,11 @@
                     if (restaurant.hours) {
                         formattedHours = formatHours(restaurant.hours);
                     }
+                    // Move Hours: label above the grouped hours lines
                     infoEl.innerHTML = [
+                        formattedHours,
                         restaurant.location ? `<span class='block'><b>Address:</b> ${restaurant.location}</span>` : '',
-                        restaurant.phone ? `<span class='block'><b>Phone:</b> ${restaurant.phone}</span>` : '',
-                        formattedHours
+                        restaurant.phone ? `<span class='block'><b>Phone:</b> ${restaurant.phone}</span>` : ''
                     ].filter(Boolean).join('');
             } else {
                 nameEl.textContent = '';
