@@ -87,6 +87,10 @@
         function renderMenu(menuItems) {
             const menuContainer = document.getElementById('menuContainer');
             menuContainer.innerHTML = '';
+            if (!menuItems || menuItems.length === 0) {
+                menuContainer.innerHTML = '<div class="text-center text-gray-400 text-xl py-12">Menu not available or under maintenance.</div>';
+                return;
+            }
             // Group by category
             const groupedMenu = menuItems.reduce((acc, item) => {
                 (acc[item.category] = acc[item.category] || []).push(item);

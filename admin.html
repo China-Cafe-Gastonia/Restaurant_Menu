@@ -96,34 +96,51 @@
             section.innerHTML = '<div class="text-gray-500">No menu items loaded.</div>';
             return;
         }
-        let html = `<table class="min-w-full text-sm"><thead><tr>
-            <th class="border-b p-2">Name</th>
-            <th class="border-b p-2">Description</th>
-            <th class="border-b p-2">Category</th>
-            <th class="border-b p-2">Price</th>
-            <th class="border-b p-2">Actions</th>
-        </tr></thead><tbody>`;
-        menuItems.forEach((item, idx) => {
-            html += `<tr>
-                <td class="border-b p-2"><input type="text" class="w-full border rounded px-1" value="${item.name || ''}" data-field="name" data-idx="${idx}"></td>
-                <td class="border-b p-2"><input type="text" class="w-full border rounded px-1" value="${item.description || ''}" data-field="description" data-idx="${idx}"></td>
-                <td class="border-b p-2"><input type="text" class="w-full border rounded px-1" value="${item.category || ''}" data-field="category" data-idx="${idx}"></td>
-                <td class="border-b p-2"><input type="number" step="0.01" class="w-full border rounded px-1" value="${item.price || ''}" data-field="price" data-idx="${idx}"></td>
-                <td class="border-b p-2">
-                    <button class="bg-green-500 text-white px-2 py-1 rounded mr-2 saveMenuItemBtn" data-idx="${idx}">Save</button>
-                    <button class="bg-red-500 text-white px-2 py-1 rounded deleteMenuItemBtn" data-idx="${idx}">Delete</button>
-                </td>
-            </tr>`;
-        });
-        // Add new item row
-        html += `<tr>
-            <td class="border-b p-2"><input type="text" class="w-full border rounded px-1" id="newName"></td>
-            <td class="border-b p-2"><input type="text" class="w-full border rounded px-1" id="newDescription"></td>
-            <td class="border-b p-2"><input type="text" class="w-full border rounded px-1" id="newCategory"></td>
-            <td class="border-b p-2"><input type="number" step="0.01" class="w-full border rounded px-1" id="newPrice"></td>
-            <td class="border-b p-2"><button class="bg-blue-500 text-white px-2 py-1 rounded" id="addMenuItemBtn">Add</button></td>
-        </tr>`;
-        html += '</tbody></table>';
+        // Group items by category
+        const groupedMenu = menuItems.reduce((acc, item, idx) => {
+            (acc[item.category] = acc[item.category] || []).push({ ...item, _idx: idx });
+            return acc;
+        }, {});
+        let html = '';
+        for (const category in groupedMenu) {
+            html += `<div class="menu-card mb-8">
+                <h2 class="text-2xl font-bold text-gray-900 mb-4 flex items-center">
+                    <input type="text" value="${category}" data-category-edit="${category}" class="font-bold text-gray-900 bg-gray-100 rounded px-2 py-1 mr-2" style="min-width:120px;" />
+                </h2>
+                <ul class="space-y-4">`;
+            groupedMenu[category].forEach((item, idxInCat) => {
+                html += `
+                <li class="flex justify-between items-center border-b pb-2">
+                    <div class="flex-grow flex flex-col gap-1">
+                        <input type="text" class="text-lg font-semibold text-gray-800 bg-gray-50 rounded px-2 py-1 mb-1 w-full" value="${item.name || ''}" data-field="name" data-idx="${item._idx}">
+                        <input type="text" class="text-sm text-gray-500 bg-gray-50 rounded px-2 py-1 w-full" value="${item.description || ''}" data-field="description" data-idx="${item._idx}">
+                    </div>
+                    <div class="flex flex-col items-end ml-4">
+                        <input type="number" step="0.01" class="text-orange-600 text-lg bg-gray-50 rounded px-2 py-1 w-24 mb-1" value="${item.price || ''}" data-field="price" data-idx="${item._idx}">
+                        <div class="flex gap-1">
+                            <button class="bg-green-500 text-white px-2 py-1 rounded saveMenuItemBtn" data-idx="${item._idx}">Save</button>
+                            <button class="bg-red-500 text-white px-2 py-1 rounded deleteMenuItemBtn" data-idx="${item._idx}">Delete</button>
+                        </div>
+                        <div class="flex gap-1 mt-1">
+                            <button class="bg-blue-200 text-blue-800 px-2 py-1 rounded addAboveMenuItemBtn" data-idx="${item._idx}">Add Above</button>
+                            <button class="bg-blue-200 text-blue-800 px-2 py-1 rounded addBelowMenuItemBtn" data-idx="${item._idx}">Add Below</button>
+                        </div>
+                    </div>
+                </li>`;
+            });
+            // Add new item to this category
+            html += `<li class="flex justify-between items-center pt-4">
+                <div class="flex-grow flex flex-col gap-1">
+                    <input type="text" class="text-lg font-semibold text-gray-800 bg-gray-50 rounded px-2 py-1 mb-1 w-full" id="newName-${category}">
+                    <input type="text" class="text-sm text-gray-500 bg-gray-50 rounded px-2 py-1 w-full" id="newDescription-${category}">
+                </div>
+                <div class="flex flex-col items-end ml-4">
+                    <input type="number" step="0.01" class="text-orange-600 text-lg bg-gray-50 rounded px-2 py-1 w-24 mb-1" id="newPrice-${category}">
+                    <button class="bg-blue-500 text-white px-2 py-1 rounded" data-category="${category}" id="addMenuItemBtn-${category}">Add</button>
+                </div>
+            </li>`;
+            html += '</ul></div>';
+        }
         section.innerHTML = html;
     }
 
@@ -150,11 +167,11 @@
         if (e.target.classList.contains('saveMenuItemBtn')) {
             const idx = e.target.getAttribute('data-idx');
             const item = loadedMenuItems[idx];
-            // Get updated values
-            const row = e.target.closest('tr');
+            // Find the corresponding input fields in the DOM
+            const row = e.target.closest('li');
             item.name = row.querySelector('input[data-field="name"]').value;
             item.description = row.querySelector('input[data-field="description"]').value;
-            item.category = row.querySelector('input[data-field="category"]').value;
+            // Category is not editable per item in new UI, so keep as is
             item.price = parseFloat(row.querySelector('input[data-field="price"]').value) || 0;
             // Save to Firestore
             try {
@@ -178,12 +195,30 @@
             } catch (err) {
                 statusMessage.textContent = 'Error deleting item: ' + err.message;
             }
-        } else if (e.target.id === 'addMenuItemBtn') {
-            // Add new item
-            const name = document.getElementById('newName').value;
-            const description = document.getElementById('newDescription').value;
-            const category = document.getElementById('newCategory').value;
-            const price = parseFloat(document.getElementById('newPrice').value) || 0;
+        } else if (e.target.classList.contains('addAboveMenuItemBtn') || e.target.classList.contains('addBelowMenuItemBtn')) {
+            // Insert a blank item above or below the clicked item
+            const idx = parseInt(e.target.getAttribute('data-idx'));
+            const refItem = loadedMenuItems[idx];
+            const newItem = {
+                name: '',
+                description: '',
+                category: refItem.category,
+                price: '',
+                // _id will be assigned when saved
+            };
+            if (e.target.classList.contains('addAboveMenuItemBtn')) {
+                loadedMenuItems.splice(idx, 0, newItem);
+            } else {
+                loadedMenuItems.splice(idx + 1, 0, newItem);
+            }
+            renderMenuEditTable(loadedMenuItems);
+            statusMessage.textContent = 'New item added. Fill in details and click Save.';
+        } else if (e.target.id && e.target.id.startsWith('addMenuItemBtn-')) {
+            // Add new item to category (bottom add)
+            const category = e.target.getAttribute('data-category');
+            const name = document.getElementById(`newName-${category}`).value;
+            const description = document.getElementById(`newDescription-${category}`).value;
+            const price = parseFloat(document.getElementById(`newPrice-${category}`).value) || 0;
             if (!name || !category) {
                 statusMessage.textContent = 'Name and category are required.';
                 return;
