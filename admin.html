@@ -156,8 +156,18 @@
 
     // Load menu from Firestore and render edit table
     let loadedMenuItems = [];
+    // Helper to log to both statusMessage and consoleOutput
+    function logStatus(msg) {
+        statusMessage.textContent = msg;
+        const consoleOutput = document.getElementById('consoleOutput');
+        if (consoleOutput) {
+            consoleOutput.textContent += msg + '\n';
+            consoleOutput.scrollTop = consoleOutput.scrollHeight;
+        }
+    }
+
     document.getElementById('loadMenuButton').addEventListener('click', async () => {
-        statusMessage.textContent = 'Loading menu...';
+        logStatus('Loading menu...');
         try {
             const menuRef = collection(db, `artifacts/${firebaseConfig.appId}/public/data/menu_data`);
             const snapshot = await getDocs(menuRef);
@@ -166,9 +176,9 @@
                 loadedMenuItems.push({ ...docSnap.data(), _id: docSnap.id });
             });
             renderMenuEditTable(loadedMenuItems);
-            statusMessage.textContent = 'Menu loaded.';
+            logStatus('Menu loaded.');
         } catch (e) {
-            statusMessage.textContent = 'Error loading menu: ' + e.message;
+            logStatus('Error loading menu: ' + e.message);
         }
     });
 
@@ -308,27 +318,33 @@
                 return;
             }
 
-            statusMessage.textContent = 'Uploading menu...';
+            logStatus('Uploading menu...');
 
             try {
                 const fileReader = new FileReader();
                 fileReader.onload = async (event) => {
+                    let menuData;
                     try {
-                        let menuData = JSON.parse(event.target.result);
-                        // Accept both flat array and nested format
-                        if (!Array.isArray(menuData)) {
-                            // Try to extract and flatten from nested format
-                            if (menuData.menu && Array.isArray(menuData.menu)) {
-                                // Flatten all items from all categories
-                                menuData = menuData.menu.flatMap(cat =>
-                                    (cat.items || []).map(item => ({ ...item, category: cat.category }))
-                                );
-                            } else {
-                                statusMessage.textContent = 'Error: The uploaded file is not a valid JSON array or menu format.';
-                                return;
-                            }
+                        menuData = JSON.parse(event.target.result);
+                    } catch (parseError) {
+                        console.error("Error parsing JSON file:", parseError);
+                        logStatus(`Error parsing JSON file: ${parseError.message}`);
+                        return;
+                    }
+                    // Accept both flat array and nested format
+                    if (!Array.isArray(menuData)) {
+                        // Try to extract and flatten from nested format
+                        if (menuData.menu && Array.isArray(menuData.menu)) {
+                            // Flatten all items from all categories
+                            menuData = menuData.menu.flatMap(cat =>
+                                (cat.items || []).map(item => ({ ...item, category: cat.category }))
+                            );
+                        } else {
+                            logStatus('Error: The uploaded file is not a valid JSON array or menu format.');
+                            return;
                         }
-
+                    }
+                    try {
                         // Reference to the collection
                         const menuRef = collection(db, `artifacts/${firebaseConfig.appId}/public/data/menu_data`);
                         // Delete all existing documents
@@ -347,18 +363,18 @@
                         });
                         await newBatch.commit();
 
-                        statusMessage.textContent = `Menu uploaded successfully! Added ${menuData.length} items.`;
+                        logStatus(`Menu uploaded successfully! Added ${menuData.length} items.`);
                         // Immediately reload menu edit table to reflect new data
                         document.getElementById('loadMenuButton').click();
-                    } catch (parseError) {
-                        console.error("Error parsing JSON file:", parseError);
-                        statusMessage.textContent = `Error parsing JSON file: ${parseError.message}`;
+                    } catch (uploadError) {
+                        console.error("Error uploading menu:", uploadError);
+                        logStatus(`Error uploading menu: ${uploadError.message}`);
                     }
                 };
                 fileReader.readAsText(file);
             } catch (error) {
                 console.error("Error uploading menu:", error);
-                statusMessage.textContent = `Error uploading menu: ${error.message}`;
+                logStatus(`Error uploading menu: ${error.message}`);
             }
         });
 
@@ -370,7 +386,7 @@
             }
 
             try {
-                statusMessage.textContent = 'Deleting menu...';
+                logStatus('Deleting menu...');
                 const menuRef = collection(db, `artifacts/${appId}/public/data/menu_data`);
                 const existingDocs = await getDocs(menuRef);
                 const deleteBatch = writeBatch(db);
@@ -378,55 +394,14 @@
                     deleteBatch.delete(doc.ref);
                 });
                 await deleteBatch.commit();
-                statusMessage.textContent = 'Menu deleted successfully!';
+                logStatus('Menu deleted successfully!');
                 // Immediately reload menu edit table to reflect deletion
                 document.getElementById('loadMenuButton').click();
             } catch (error) {
                 console.error("Error deleting menu:", error);
-                statusMessage.textContent = `Error deleting menu: ${error.message}`;
+                logStatus(`Error deleting menu: ${error.message}`);
             }
         });
-    </script>
-    // --- Console logic ---
-    const consoleInput = document.getElementById('consoleInput');
-    const consoleOutput = document.getElementById('consoleOutput');
-    const runConsoleBtn = document.getElementById('runConsoleBtn');
-    const clearConsoleBtn = document.getElementById('clearConsoleBtn');
-
-    if (runConsoleBtn && consoleInput && consoleOutput) {
-        runConsoleBtn.addEventListener('click', () => {
-            const cmd = consoleInput.value.trim();
-            if (!cmd) return;
-            try {
-                // For now, just echo the command. You can expand this to run JS or admin actions.
-                let result = '';
-                if (cmd.toLowerCase() === 'help') {
-                    result = 'Available commands: help, echo <text>, clear, date, loadedMenuItems, status';
-                } else if (cmd.startsWith('echo ')) {
-                    result = cmd.slice(5);
-                } else if (cmd === 'clear') {
-                    consoleOutput.textContent = '';
-                    return;
-                } else if (cmd === 'date') {
-                    result = new Date().toLocaleString();
-                } else if (cmd === 'loadedMenuItems') {
-                    result = JSON.stringify(loadedMenuItems, null, 2);
-                } else if (cmd === 'status') {
-                    result = statusMessage.textContent;
-                } else {
-                    result = 'Unknown command. Type help for options.';
-                }
-                consoleOutput.textContent += '> ' + cmd + '\n' + result + '\n';
-                consoleOutput.scrollTop = consoleOutput.scrollHeight;
-            } catch (err) {
-                consoleOutput.textContent += '> ' + cmd + '\nError: ' + err.message + '\n';
-            }
-        });
-    }
-    if (clearConsoleBtn && consoleOutput) {
-        clearConsoleBtn.addEventListener('click', () => {
-            consoleOutput.textContent = '';
-        });
-    }
+</script>
 </body>
 </html>
