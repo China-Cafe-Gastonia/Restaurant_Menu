@@ -567,210 +567,210 @@
             }
         });
 
-    // Delete the entire PRIVATE menu from Firestore
-    deleteButton.addEventListener('click', async () => {
-        // Delete the entire PUBLIC menu from Firestore
-        deletePublicButton.addEventListener('click', async () => {
-            if (!db || !auth.currentUser) {
-                statusMessage.textContent = 'You must be logged in as admin.';
+    // Delete the entire PUBLIC menu from Firestore
+    deletePublicButton.addEventListener('click', async () => {
+        if (!db || !auth.currentUser) {
+            statusMessage.textContent = 'You must be logged in as admin.';
+            return;
+        }
+        try {
+            logStatus('Deleting PUBLIC menu...');
+            const menuRef = collection(db, `artifacts/${appId}/public/data/menu_data`);
+            const existingDocs = await getDocs(menuRef);
+            const deleteBatch = writeBatch(db);
+            existingDocs.forEach((doc) => {
+                deleteBatch.delete(doc.ref);
+            });
+            await deleteBatch.commit();
+            logStatus('PUBLIC menu deleted successfully!');
+        } catch (error) {
+            console.error("Error deleting public menu:", error);
+            logStatus(`Error deleting public menu: ${error.message}`);
+        }
+    });
+
+    // Hide loading message after menu loads (if menu is loaded elsewhere, this should be called after render)
+    function hideLoadingMessage() {
+        const loadingMsg = document.getElementById('loadingMessage');
+        if (loadingMsg) loadingMsg.style.display = 'none';
+    }
+
+    // --- MENU LOADING AND RENDERING LOGIC ---
+    document.getElementById('loadMenuButton').addEventListener('click', loadAndRenderMenu);
+
+    async function loadAndRenderMenu() {
+        logStatus('Load Menu button clicked. Loading PRIVATE menu...');
+        const menuContainer = document.getElementById('menuContainer');
+        const loadingMsg = document.getElementById('loadingMessage');
+        if (loadingMsg) loadingMsg.style.display = '';
+        menuContainer.innerHTML = '';
+        document.getElementById('editRestaurantName').value = '';
+        document.getElementById('editRestaurantAddress').value = '';
+        document.getElementById('editRestaurantPhone').value = '';
+        document.getElementById('editComboNote').value = '';
+        document.getElementById('editLunchNote').value = '';
+        document.getElementById('editHoursLines').innerHTML = '';
+        try {
+            const menuRef = collection(db, `artifacts/${appId}/private/data/menu_data_admin`);
+            const snapshot = await getDocs(menuRef);
+            if (snapshot.empty) {
+                hideLoadingMessage();
+                logStatus('No private menu data found.');
                 return;
             }
-            try {
-                logStatus('Deleting PUBLIC menu...');
-                const menuRef = collection(db, `artifacts/${appId}/public/data/menu_data`);
-                const existingDocs = await getDocs(menuRef);
-                const deleteBatch = writeBatch(db);
-                existingDocs.forEach((doc) => {
-                    deleteBatch.delete(doc.ref);
-                });
-                await deleteBatch.commit();
-                logStatus('PUBLIC menu deleted successfully!');
-            } catch (error) {
-                console.error("Error deleting public menu:", error);
-                logStatus(`Error deleting public menu: ${error.message}`);
-            }
-        });
-
-        // Hide loading message after menu loads (if menu is loaded elsewhere, this should be called after render)
-        function hideLoadingMessage() {
-            const loadingMsg = document.getElementById('loadingMessage');
-            if (loadingMsg) loadingMsg.style.display = 'none';
-        }
-
-        // --- MENU LOADING AND RENDERING LOGIC ---
-        document.getElementById('loadMenuButton').addEventListener('click', loadAndRenderMenu);
-
-        async function loadAndRenderMenu() {
-            logStatus('Load Menu button clicked. Loading PRIVATE menu...');
-            const menuContainer = document.getElementById('menuContainer');
-            const loadingMsg = document.getElementById('loadingMessage');
-            if (loadingMsg) loadingMsg.style.display = '';
-            menuContainer.innerHTML = '';
-            document.getElementById('editRestaurantName').value = '';
-            document.getElementById('editRestaurantAddress').value = '';
-            document.getElementById('editRestaurantPhone').value = '';
-            document.getElementById('editComboNote').value = '';
-            document.getElementById('editLunchNote').value = '';
-            document.getElementById('editHoursLines').innerHTML = '';
-            try {
-                const menuRef = collection(db, `artifacts/${firebaseConfig.appId}/private/data/menu_data_admin`);
-                const snapshot = await getDocs(menuRef);
-                if (snapshot.empty) {
-                    hideLoadingMessage();
-                    logStatus('No private menu data found.');
-                    return;
+            let menuItems = [];
+            let infoDoc = null;
+            snapshot.forEach(docSnap => {
+                if (docSnap.id === '_info') {
+                    infoDoc = docSnap.data();
+                } else {
+                    menuItems.push({ _id: docSnap.id, ...docSnap.data() });
                 }
-                let menuItems = [];
-                let infoDoc = null;
-                snapshot.forEach(docSnap => {
-                    if (docSnap.id === '_info') {
-                        infoDoc = docSnap.data();
-                    } else {
-                        menuItems.push({ _id: docSnap.id, ...docSnap.data() });
-                    }
-                });
-                // keep a representation of the loaded private dataset so Normalize & Download can use it
-                lastParsedDoc = { menuData: menuItems, info: infoDoc };
-                menuItems.sort((a, b) => (a.categoryOrder - b.categoryOrder) || (a.itemOrder - b.itemOrder));
-                if (infoDoc && infoDoc.restaurant) {
-                    document.getElementById('editRestaurantName').value = infoDoc.restaurant.name || '';
-                    document.getElementById('editRestaurantAddress').value = infoDoc.restaurant.address || infoDoc.restaurant.location || '';
-                    document.getElementById('editRestaurantPhone').value = infoDoc.restaurant.phone || '';
-                    const hoursLines = document.getElementById('editHoursLines');
-                    hoursLines.innerHTML = '';
-                    if (infoDoc.restaurant.hours && Array.isArray(infoDoc.restaurant.hours)) {
-                        infoDoc.restaurant.hours.forEach((line, idx) => {
-                            const input = document.createElement('input');
-                            input.type = 'text';
-                            input.className = 'block w-full text-base text-gray-700 bg-gray-50 rounded px-2 py-1 mb-1 max-w-xl';
-                            input.value = line;
-                            input.placeholder = 'Hours line';
-                            input.dataset.idx = idx;
-                            hoursLines.appendChild(input);
+            });
+            // keep a representation of the loaded private dataset so Normalize & Download can use it
+            lastParsedDoc = { menuData: menuItems, info: infoDoc };
+            menuItems.sort((a, b) => (a.categoryOrder - b.categoryOrder) || (a.itemOrder - b.itemOrder));
+            if (infoDoc && infoDoc.restaurant) {
+                document.getElementById('editRestaurantName').value = infoDoc.restaurant.name || '';
+                document.getElementById('editRestaurantAddress').value = infoDoc.restaurant.address || infoDoc.restaurant.location || '';
+                document.getElementById('editRestaurantPhone').value = infoDoc.restaurant.phone || '';
+                const hoursLines = document.getElementById('editHoursLines');
+                hoursLines.innerHTML = '';
+                if (infoDoc.restaurant.hours && Array.isArray(infoDoc.restaurant.hours)) {
+                    infoDoc.restaurant.hours.forEach((line, idx) => {
+                        const input = document.createElement('input');
+                        input.type = 'text';
+                        input.className = 'block w-full text-base text-gray-700 bg-gray-50 rounded px-2 py-1 mb-1 max-w-xl';
+                        input.value = line;
+                        input.placeholder = 'Hours line';
+                        input.dataset.idx = idx;
+                        hoursLines.appendChild(input);
+                    });
+                }
+            }
+            if (infoDoc && infoDoc.notes) {
+                document.getElementById('editComboNote').value = infoDoc.notes.combination_plate || infoDoc.notes.combo || '';
+                document.getElementById('editLunchNote').value = infoDoc.notes.lunch_special || infoDoc.notes.lunch || '';
+            }
+            // Normalize items to ensure `unit` is an array of objects for rendering
+            menuItems = menuItems.map(i => normalizeMenuItem(i));
+            const groupedMenu = menuItems.reduce((acc, item) => {
+                (acc[item.category] = acc[item.category] || []).push(item);
+                return acc;
+            }, {});
+            for (const category in groupedMenu) {
+                const items = groupedMenu[category];
+                const firstItem = items[0] || {};
+                const chineseName = firstItem.chinese_name || '';
+                const note = firstItem.note || '';
+                const card = document.createElement('div');
+                card.className = 'menu-card mb-8';
+                const headerDiv = document.createElement('div');
+                headerDiv.className = 'category-header flex items-center';
+                const catInput = document.createElement('input');
+                catInput.type = 'text';
+                catInput.value = category;
+                catInput.className = 'text-2xl font-extrabold text-gray-900 bg-gray-50 rounded px-2 py-1';
+                headerDiv.appendChild(catInput);
+                const catChinese = document.createElement('input');
+                catChinese.type = 'text';
+                catChinese.value = chineseName;
+                catChinese.className = 'text-lg text-gray-500 bg-gray-50 rounded px-2 py-1 ml-2';
+                headerDiv.appendChild(catChinese);
+                card.appendChild(headerDiv);
+                if (note) {
+                    const catNote = document.createElement('input');
+                    catNote.type = 'text';
+                    catNote.value = note;
+                    catNote.className = 'w-full text-base text-yellow-700 bg-yellow-50 border-l-4 border-yellow-400 rounded-lg p-2 mb-2';
+                    card.appendChild(catNote);
+                }
+                const ul = document.createElement('ul');
+                ul.className = 'space-y-4';
+                items.forEach(item => {
+                    const li = document.createElement('li');
+                    li.className = 'border-b pb-2';
+                    const flexDiv = document.createElement('div');
+                    flexDiv.className = 'flex-grow';
+                    const nameInput = document.createElement('input');
+                    nameInput.type = 'text';
+                    nameInput.value = item.name || '';
+                    nameInput.className = 'text-lg font-semibold text-gray-800 bg-gray-50 rounded px-2 py-1 mb-1 w-full';
+                    flexDiv.appendChild(nameInput);
+                    const descInput = document.createElement('input');
+                    descInput.type = 'text';
+                    descInput.value = item.description || '';
+                    descInput.className = 'text-sm text-gray-500 bg-gray-50 rounded px-2 py-1 mb-1 w-full';
+                    flexDiv.appendChild(descInput);
+                    if (Array.isArray(item.unit)) {
+                        item.unit.forEach(opt => {
+                            const unitDiv = document.createElement('div');
+                            unitDiv.className = 'flex gap-2 mb-1';
+                            // Size
+                            const sizeInput = document.createElement('input');
+                            sizeInput.type = 'text';
+                            sizeInput.value = opt.size || '';
+                            sizeInput.placeholder = 'Size';
+                            sizeInput.className = 'text-sm text-gray-700 bg-gray-50 rounded px-2 py-1 w-28';
+                            unitDiv.appendChild(sizeInput);
+                            // Option
+                            const optionInput = document.createElement('input');
+                            optionInput.type = 'text';
+                            optionInput.value = opt.option || '';
+                            optionInput.placeholder = 'Option';
+                            optionInput.className = 'text-sm text-gray-700 bg-gray-50 rounded px-2 py-1 w-40';
+                            unitDiv.appendChild(optionInput);
+                            // Price
+                            const unitPrice = document.createElement('input');
+                            unitPrice.type = 'text';
+                            unitPrice.value = opt.price || '';
+                            unitPrice.placeholder = 'Price';
+                            unitPrice.className = 'w-20 bg-gray-50 rounded px-2 py-1 text-orange-600 font-semibold';
+                            unitDiv.appendChild(unitPrice);
+                            flexDiv.appendChild(unitDiv);
                         });
                     }
-                }
-                if (infoDoc && infoDoc.notes) {
-                    document.getElementById('editComboNote').value = infoDoc.notes.combination_plate || infoDoc.notes.combo || '';
-                    document.getElementById('editLunchNote').value = infoDoc.notes.lunch_special || infoDoc.notes.lunch || '';
-                }
-                // Normalize items to ensure `unit` is an array of objects for rendering
-                menuItems = menuItems.map(i => normalizeMenuItem(i));
-                const groupedMenu = menuItems.reduce((acc, item) => {
-                    (acc[item.category] = acc[item.category] || []).push(item);
-                    return acc;
-                }, {});
-                for (const category in groupedMenu) {
-                    const items = groupedMenu[category];
-                    const firstItem = items[0] || {};
-                    const chineseName = firstItem.chinese_name || '';
-                    const note = firstItem.note || '';
-                    const card = document.createElement('div');
-                    card.className = 'menu-card mb-8';
-                    const headerDiv = document.createElement('div');
-                    headerDiv.className = 'category-header flex items-center';
-                    const catInput = document.createElement('input');
-                    catInput.type = 'text';
-                    catInput.value = category;
-                    catInput.className = 'text-2xl font-extrabold text-gray-900 bg-gray-50 rounded px-2 py-1';
-                    headerDiv.appendChild(catInput);
-                    const catChinese = document.createElement('input');
-                    catChinese.type = 'text';
-                    catChinese.value = chineseName;
-                    catChinese.className = 'text-lg text-gray-500 bg-gray-50 rounded px-2 py-1 ml-2';
-                    headerDiv.appendChild(catChinese);
-                    card.appendChild(headerDiv);
-                    if (note) {
-                        const catNote = document.createElement('input');
-                        catNote.type = 'text';
-                        catNote.value = note;
-                        catNote.className = 'w-full text-base text-yellow-700 bg-yellow-50 border-l-4 border-yellow-400 rounded-lg p-2 mb-2';
-                        card.appendChild(catNote);
-                    }
-                    const ul = document.createElement('ul');
-                    ul.className = 'space-y-4';
-                    items.forEach(item => {
-                        const li = document.createElement('li');
-                        li.className = 'border-b pb-2';
-                        const flexDiv = document.createElement('div');
-                        flexDiv.className = 'flex-grow';
-                        const nameInput = document.createElement('input');
-                        nameInput.type = 'text';
-                        nameInput.value = item.name || '';
-                        nameInput.className = 'text-lg font-semibold text-gray-800 bg-gray-50 rounded px-2 py-1 mb-1 w-full';
-                        flexDiv.appendChild(nameInput);
-                        const descInput = document.createElement('input');
-                        descInput.type = 'text';
-                        descInput.value = item.description || '';
-                        descInput.className = 'text-sm text-gray-500 bg-gray-50 rounded px-2 py-1 mb-1 w-full';
-                        flexDiv.appendChild(descInput);
-                        if (Array.isArray(item.unit)) {
-                            item.unit.forEach(opt => {
-                                const unitDiv = document.createElement('div');
-                                unitDiv.className = 'flex gap-2 mb-1';
-                                // Size
-                                const sizeInput = document.createElement('input');
-                                sizeInput.type = 'text';
-                                sizeInput.value = opt.size || '';
-                                sizeInput.placeholder = 'Size';
-                                sizeInput.className = 'text-sm text-gray-700 bg-gray-50 rounded px-2 py-1 w-28';
-                                unitDiv.appendChild(sizeInput);
-                                // Option
-                                const optionInput = document.createElement('input');
-                                optionInput.type = 'text';
-                                optionInput.value = opt.option || '';
-                                optionInput.placeholder = 'Option';
-                                optionInput.className = 'text-sm text-gray-700 bg-gray-50 rounded px-2 py-1 w-40';
-                                unitDiv.appendChild(optionInput);
-                                // Price
-                                const unitPrice = document.createElement('input');
-                                unitPrice.type = 'text';
-                                unitPrice.value = opt.price || '';
-                                unitPrice.placeholder = 'Price';
-                                unitPrice.className = 'w-20 bg-gray-50 rounded px-2 py-1 text-orange-600 font-semibold';
-                                unitDiv.appendChild(unitPrice);
-                                flexDiv.appendChild(unitDiv);
-                            });
-                        }
-                        const priceInput = document.createElement('input');
-                        priceInput.type = 'text';
-                        priceInput.value = item.price || '';
-                        priceInput.className = 'w-24 bg-gray-50 rounded px-2 py-1 ml-2 text-orange-600 font-semibold';
-                        flexDiv.appendChild(priceInput);
-                        li.appendChild(flexDiv);
-                        ul.appendChild(li);
-                    });
-                    card.appendChild(ul);
-                    menuContainer.appendChild(card);
-                }
-                hideLoadingMessage();
-                logStatus('PRIVATE menu loaded.');
-            } catch (err) {
-                hideLoadingMessage();
-                logStatus('Error loading menu: ' + (err.message || err));
-            }
-        }
-            if (!db || !auth.currentUser) {
-                statusMessage.textContent = 'You must be logged in as admin.';
-                return;
-            }
-
-            try {
-                logStatus('Deleting PRIVATE menu...');
-                const menuRef = collection(db, `artifacts/${appId}/private/data/menu_data_admin`);
-                const existingDocs = await getDocs(menuRef);
-                const deleteBatch = writeBatch(db);
-                existingDocs.forEach((doc) => {
-                    deleteBatch.delete(doc.ref);
+                    const priceInput = document.createElement('input');
+                    priceInput.type = 'text';
+                    priceInput.value = item.price || '';
+                    priceInput.className = 'w-24 bg-gray-50 rounded px-2 py-1 ml-2 text-orange-600 font-semibold';
+                    flexDiv.appendChild(priceInput);
+                    li.appendChild(flexDiv);
+                    ul.appendChild(li);
                 });
-                await deleteBatch.commit();
-                logStatus('PRIVATE menu deleted successfully!');
-                document.getElementById('loadMenuButton').click();
-            } catch (error) {
-                console.error("Error deleting menu:", error);
-                logStatus(`Error deleting menu: ${error.message}`);
+                card.appendChild(ul);
+                menuContainer.appendChild(card);
             }
-        });
+            hideLoadingMessage();
+            logStatus('PRIVATE menu loaded.');
+        } catch (err) {
+            hideLoadingMessage();
+            logStatus('Error loading menu: ' + (err.message || err));
+        }
+    }
+
+    // Delete the entire PRIVATE menu from Firestore
+    deleteButton.addEventListener('click', async () => {
+        if (!db || !auth.currentUser) {
+            statusMessage.textContent = 'You must be logged in as admin.';
+            return;
+        }
+        try {
+            logStatus('Deleting PRIVATE menu...');
+            const menuRef = collection(db, `artifacts/${appId}/private/data/menu_data_admin`);
+            const existingDocs = await getDocs(menuRef);
+            const deleteBatch = writeBatch(db);
+            existingDocs.forEach((doc) => {
+                deleteBatch.delete(doc.ref);
+            });
+            await deleteBatch.commit();
+            logStatus('PRIVATE menu deleted successfully!');
+            document.getElementById('loadMenuButton').click();
+        } catch (error) {
+            console.error("Error deleting menu:", error);
+            logStatus(`Error deleting menu: ${error.message}`);
+        }
+    });
 
         // Publish button logic: copy private dataset to public
         document.getElementById('publishButton').addEventListener('click', async () => {
