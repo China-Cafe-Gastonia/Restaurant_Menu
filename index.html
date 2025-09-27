@@ -181,6 +181,66 @@
             return copy;
         }
 
+        // Filtering state for public page
+        let _cachedMenuItems = [];
+        const ingredientFilters = new Set();
+        let spicyOnlyFilter = false;
+
+        function normalizeIngredientToken(s) {
+            return String(s || '').trim().toLowerCase();
+        }
+
+        function renderFilterBar(menuDocs) {
+            // Collect unique ingredients
+            const ingredientSet = new Map(); // token -> display
+            menuDocs.forEach(it => {
+                const ing = it.ingredients;
+                if (!ing) return;
+                if (Array.isArray(ing)) {
+                    ing.forEach(i => ingredientSet.set(normalizeIngredientToken(i), i.trim()));
+                } else if (typeof ing === 'string') {
+                    ing.split(/[\n,]/).map(s => s.trim()).filter(Boolean).forEach(i => ingredientSet.set(normalizeIngredientToken(i), i));
+                }
+            });
+
+            const menuContainer = document.getElementById('menuContainer');
+            // Create or replace filter bar at top
+            let filterBar = document.getElementById('filterBar');
+            if (!filterBar) {
+                filterBar = document.createElement('div');
+                filterBar.id = 'filterBar';
+                filterBar.className = 'mb-4 flex flex-wrap items-center gap-2';
+                menuContainer.appendChild(filterBar);
+            }
+            // Build HTML for tags
+            const parts = [];
+            // Spicy toggle
+            parts.push(`<button data-filter-spicy="1" class="px-3 py-1 rounded-full text-sm ${spicyOnlyFilter ? 'bg-red-100 text-red-800' : 'bg-gray-100 text-gray-700'}">🌶️ Spicy</button>`);
+            // Ingredient tags
+            Array.from(ingredientSet.entries()).sort((a,b)=> a[1].localeCompare(b[1])).forEach(([token, display]) => {
+                const active = ingredientFilters.has(token);
+                parts.push(`<button data-ingredient="${encodeURIComponent(token)}" class="px-3 py-1 rounded-full text-sm ${active ? 'bg-yellow-100 text-yellow-800' : 'bg-gray-100 text-gray-700'}">${display}</button>`);
+            });
+
+            filterBar.innerHTML = parts.join('');
+
+            // Attach handlers
+            filterBar.querySelectorAll('[data-ingredient]').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const token = decodeURIComponent(btn.getAttribute('data-ingredient'));
+                    if (ingredientFilters.has(token)) ingredientFilters.delete(token); else ingredientFilters.add(token);
+                    renderMenu(_cachedMenuItems);
+                });
+            });
+            const spicyBtn = filterBar.querySelector('[data-filter-spicy]');
+            if (spicyBtn) {
+                spicyBtn.addEventListener('click', () => {
+                    spicyOnlyFilter = !spicyOnlyFilter;
+                    renderMenu(_cachedMenuItems);
+                });
+            }
+        }
+
         function formatPrice(val) {
             if (val === null || val === undefined || val === '') return '';
             const n = Number(val);
@@ -202,24 +262,28 @@
                 }, {});
                 const html = Object.entries(groups).map(([size, opts]) => {
                     const sizeLabel = size || '';
-                    const optsHtml = opts.map(u => {
-                        if (u && typeof u === 'object') {
-                            const parts = [];
-                            // show option if different from size
-                            if (u.option) parts.push(`<span class="text-sm text-gray-700">${u.option}</span>`);
-                            const priceHtml = `<span class="text-orange-600 font-semibold">${formatPrice(u.price)}</span>`;
-                            // If there's an option, list it on its own row; otherwise show price alongside size
-                            if (u.option) {
-                                return `<div class="flex justify-between"><div>${parts.join(' - ')}</div>${priceHtml}</div>`;
-                            }
-                            return `<div class="flex justify-between"><div class="text-sm text-gray-700">${sizeLabel}</div>${priceHtml}</div>`;
-                        } else {
-                            return `<div class="text-sm text-gray-700">${String(u)}</div>`;
-                        }
-                    }).join('');
-                    // If any opt had an explicit option, render size as a small header
                     const hasOptions = opts.some(o => o && typeof o === 'object' && o.option);
-                    return `<div class="mb-1">${sizeLabel ? `<div class="text-sm font-semibold text-gray-800">${sizeLabel}</div>` : ''}${optsHtml}</div>`;
+                    // If there are options for this size, show the size once as a header and then option rows
+                    if (hasOptions) {
+                        const optsHtml = opts.map(u => {
+                            if (u && typeof u === 'object') {
+                                const priceHtml = `<div class="text-orange-600 font-semibold">${formatPrice(u.price)}</div>`;
+                                const label = u.option ? `${u.option}` : '';
+                                return `<div class="flex items-center gap-3 mb-0.5"><div class="text-sm text-gray-700">${label}</div>${priceHtml}</div>`;
+                            }
+                            return `<div class="text-sm text-gray-700 mb-0.5">${String(u)}</div>`;
+                        }).join('');
+                        return `<div class="mb-1">${sizeLabel ? `<div class="text-sm font-semibold text-gray-800 mb-0.5">${sizeLabel}</div>` : ''}${optsHtml}</div>`;
+                    }
+                    // No options: render rows with size and price (no extra header)
+                    const rows = opts.map(u => {
+                        if (u && typeof u === 'object') {
+                            const priceHtml = `<div class="text-orange-600 font-semibold">${formatPrice(u.price)}</div>`;
+                            return `<div class="flex items-center gap-3 mb-0.5"><div class="text-sm text-gray-700">${sizeLabel}</div>${priceHtml}</div>`;
+                        }
+                        return `<div class="text-sm text-gray-700 mb-0.5">${String(u)}</div>`;
+                    }).join('');
+                    return `<div class="mb-1">${rows}</div>`;
                 }).join('');
                 return `<div class="space-y-1">${html}</div>`;
             }
@@ -362,6 +426,26 @@
     } else {
         notesEl.innerHTML = '';
     }
+            // Cache unfiltered docs for filter UI and interactions
+            _cachedMenuItems = menuDocs.slice();
+            // Render filter bar (collects tags from the full menu)
+            renderFilterBar(_cachedMenuItems);
+
+            // Apply filters (spicy and ingredient tags)
+            let filteredDocs = menuDocs.filter(it => {
+                if (spicyOnlyFilter && !it.spicy) return false;
+                if (ingredientFilters.size > 0) {
+                    const ing = it.ingredients || null;
+                    if (!ing) return false;
+                    const tokens = Array.isArray(ing) ? ing.map(normalizeIngredientToken) : String(ing).split(/[\n,]/).map(s => normalizeIngredientToken(s)).filter(Boolean);
+                    // Keep item if it matches ANY selected ingredient token
+                    const hasAny = Array.from(ingredientFilters).some(tok => tokens.includes(tok));
+                    if (!hasAny) return false;
+                }
+                return true;
+            });
+            menuDocs = filteredDocs;
+
             if (!menuDocs || menuDocs.length === 0) {
                 menuContainer.innerHTML = '<div class="text-center text-gray-400 text-xl py-12">Menu not available or under maintenance.</div>';
                 return;
@@ -401,8 +485,11 @@
                             return `
                             <li class="border-b pb-2">
                                 <div class="flex-grow">
-                                    <h3 class="text-lg font-semibold text-gray-800">${item.name}</h3>
+                                    <h3 class="text-lg font-semibold">
+                                        ${item.spicy ? `<span role="img" aria-label="spicy" title="Spicy" style="color:#be123c; margin-right:0.5rem; display:inline-block; vertical-align:middle;">🌶️</span>` : ''}${item.name}
+                                    </h3>
                                     <p class="text-sm text-gray-500 mb-1">${item.description || ''}</p>
+                                    ${((Array.isArray(item.ingredients) && item.ingredients.length > 0) || (typeof item.ingredients === 'string' && item.ingredients.trim().length > 0)) ? `<div class="text-sm text-gray-600 mb-1"><b>Ingredients:</b> ${Array.isArray(item.ingredients) ? item.ingredients.join(', ') : String(item.ingredients)}</div>` : ''}
                                     ${details ? details : ''}
                                 </div>
                             </li>

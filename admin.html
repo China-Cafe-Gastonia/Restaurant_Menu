@@ -124,6 +124,18 @@
             <button id="saveMenuBtn" class="bg-green-600 text-white font-bold py-2 px-8 rounded-full shadow hover:bg-green-700">Save Menu</button>
         </div>
 
+        <!-- Confirmation Modal for Save -->
+        <div id="confirmModal" class="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center" style="display:none; z-index:200;">
+            <div class="bg-white rounded-lg p-6 w-96 shadow-lg">
+                <h3 class="text-lg font-semibold mb-3">Confirm Save</h3>
+                <p class="text-sm text-gray-700 mb-4">This will update the private menu. Do you want to continue?</p>
+                <div class="flex justify-end gap-3">
+                    <button id="confirmCancelBtn" class="px-3 py-1 rounded bg-gray-200">Cancel</button>
+                    <button id="confirmSaveBtn" class="px-3 py-1 rounded bg-green-600 text-white">Save</button>
+                </div>
+            </div>
+        </div>
+
         <!-- Field/Form 3: Output Box (always visible, toggle with arrow) -->
         <div id="outputBox" class="card" style="position:fixed;left:0;right:0;bottom:0;z-index:50;margin:0 auto;max-width:900px;box-shadow:0 -2px 16px 0 #0001;transition:transform 0.3s cubic-bezier(.4,0,.2,1);">
             <div class="flex items-center justify-between mb-2 relative">
@@ -411,30 +423,67 @@
             return copy;
         }
 
+        // Normalize ingredient name to Title Case (e.g., "water chestnut" -> "Water Chestnut")
+        function normalizeIngredientName(raw) {
+            if (!raw) return '';
+            return String(raw).trim().split(/\s+/).map(word => {
+                return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+            }).join(' ');
+        }
+
         // Build admin-friendly HTML for an item with editable fields
         function buildAdminItemHtml(item) {
             // item is normalized (unit array of {size, option, price})
             const name = item.name || '';
             const desc = item.description || '';
-            const unitHtml = (Array.isArray(item.unit) ? item.unit : []).map(u => {
-                if (u && typeof u === 'object') {
+            const units = Array.isArray(item.unit) ? item.unit : [];
+            // Group by size
+            const groups = units.reduce((acc, u) => {
+                const key = u && typeof u === 'object' ? String(u.size || '') : String(u || '');
+                (acc[key] = acc[key] || []).push(u);
+                return acc;
+            }, {});
+            const unitHtml = Object.entries(groups).map(([size, opts]) => {
+                const hasOptions = opts.some(o => o && typeof o === 'object' && o.option);
+                    if (hasOptions) {
+                    const optsHtml = opts.map(u => `
+                        <div class="admin-unit-row admin-unit-option flex items-center gap-3 mb-0.5">
+                            <input type="hidden" class="admin-unit-size" value="${size}" />
+                            <input type="text" class="text-sm text-gray-700 bg-gray-50 rounded px-2 py-1 w-40 admin-unit-option-input" value="${u.option || ''}" placeholder="Option" />
+                            <input type="text" class="w-20 bg-gray-50 rounded px-2 py-1 text-orange-600 font-semibold admin-unit-price-input" value="${u.price || ''}" placeholder="Price" />
+                        </div>`).join('');
                     return `
-                        <div class="flex gap-2 mb-1">
-                            <input type="text" class="text-sm text-gray-700 bg-gray-50 rounded px-2 py-1 w-28" value="${u.size || ''}" placeholder="Size" />
-                            <input type="text" class="text-sm text-gray-700 bg-gray-50 rounded px-2 py-1 w-40" value="${u.option || ''}" placeholder="Option" />
-                            <input type="text" class="w-20 bg-gray-50 rounded px-2 py-1 text-orange-600 font-semibold" value="${u.price || ''}" placeholder="Price" />
+                        <div class="mb-1 admin-unit-group">
+                            ${size ? `<div class="text-sm font-semibold text-gray-800 mb-0.5">${size}</div>` : ''}
+                            ${optsHtml}
                         </div>`;
                 }
-                return `<div class="text-sm text-gray-700">${String(u)}</div>`;
+                // No options: show size with price(s)
+                const rows = opts.map(u => `
+                    <div class="admin-unit-row admin-unit-simple flex items-center gap-3 mb-0.5">
+                        <input type="text" class="text-sm text-gray-700 bg-gray-50 rounded px-2 py-1 w-28 admin-unit-size-input" value="${size}" placeholder="Size" />
+                        <input type="text" class="w-20 bg-gray-50 rounded px-2 py-1 text-orange-600 font-semibold admin-unit-price-input" value="${u && u.price ? u.price : ''}" placeholder="Price" />
+                    </div>`).join('');
+                return `<div class="mb-1 admin-unit-group">${rows}</div>`;
             }).join('');
             return `
-                <div class="border-b pb-2">
-                    <div class="flex-grow">
-                        <input type="text" class="text-lg font-semibold text-gray-800 bg-gray-50 rounded px-2 py-1 mb-1 w-full" value="${name}" />
-                        <input type="text" class="text-sm text-gray-500 bg-gray-50 rounded px-2 py-1 mb-1 w-full" value="${desc}" />
-                        ${unitHtml}
+                <li class="border-b pb-2 admin-item">
+                    <div class="flex items-start gap-3">
+                        <div class="flex-shrink-0 mt-1">
+                            <label class="inline-flex items-center text-sm">
+                                <input type="checkbox" class="admin-item-spicy mr-2" ${item.spicy ? 'checked' : ''} />
+                                <span class="text-sm text-gray-600">Spicy</span>
+                            </label>
+                        </div>
+                        <div class="flex-grow">
+                            <input type="hidden" class="admin-item-id" value="${item._id || ''}" />
+                            <input type="text" class="text-lg font-semibold bg-gray-50 rounded px-2 py-1 mb-1 w-full admin-item-name" value="${name}" style="${item.spicy ? 'color:#be123c;' : ''}" />
+                            <input type="text" class="text-sm text-gray-500 bg-gray-50 rounded px-2 py-1 mb-1 w-full admin-item-desc" value="${desc}" />
+                            <textarea class="text-sm text-gray-600 bg-gray-50 rounded px-2 py-1 mb-1 w-full admin-item-ingredients" placeholder="Ingredients (comma or newline separated)">${Array.isArray(item.ingredients) ? item.ingredients.join(', ') : (item.ingredients || '')}</textarea>
+                            ${unitHtml}
+                        </div>
                     </div>
-                </div>`;
+                </li>`;
         }
         // UI elements
         const loginCard = document.getElementById('loginCard');
@@ -592,6 +641,186 @@
                 logStatus(`Error uploading menu: ${error.message}`);
             }
         });
+
+                // Save Menu button: collect edits from admin UI and write to PRIVATE dataset
+                const saveMenuBtn = document.getElementById('saveMenuBtn');
+                const confirmModal = document.getElementById('confirmModal');
+                const confirmCancelBtn = document.getElementById('confirmCancelBtn');
+                const confirmSaveBtn = document.getElementById('confirmSaveBtn');
+
+                saveMenuBtn.addEventListener('click', () => {
+                    // show modal
+                    confirmModal.style.display = '';
+                });
+                confirmCancelBtn.addEventListener('click', () => {
+                    confirmModal.style.display = 'none';
+                });
+
+                confirmSaveBtn.addEventListener('click', async () => {
+                    confirmModal.style.display = 'none';
+                    if (!db || !auth.currentUser) {
+                        logStatus('You must be logged in as admin.');
+                        return;
+                    }
+                    try {
+                        logStatus('Preparing to save edited menu (upsert) to PRIVATE dataset...');
+
+                        // Build items by iterating categories to capture ordering correctly
+                        const menuContainer = document.getElementById('menuContainer');
+                        const categoryCards = menuContainer.querySelectorAll('.menu-card');
+                        const items = [];
+                        let hasInvalid = false;
+                        let firstInvalidEl = null;
+
+                        categoryCards.forEach((card, catIdx) => {
+                            const categoryName = (card.querySelector('.text-2xl')?.value || card.querySelector('input[type=text]')?.value || '').trim();
+                            const itemEls = card.querySelectorAll('.admin-item');
+                            itemEls.forEach((li, itemIdx) => {
+                                const id = li.querySelector('.admin-item-id')?.value || null;
+                                const name = li.querySelector('.admin-item-name')?.value || '';
+                                const description = li.querySelector('.admin-item-desc')?.value || '';
+                                // collect unit groups
+                                const unit = [];
+                                const groups = li.querySelectorAll('.admin-unit-group');
+                                groups.forEach(g => {
+                                    const sizeHeader = (g.querySelector('.text-sm.font-semibold')?.textContent || '').trim();
+                                    const optionRows = g.querySelectorAll('.admin-unit-option');
+                                    if (optionRows && optionRows.length) {
+                                        optionRows.forEach(row => {
+                                            const size = (row.querySelector('.admin-unit-size')?.value || sizeHeader || '').trim() || null;
+                                            const opt = (row.querySelector('.admin-unit-option-input')?.value || '').trim() || null;
+                                            const priceEl = row.querySelector('.admin-unit-price-input');
+                                            const priceRaw = priceEl?.value ?? '';
+                                            const price = priceRaw === null || priceRaw === '' ? null : Number(priceRaw);
+                                            // validation: non-empty must be a finite number
+                                            if (priceRaw !== '' && !Number.isFinite(Number(priceRaw))) {
+                                                hasInvalid = true;
+                                                if (priceEl) {
+                                                    priceEl.style.border = '2px solid #f87171';
+                                                    if (!firstInvalidEl) firstInvalidEl = priceEl;
+                                                }
+                                            } else if (priceEl) {
+                                                // clear previous invalid styles
+                                                priceEl.style.border = '';
+                                            }
+                                            unit.push({ size, option: opt, price });
+                                        });
+                                    } else {
+                                        const simpleRows = g.querySelectorAll('.admin-unit-simple');
+                                        simpleRows.forEach(sr => {
+                                            const size = (sr.querySelector('.admin-unit-size-input')?.value || '').trim() || null;
+                                            const priceEl = sr.querySelector('.admin-unit-price-input');
+                                            const priceRaw = priceEl?.value ?? '';
+                                            const price = priceRaw === null || priceRaw === '' ? null : Number(priceRaw);
+                                            if (priceRaw !== '' && !Number.isFinite(Number(priceRaw))) {
+                                                hasInvalid = true;
+                                                if (priceEl) {
+                                                    priceEl.style.border = '2px solid #f87171';
+                                                    if (!firstInvalidEl) firstInvalidEl = priceEl;
+                                                }
+                                            } else if (priceEl) {
+                                                priceEl.style.border = '';
+                                            }
+                                            unit.push({ size, option: null, price });
+                                        });
+                                    }
+                                });
+
+                                const spicy = !!li.querySelector('.admin-item-spicy')?.checked;
+                                const ingredientsRaw = li.querySelector('.admin-item-ingredients')?.value || '';
+                                const ingredients = (ingredientsRaw || '').split(/[\n,]/).map(s => s.trim()).filter(Boolean).map(normalizeIngredientName);
+                                // dedupe while preserving order
+                                const dedup = [];
+                                const seen = new Set();
+                                ingredients.forEach(i => {
+                                    const key = i.toLowerCase();
+                                    if (!seen.has(key)) { seen.add(key); dedup.push(i); }
+                                });
+                                items.push({ _id: id, name, description, unit, spicy, ingredients: dedup.length ? dedup : null, category: categoryName, categoryOrder: catIdx, itemOrder: itemIdx });
+                            });
+                        });
+
+                        if (hasInvalid) {
+                            logStatus('One or more price fields are invalid. Fix highlighted fields and retry save.');
+                            if (firstInvalidEl && typeof firstInvalidEl.scrollIntoView === 'function') firstInvalidEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                            return;
+                        }
+
+                        // Build info object from fields
+                        const info = {};
+                        const restName = document.getElementById('editRestaurantName')?.value || '';
+                        const restAddr = document.getElementById('editRestaurantAddress')?.value || '';
+                        const restPhone = document.getElementById('editRestaurantPhone')?.value || '';
+                        const combo = document.getElementById('editComboNote')?.value || '';
+                        const lunch = document.getElementById('editLunchNote')?.value || '';
+                        if (restName || restAddr || restPhone) info.restaurant = { name: restName, address: restAddr, phone: restPhone };
+                        if (combo || lunch) info.notes = { combination_plate: combo, lunch_special: lunch };
+
+                        // Prepare Firestore refs
+                        const menuRef = collection(db, `artifacts/${firebaseConfig.appId}/private/data/menu_data_admin`);
+
+                        // Fetch existing docs to decide which to update/delete and to create a backup
+                        const existingDocsSnap = await getDocs(menuRef);
+                        const existingById = {};
+                        const backupItems = [];
+                        let existingInfo = null;
+                        existingDocsSnap.forEach(ds => {
+                            if (ds.id === '_info') {
+                                existingInfo = ds.data();
+                            } else {
+                                existingById[ds.id] = ds.ref;
+                                backupItems.push({ _id: ds.id, ...ds.data() });
+                            }
+                        });
+
+                        // Download a JSON backup of the current private menu before making changes
+                        try {
+                            const backup = { exportedAt: new Date().toISOString(), appId: firebaseConfig.appId, info: existingInfo, menuData: backupItems };
+                            const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
+                            const url = URL.createObjectURL(blob);
+                            const a = document.createElement('a');
+                            a.href = url;
+                            a.download = `menu_backup_private_${new Date().toISOString().replace(/[:.]/g, '-')}.json`;
+                            document.body.appendChild(a);
+                            a.click();
+                            a.remove();
+                            URL.revokeObjectURL(url);
+                            logStatus('Backup downloaded locally before saving changes.');
+                        } catch (dlErr) {
+                            console.warn('Failed to download backup before saving:', dlErr);
+                            logStatus('Warning: failed to download backup before saving. Proceeding with save.');
+                        }
+
+                        // Perform upsert/delete with batch
+                        const batch = writeBatch(db);
+                        if (Object.keys(info).length) {
+                            batch.set(doc(menuRef, '_info'), info);
+                        }
+
+                        items.forEach(it => {
+                            let docRef;
+                            if (it._id && existingById[it._id]) {
+                                docRef = existingById[it._id];
+                            } else if (it._id) {
+                                docRef = doc(menuRef, it._id);
+                            } else {
+                                docRef = doc(menuRef);
+                            }
+                            const saveObj = normalizeMenuItem({ name: it.name, description: it.description, unit: it.unit, category: it.category || '', categoryOrder: it.categoryOrder || 0, itemOrder: it.itemOrder || 0 });
+                            batch.set(docRef, saveObj);
+                            if (docRef.id) delete existingById[docRef.id];
+                        });
+
+                        // Delete any remaining old docs that were removed
+                        Object.values(existingById).forEach(ref => batch.delete(ref));
+                        await batch.commit();
+                        logStatus(`Saved ${items.length} items to PRIVATE dataset (upsert).`);
+                        document.getElementById('loadMenuButton').click();
+                    } catch (e) {
+                        console.error(e);
+                        logStatus('Error saving menu: ' + (e.message || e));
+                    }
+                });
 
     // Delete the entire PUBLIC menu from Firestore
     deletePublicButton.addEventListener('click', async () => {
