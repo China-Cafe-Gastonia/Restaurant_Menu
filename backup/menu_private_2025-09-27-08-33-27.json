@@ -1,0 +1,3108 @@
+{
+  "generatedAt": "2025-09-27T08:33:27.637Z",
+  "info": {
+    "restaurant": {
+      "phone": "704-810-8500, 704-810-8588",
+      "hours": {
+        "Tuesday": {
+          "open": "11:00",
+          "close": "21:00"
+        },
+        "Wednesday": {
+          "close": "21:00",
+          "open": "11:00"
+        },
+        "Monday": {
+          "open": "11:00",
+          "close": "21:00"
+        },
+        "Friday": {
+          "close": "21:30",
+          "open": "11:00"
+        },
+        "Saturday": {
+          "open": "11:00",
+          "close": "21:30"
+        },
+        "Thursday": {
+          "open": "11:00",
+          "close": "21:00"
+        }
+      },
+      "address": "2212 Union Rd, Gastonia, NC 28054, USA",
+      "location": "2212 Union Rd, Gastonia, NC 28054, USA",
+      "name": "China Cafe"
+    },
+    "notes": {
+      "combination_plate": "Dinner Combo, Served All Day with Fried Rice, Egg Roll. Extra $1.25 for a Fountain Drink Per Combo",
+      "lunch_special": "Mon. - Fri.: 11:00 am - 3:00 pm. Served with Fried Rice and an Fountain Drink."
+    }
+  },
+  "menu": [
+    {
+      "_id": "0FKgexENPAkHjnJ3YGD8",
+      "name": "Steamed Chicken Broccoli",
+      "categoryOrder": 14,
+      "category": "Steamed Healthy Dishes",
+      "unit": [
+        {
+          "size": "Large",
+          "option": null,
+          "price": "11.70"
+        }
+      ],
+      "description": "Steamed chicken and broccoli, perfect for a healthy meal. Served with brown sauce on the side.",
+      "note": "All Dishes are Steamed, No Oil, and Sauce on the Side",
+      "chinese_name": "健康菜",
+      "itemOrder": 1
+    },
+    {
+      "_id": "0MhfL4jthAYKyvnWqgSZ",
+      "categoryOrder": 7,
+      "itemOrder": 16,
+      "name": "Seafood Triple",
+      "note": "Served with Steamed Rice (Fried Rice Substitution $0.50)",
+      "category": "Chef's Special",
+      "chinese_name": "廚師特餐",
+      "description": "A bountiful dish with shrimp, scallops, and mixed vegetables in white sauce.",
+      "unit": [
+        {
+          "option": null,
+          "size": "Large",
+          "price": "14.00"
+        }
+      ]
+    },
+    {
+      "_id": "0qC8eAZjAl5VDoulhxWa",
+      "itemOrder": 1,
+      "chinese_name": "米粉",
+      "categoryOrder": 5,
+      "category": "Mei Fun",
+      "note": "Thin Rice Noodles",
+      "unit": [
+        {
+          "size": "Large",
+          "option": null,
+          "price": "10.50"
+        }
+      ],
+      "description": "Thin rice noodles stir-fried with sliced chicken and vegetables.",
+      "name": "Chicken Mei Fun"
+    },
+    {
+      "_id": "11CBQWrOR50uKpYHnvFL",
+      "chinese_name": "廚師特餐",
+      "categoryOrder": 7,
+      "unit": [
+        {
+          "size": "Large",
+          "price": "13.70",
+          "option": null
+        }
+      ],
+      "itemOrder": 11,
+      "category": "Chef's Special",
+      "description": "A spicy dish with chicken, beef, and shrimp, along with broccoli, carrots, green peppers, onions, water chestnuts, and zucchini in a bold Hunan sauce.",
+      "name": "Hunan Triple",
+      "note": "Served with Steamed Rice (Fried Rice Substitution $0.50)"
+    },
+    {
+      "_id": "1Ph20dVuTewpzPtPLATn",
+      "unit": [
+        {
+          "price": "10.40",
+          "option": null,
+          "size": "Large"
+        }
+      ],
+      "name": "Pork Fried Rice",
+      "category": "Fried Rice",
+      "categoryOrder": 3,
+      "description": "Savory fried rice with roasted pork.",
+      "note": "",
+      "itemOrder": 3,
+      "chinese_name": "炒飯"
+    },
+    {
+      "_id": "26y2vLZOS6FQ1y80EuMt",
+      "name": "Fried Scallops",
+      "chinese_name": "炸物",
+      "category": "Deep Fried",
+      "itemOrder": 1,
+      "note": "",
+      "description": "Crispy fried scallops, golden and delicious.",
+      "unit": [
+        {
+          "option": "Plain/Only Scallop",
+          "price": "6.00",
+          "size": "12 Scallops"
+        },
+        {
+          "size": "12 Scallops",
+          "price": "7.50",
+          "option": "w. Fried Rice/White Rice"
+        },
+        {
+          "size": "12 Scallops",
+          "price": "8.00",
+          "option": "w. French Fries"
+        },
+        {
+          "size": "12 Scallops",
+          "option": "w. Chicken Fried Rice",
+          "price": "8.00"
+        },
+        {
+          "size": "12 Scallops",
+          "option": "w. Pork Fried Rice",
+          "price": "8.00"
+        },
+        {
+          "size": "12 Scallops",
+          "price": "8.70",
+          "option": "w. Shrimp Fried Rice"
+        },
+        {
+          "size": "12 Scallops",
+          "price": "8.70",
+          "option": "w. Beef Fried Rice"
+        }
+      ],
+      "categoryOrder": 2
+    },
+    {
+      "_id": "2V80CvIPwehUHVKFBv4C",
+      "chinese_name": "湯",
+      "note": "with Crispy Noodles",
+      "itemOrder": 0,
+      "category": "Soup",
+      "unit": [
+        {
+          "option": null,
+          "size": "Pint (16 oz)",
+          "price": "3.60"
+        },
+        {
+          "price": "6.50",
+          "size": "Quart (32 oz)",
+          "option": null
+        }
+      ],
+      "description": "Savory broth with pork wontons.",
+      "name": "Wonton Soup",
+      "categoryOrder": 1
+    },
+    {
+      "_id": "2Xx7spUANAvpwSImsVqO",
+      "note": "All Dishes are Steamed, No Oil, and Sauce on the Side",
+      "category": "Steamed Healthy Dishes",
+      "description": "A nutritious trio of steamed chicken, beef, and shrimp with mixed vegetables, served with brown sauce on the side.",
+      "chinese_name": "健康菜",
+      "name": "Steamed Chicken, Beef & Shrimp Mixed Vegetables",
+      "unit": [
+        {
+          "option": null,
+          "size": "Large",
+          "price": "12.70"
+        }
+      ],
+      "categoryOrder": 14,
+      "itemOrder": 7
+    },
+    {
+      "_id": "3dRhgo3tU3fuqqNdCfx1",
+      "unit": [
+        {
+          "size": "Regular",
+          "price": "9.20",
+          "option": null
+        },
+        {
+          "size": "Large",
+          "price": "12.70",
+          "option": null
+        },
+        {
+          "option": null,
+          "price": "8.80",
+          "size": "Lunch"
+        },
+        {
+          "price": "10.20",
+          "size": "Combo",
+          "option": null
+        }
+      ],
+      "categoryOrder": 10,
+      "chinese_name": "海鮮",
+      "note": "Served w. Steamed Rice (Fried Rice Substitution $0.50)",
+      "category": "Shrimp",
+      "itemOrder": 2,
+      "name": "Shrimp Mushroom",
+      "description": "Tender shrimp and mushrooms stir-fried in a savory sauce."
+    },
+    {
+      "_id": "4jSlozp8kCV22WcFcvb7",
+      "itemOrder": 5,
+      "note": "Served with Steamed Rice (Fried Rice Substitution $0.50)",
+      "unit": [
+        {
+          "size": "Large",
+          "price": "13.50",
+          "option": null
+        }
+      ],
+      "chinese_name": "廚師特餐",
+      "description": "Crispy slices of beef tossed in a sweet and savory sesame sauce, topped with sesame seeds.",
+      "category": "Chef's Special",
+      "name": "Sesame Beef",
+      "categoryOrder": 7
+    },
+    {
+      "_id": "4woe1WGhFZ4zjFZBDOBa",
+      "chinese_name": "廚師特餐",
+      "note": "Served with Steamed Rice (Fried Rice Substitution $0.50)",
+      "name": "Beef & Scallop House Special Sauce",
+      "category": "Chef's Special",
+      "unit": [
+        {
+          "price": "14.20",
+          "option": null,
+          "size": "Large"
+        }
+      ],
+      "categoryOrder": 7,
+      "description": "Tender beef and delicate scallops stir-fried in our chef's special savory sauce.",
+      "itemOrder": 1
+    },
+    {
+      "_id": "5YTdVLb0XQppmAXYBpQa",
+      "note": "",
+      "category": "Appetizers",
+      "name": "Fried Pork Wontons",
+      "categoryOrder": 0,
+      "description": "Ten crispy fried wontons filled with a savory pork mixture.",
+      "unit": [
+        {
+          "size": "(10)",
+          "option": null,
+          "price": "6.00"
+        }
+      ],
+      "chinese_name": "頭盤",
+      "itemOrder": 7
+    },
+    {
+      "_id": "5g09jPkNaGxCaegVFTf4",
+      "categoryOrder": 8,
+      "category": "Chicken",
+      "description": "Chicken with vegetables in a savory and spicy Sa Cha sauce.",
+      "name": "Sa Cha Chicken",
+      "unit": [
+        {
+          "price": "8.70",
+          "option": null,
+          "size": "Regular"
+        },
+        {
+          "option": null,
+          "price": "11.70",
+          "size": "Large"
+        },
+        {
+          "option": null,
+          "size": "Lunch",
+          "price": "8.80"
+        },
+        {
+          "option": null,
+          "price": "10.20",
+          "size": "Combo"
+        }
+      ],
+      "itemOrder": 3,
+      "note": "Served w. Steamed Rice (Fried Rice Substitution $0.50)",
+      "chinese_name": "雞肉"
+    },
+    {
+      "_id": "71INyyychkwkwwDesznk",
+      "name": "Hunan Beef",
+      "chinese_name": "牛肉",
+      "category": "Beef",
+      "itemOrder": 4,
+      "note": "Served w. Steamed Rice (Fried Rice Substitution $0.50)",
+      "unit": [
+        {
+          "price": "9.20",
+          "option": null,
+          "size": "Regular"
+        },
+        {
+          "option": null,
+          "price": "12.70",
+          "size": "Large"
+        },
+        {
+          "price": "8.80",
+          "size": "Lunch",
+          "option": null
+        },
+        {
+          "size": "Combo",
+          "option": null,
+          "price": "10.20"
+        }
+      ],
+      "categoryOrder": 9,
+      "description": "Slices of beef with broccoli, carrots, green peppers, onions, water chestnuts, and zucchini in a spicy Hunan sauce."
+    },
+    {
+      "_id": "8CDqlCp4Yn8grjioCAcE",
+      "itemOrder": 5,
+      "name": "Hunan Chicken",
+      "note": "Served w. Steamed Rice (Fried Rice Substitution $0.50)",
+      "unit": [
+        {
+          "size": "Regular",
+          "option": null,
+          "price": "8.70"
+        },
+        {
+          "size": "Large",
+          "option": null,
+          "price": "11.70"
+        },
+        {
+          "size": "Lunch",
+          "option": null,
+          "price": "8.80"
+        },
+        {
+          "size": "Combo",
+          "price": "10.20",
+          "option": null
+        }
+      ],
+      "category": "Chicken",
+      "categoryOrder": 8,
+      "description": "Slices of chicken with broccoli, carrots, green peppers, onions, water chestnuts, and zucchini in a spicy Hunan sauce.",
+      "chinese_name": "雞肉"
+    },
+    {
+      "_id": "8HnQerUQcLTSwYmhBxJf",
+      "name": "Plain Fried Rice",
+      "description": "Classic fried rice stir-fried with no vegetables.",
+      "note": "",
+      "categoryOrder": 3,
+      "unit": [
+        {
+          "size": "Large",
+          "price": "7.20",
+          "option": null
+        }
+      ],
+      "category": "Fried Rice",
+      "itemOrder": 0,
+      "chinese_name": "炒飯"
+    },
+    {
+      "_id": "8kwOzLQxvif2hUFVmbLG",
+      "itemOrder": 7,
+      "description": "Crispy jumbo shrimp in our signature sweet and spicy General Tso's sauce.",
+      "category": "Chef's Special",
+      "note": "Served with Steamed Rice (Fried Rice Substitution $0.50)",
+      "name": "General Tso's Shrimp",
+      "chinese_name": "廚師特餐",
+      "unit": [
+        {
+          "size": "Large",
+          "option": null,
+          "price": "13.50"
+        }
+      ],
+      "categoryOrder": 7
+    },
+    {
+      "_id": "992ZEQ85qkQvISK02G8Z",
+      "description": "Shrimp stir-fried with vegetables and served with crispy noodles in white sauce.",
+      "note": "East Coast style with Crispy Noodles, Not a noodle dish",
+      "categoryOrder": 6,
+      "chinese_name": "炒麵",
+      "name": "Shrimp",
+      "category": "Chow Mein",
+      "unit": [
+        {
+          "option": null,
+          "price": "8.70",
+          "size": "Regular"
+        },
+        {
+          "size": "Large",
+          "price": "11.00",
+          "option": null
+        },
+        {
+          "size": "Lunch",
+          "option": null,
+          "price": "8.80"
+        },
+        {
+          "option": null,
+          "size": "Combo",
+          "price": "10.20"
+        }
+      ],
+      "itemOrder": 4
+    },
+    {
+      "_id": "9AvTbpap7empqnBwprys",
+      "unit": [
+        {
+          "size": "Regular",
+          "option": null,
+          "price": "7.7"
+        },
+        {
+          "price": "10.30",
+          "size": "Large",
+          "option": null
+        },
+        {
+          "price": "8.80",
+          "option": null,
+          "size": "Lunch"
+        },
+        {
+          "size": "Combo",
+          "option": null,
+          "price": "10.20"
+        }
+      ],
+      "chinese_name": "素菜",
+      "category": "Vegetable Dishes",
+      "description": "A colorful mix of fresh vegetables sauteed in a savory sauce.",
+      "categoryOrder": 13,
+      "name": "Sauteed Mixed Vegetables",
+      "itemOrder": 1,
+      "note": "Served w. Steamed Rice (Fried Rice Substitution $0.50)"
+    },
+    {
+      "_id": "9VxeM1aZBeEaRcINSzzk",
+      "unit": [
+        {
+          "price": "3.60",
+          "size": "Pint (16 oz)",
+          "option": null
+        },
+        {
+          "price": "6.50",
+          "size": "Quart (32 oz)",
+          "option": null
+        }
+      ],
+      "categoryOrder": 1,
+      "chinese_name": "湯",
+      "category": "Soup",
+      "note": "with Crispy Noodles",
+      "description": "A soup with chicken and soft noodles.",
+      "name": "Chicken Noodle Soup",
+      "itemOrder": 5
+    },
+    {
+      "_id": "9f2PnvCsmeRCRsPrYwbq",
+      "unit": [
+        {
+          "price": "8.70",
+          "option": null,
+          "size": "Regular"
+        },
+        {
+          "size": "Large",
+          "option": null,
+          "price": "11.00"
+        },
+        {
+          "option": null,
+          "size": "Lunch",
+          "price": "8.80"
+        },
+        {
+          "size": "Combo",
+          "option": null,
+          "price": "10.20"
+        }
+      ],
+      "category": "Chow Mein",
+      "description": "Beef stir-fried with vegetables and served with crispy noodles in white sauce.",
+      "note": "East Coast style with Crispy Noodles, Not a noodle dish",
+      "itemOrder": 3,
+      "categoryOrder": 6,
+      "chinese_name": "炒麵",
+      "name": "Beef"
+    },
+    {
+      "_id": "9rKT5XXqqFskm7p9lQaY",
+      "itemOrder": 1,
+      "category": "Sweet & Sour",
+      "name": "Sweet & Sour Chicken",
+      "chinese_name": "甜酸",
+      "unit": [
+        {
+          "price": "8.70",
+          "size": "Regular",
+          "option": null
+        },
+        {
+          "price": "11.2",
+          "option": null,
+          "size": "Large"
+        },
+        {
+          "price": "8.80",
+          "size": "Lunch",
+          "option": null
+        },
+        {
+          "size": "Combo",
+          "price": "10.20",
+          "option": null
+        }
+      ],
+      "description": "Crispy fried chicken served with a tangy and sweet sauce on the side.",
+      "categoryOrder": 11,
+      "note": "Sauce on the Side. Served with Steamed Rice (Fried Rice Substitution $0.50)"
+    },
+    {
+      "_id": "9xViZsn0lNTD2MlZ3gB2",
+      "name": "Beef Mushroom",
+      "itemOrder": 2,
+      "category": "Beef",
+      "categoryOrder": 9,
+      "description": "Tender sliced beef and fresh mushrooms stir-fried in a savory sauce.",
+      "note": "Served w. Steamed Rice (Fried Rice Substitution $0.50)",
+      "chinese_name": "牛肉",
+      "unit": [
+        {
+          "size": "Regular",
+          "price": "9.20",
+          "option": null
+        },
+        {
+          "size": "Large",
+          "option": null,
+          "price": "12.70"
+        },
+        {
+          "size": "Lunch",
+          "price": "8.80",
+          "option": null
+        },
+        {
+          "price": "10.20",
+          "option": null,
+          "size": "Combo"
+        }
+      ]
+    },
+    {
+      "_id": "A811Ry4oCQT5uTChvvqt",
+      "unit": [
+        {
+          "option": null,
+          "price": "11.00",
+          "size": "Large"
+        }
+      ],
+      "name": "House Special Fried Rice",
+      "category": "Fried Rice",
+      "itemOrder": 7,
+      "description": "A combination of chicken, pork, and shrimp with fried rice.",
+      "chinese_name": "炒飯",
+      "note": "",
+      "categoryOrder": 3
+    },
+    {
+      "_id": "D1eSJWIsdBZRNcGTv1GQ",
+      "unit": [
+        {
+          "size": "Large",
+          "price": "11.50",
+          "option": null
+        }
+      ],
+      "name": "House Special Mei Fun",
+      "categoryOrder": 5,
+      "note": "Thin Rice Noodles",
+      "category": "Mei Fun",
+      "chinese_name": "米粉",
+      "itemOrder": 5,
+      "description": "A combination of chicken, pork, and shrimp with thin rice noodles and vegetables."
+    },
+    {
+      "_id": "ED6m1CfG1H0PUx0vSewa",
+      "category": "Shrimp",
+      "unit": [
+        {
+          "size": "Regular",
+          "price": "9.20",
+          "option": null
+        },
+        {
+          "price": "12.70",
+          "option": null,
+          "size": "Large"
+        },
+        {
+          "size": "Lunch",
+          "option": null,
+          "price": "8.80"
+        },
+        {
+          "price": "10.20",
+          "size": "Combo",
+          "option": null
+        }
+      ],
+      "name": "Shrimp Broccoli",
+      "categoryOrder": 10,
+      "description": "Jumbo shrimp and broccoli in a classic brown sauce.",
+      "chinese_name": "海鮮",
+      "itemOrder": 0,
+      "note": "Served w. Steamed Rice (Fried Rice Substitution $0.50)"
+    },
+    {
+      "_id": "FbyuTsqMQZgBzVNJWwJU",
+      "name": "Bean Curd Home Style",
+      "unit": [
+        {
+          "size": "Large",
+          "option": null,
+          "price": "11"
+        }
+      ],
+      "note": "Served w. Steamed Rice (Fried Rice Substitution $0.50)",
+      "chinese_name": "素菜",
+      "category": "Vegetable Dishes",
+      "categoryOrder": 13,
+      "description": "A classic dish of fried tofu with mixed vegetables in a savory brown sauce.",
+      "itemOrder": 3
+    },
+    {
+      "_id": "FnFOBqEfHI3AbDXQBJJY",
+      "itemOrder": 1,
+      "description": "Serves 4 or More. Includes One 2 Liter Drink, Two Large Entree By Menu, (15 PC) Crab Rangoon & 4 Egg Roll. Comes with Medium White Rice. (Fried Rice Substitution $1.25 Extra)",
+      "name": "PACK 2",
+      "categoryOrder": 12,
+      "category": "Family Menu",
+      "note": "",
+      "chinese_name": "家庭套餐",
+      "price": "35.99"
+    },
+    {
+      "_id": "FuQPhhpHfrZzrNqqcqEL",
+      "itemOrder": 13,
+      "name": "Crispy Onion Chicken",
+      "category": "Chicken",
+      "categoryOrder": 8,
+      "chinese_name": "雞肉",
+      "note": "Served w. Steamed Rice (Fried Rice Substitution $0.50)",
+      "unit": [
+        {
+          "option": null,
+          "price": "8.70",
+          "size": "Regular"
+        },
+        {
+          "option": null,
+          "size": "Large",
+          "price": "11.70"
+        },
+        {
+          "size": "Lunch",
+          "price": "8.80",
+          "option": null
+        },
+        {
+          "price": "10.20",
+          "size": "Combo",
+          "option": null
+        }
+      ],
+      "description": "Crispy chicken with white and green onions in a sweet and savory onion glaze."
+    },
+    {
+      "_id": "HzARWH6Wah1lQRvaZTDZ",
+      "note": "Served w. Steamed Rice (Fried Rice Substitution $0.50)",
+      "itemOrder": 3,
+      "unit": [
+        {
+          "size": "Regular",
+          "price": "9.20",
+          "option": null
+        },
+        {
+          "size": "Large",
+          "option": null,
+          "price": "12.70"
+        },
+        {
+          "option": null,
+          "price": "8.80",
+          "size": "Lunch"
+        },
+        {
+          "option": null,
+          "price": "10.20",
+          "size": "Combo"
+        }
+      ],
+      "category": "Beef",
+      "chinese_name": "牛肉",
+      "categoryOrder": 9,
+      "description": "Tender beef with a mix of vegetables in a savory and spicy Sa Cha sauce.",
+      "name": "Sa Cha Beef"
+    },
+    {
+      "_id": "JYNaI35sE4UtnQwf603D",
+      "category": "Steamed Healthy Dishes",
+      "unit": [
+        {
+          "size": "Large",
+          "price": "12.70",
+          "option": null
+        }
+      ],
+      "chinese_name": "健康菜",
+      "note": "All Dishes are Steamed, No Oil, and Sauce on the Side",
+      "itemOrder": 5,
+      "description": "A healthy steamed duo of chicken and shrimp with broccoli, served with brown sauce on the side.",
+      "name": "Steamed Chicken & Shrimp Broccoli",
+      "categoryOrder": 14
+    },
+    {
+      "_id": "K5Aew5PCgILWtZfpy3HH",
+      "note": "East Coast style with Crispy Noodles, Not a noodle dish",
+      "chinese_name": "炒麵",
+      "description": "Chicken stir-fried with vegetables and served with crispy noodles in white sauce.",
+      "unit": [
+        {
+          "price": "8.50",
+          "option": null,
+          "size": "Regular"
+        },
+        {
+          "size": "Large",
+          "option": null,
+          "price": "10.40"
+        },
+        {
+          "price": "8.80",
+          "size": "Lunch",
+          "option": null
+        },
+        {
+          "size": "Combo",
+          "price": "10.20",
+          "option": null
+        }
+      ],
+      "category": "Chow Mein",
+      "categoryOrder": 6,
+      "name": "Chicken",
+      "itemOrder": 1
+    },
+    {
+      "_id": "KSHtYZSw4jZLMQdWZrYR",
+      "category": "Soup",
+      "chinese_name": "湯",
+      "unit": [
+        {
+          "size": "Pint (16 oz)",
+          "option": null,
+          "price": "3.20"
+        },
+        {
+          "option": null,
+          "size": "Quart (32 oz)",
+          "price": "6.00"
+        }
+      ],
+      "name": "Egg Drop Soup",
+      "itemOrder": 1,
+      "note": "with Crispy Noodles",
+      "categoryOrder": 1,
+      "description": "A classic broth with ribbons of whipped egg."
+    },
+    {
+      "_id": "LCl3XMHlNzAC9BKQEt6w",
+      "itemOrder": 9,
+      "note": "Served w. Steamed Rice (Fried Rice Substitution $0.50)",
+      "description": "Baby shrimp with pea pod and carrots in a soupy egg white sauce .",
+      "unit": [
+        {
+          "option": null,
+          "price": "9.20",
+          "size": "Regular"
+        },
+        {
+          "option": null,
+          "size": "Large",
+          "price": "12.70"
+        },
+        {
+          "option": null,
+          "size": "Lunch",
+          "price": "8.80"
+        },
+        {
+          "size": "Combo",
+          "option": null,
+          "price": "10.20"
+        }
+      ],
+      "categoryOrder": 10,
+      "name": "Shrimp with Lobster Sauce",
+      "category": "Shrimp",
+      "chinese_name": "海鮮"
+    },
+    {
+      "_id": "LP1zujRSnCygiQN69jfY",
+      "description": "Thin rice noodles stir-fried with curry powder, shrimp, BBQ pork, and vegetables.",
+      "itemOrder": 6,
+      "note": "Thin Rice Noodles",
+      "chinese_name": "米粉",
+      "categoryOrder": 5,
+      "name": "Singapore Mei Fun",
+      "unit": [
+        {
+          "option": null,
+          "price": "11.50",
+          "size": "Large"
+        }
+      ],
+      "category": "Mei Fun"
+    },
+    {
+      "_id": "MFSkUSJQlpWxtl6uZrLG",
+      "categoryOrder": 3,
+      "description": "Fried rice with a mix of vegetables.",
+      "unit": [
+        {
+          "price": "9.70",
+          "option": null,
+          "size": "Large"
+        }
+      ],
+      "itemOrder": 2,
+      "chinese_name": "炒飯",
+      "category": "Fried Rice",
+      "note": "",
+      "name": "Vegetable Fried Rice"
+    },
+    {
+      "_id": "MYVBnRoAoo0UukFuCT2L",
+      "categoryOrder": 2,
+      "chinese_name": "炸物",
+      "unit": [
+        {
+          "size": "4 Wings",
+          "option": "Plain/Only Wing",
+          "price": "10.20"
+        },
+        {
+          "size": "4 Wings",
+          "price": "11.70",
+          "option": "w. Fried Rice/White Rice"
+        },
+        {
+          "price": "12.80",
+          "size": "4 Wings",
+          "option": "w. French Fries"
+        },
+        {
+          "option": "w. Chicken Fried Rice",
+          "size": "4 Wings",
+          "price": "12.80"
+        },
+        {
+          "price": "12.80",
+          "option": "w. Pork Fried Rice",
+          "size": "4 Wings"
+        },
+        {
+          "size": "4 Wings",
+          "price": "13.30",
+          "option": "w. Shrimp Fried Rice"
+        },
+        {
+          "price": "13.30",
+          "size": "4 Wings",
+          "option": "w. Beef Fried Rice"
+        },
+        {
+          "option": "w. Lo Mein",
+          "price": "13.80",
+          "size": "4 Wings"
+        },
+        {
+          "price": "14.20",
+          "option": "w. Vegetable Lo Mein",
+          "size": "4 Wings"
+        },
+        {
+          "size": "6 Wings",
+          "price": "14.20",
+          "option": "Plain/Only Wing"
+        },
+        {
+          "size": "6 Wings",
+          "option": "w. Fried Rice/White Rice",
+          "price": "15.70"
+        },
+        {
+          "size": "6 Wings",
+          "option": "w. French Fries",
+          "price": "16.70"
+        },
+        {
+          "price": "16.70",
+          "size": "6 Wings",
+          "option": "w. Chicken Fried Rice"
+        },
+        {
+          "size": "6 Wings",
+          "option": "w. Pork Fried Rice",
+          "price": "16.70"
+        },
+        {
+          "option": "w. Shrimp Fried Rice",
+          "price": "17.20",
+          "size": "6 Wings"
+        },
+        {
+          "size": "6 Wings",
+          "option": "w. Beef Fried Rice",
+          "price": "17.20"
+        },
+        {
+          "price": "17.70",
+          "option": "w. Lo Mein",
+          "size": "6 Wings"
+        },
+        {
+          "option": "w. Vegetable Lo Mein",
+          "size": "6 Wings",
+          "price": "18.20"
+        }
+      ],
+      "category": "Deep Fried",
+      "note": "",
+      "itemOrder": 4,
+      "name": "Spicy Buffalo Wings",
+      "description": "Crispy fried chicken wings tossed in a spicy buffalo sauce."
+    },
+    {
+      "_id": "MmqWg8fGI5WQ7x3X3pAj",
+      "categoryOrder": 7,
+      "unit": [
+        {
+          "option": null,
+          "size": "Large",
+          "price": "13.70"
+        }
+      ],
+      "name": "Four Seasons",
+      "itemOrder": 3,
+      "note": "Served with Steamed Rice (Fried Rice Substitution $0.50)",
+      "description": "A delightful medley of chicken, beef, jumbo shrimp, and pork with fresh broccoli, carrots, mushrooms, onions, snow peas, and zucchini in a savory brown sauce.",
+      "chinese_name": "廚師特餐",
+      "category": "Chef's Special"
+    },
+    {
+      "_id": "Mphi5yeL9YWby2UMtjLX",
+      "description": "Crispy fried chicken wings.",
+      "category": "Deep Fried",
+      "name": "Fried Wings",
+      "itemOrder": 3,
+      "unit": [
+        {
+          "price": "8.70",
+          "option": "Plain/Only Wing",
+          "size": "4 Wings"
+        },
+        {
+          "price": "10.20",
+          "option": "w. Fried Rice/White Rice",
+          "size": "4 Wings"
+        },
+        {
+          "option": "w. French Fries",
+          "price": "11.10",
+          "size": "4 Wings"
+        },
+        {
+          "option": "w. Chicken Fried Rice",
+          "size": "4 Wings",
+          "price": "11.10"
+        },
+        {
+          "price": "11.10",
+          "option": "w. Pork Fried Rice",
+          "size": "4 Wings"
+        },
+        {
+          "price": "11.70",
+          "option": "w. Shrimp Fried Rice",
+          "size": "4 Wings"
+        },
+        {
+          "option": "w. Beef Fried Rice",
+          "size": "4 Wings",
+          "price": "11.70"
+        },
+        {
+          "size": "4 Wings",
+          "option": "w. House Fried Rice",
+          "price": "12.50"
+        },
+        {
+          "size": "4 Wings",
+          "price": "12.50",
+          "option": "w. Lo Mein"
+        },
+        {
+          "option": "w. Vegetable Lo Mein",
+          "price": "13.50",
+          "size": "4 Wings"
+        },
+        {
+          "price": "12.50",
+          "option": "Plain/Only Wing",
+          "size": "6 Wings"
+        },
+        {
+          "price": "14.00",
+          "option": "w. Fried Rice/White Rice",
+          "size": "6 Wings"
+        },
+        {
+          "size": "6 Wings",
+          "price": "15.00",
+          "option": "w. French Fries"
+        },
+        {
+          "price": "15.00",
+          "option": "w. Chicken Fried Rice",
+          "size": "6 Wings"
+        },
+        {
+          "price": "15.50",
+          "size": "6 Wings",
+          "option": "w. Pork Fried Rice"
+        },
+        {
+          "price": "15.50",
+          "option": "w. Shrimp Fried Rice",
+          "size": "6 Wings"
+        },
+        {
+          "option": "w. Beef Fried Rice",
+          "size": "6 Wings",
+          "price": "15.50"
+        },
+        {
+          "option": "w. House Fried Rice",
+          "price": "16.00",
+          "size": "6 Wings"
+        },
+        {
+          "size": "6 Wings",
+          "option": "w. Lo Mein",
+          "price": "16.00"
+        },
+        {
+          "option": "w. Vegetable Lo Mein",
+          "price": "17.00",
+          "size": "6 Wings"
+        }
+      ],
+      "chinese_name": "炸物",
+      "categoryOrder": 2,
+      "note": ""
+    },
+    {
+      "_id": "NtCllBIN6LjgJrEj5gEN",
+      "note": "Soft Noodles",
+      "category": "Lo Mein",
+      "chinese_name": "撈麵",
+      "categoryOrder": 4,
+      "name": "Regular",
+      "description": "Soft noodles with cabbages, onions, and carrots.",
+      "itemOrder": 1,
+      "unit": [
+        {
+          "size": "Large",
+          "option": null,
+          "price": "7.20"
+        }
+      ]
+    },
+    {
+      "_id": "O90AUvZhw8is5GXo1TBM",
+      "category": "Appetizers",
+      "chinese_name": "頭盤",
+      "itemOrder": 5,
+      "categoryOrder": 0,
+      "name": "BBQ Boneless Ribs",
+      "description": "Tender boneless ribs marinated in a sweet barbecue sauce.",
+      "unit": [
+        {
+          "option": null,
+          "size": "Small",
+          "price": "7.20"
+        },
+        {
+          "option": null,
+          "size": "Large",
+          "price": "12.20"
+        }
+      ],
+      "note": ""
+    },
+    {
+      "_id": "PXzqnLUF9UcnT3na9Zk0",
+      "itemOrder": 7,
+      "note": "Served w. Steamed Rice (Fried Rice Substitution $0.50)",
+      "description": "Tender slices of steak and onions stir-fried with green peppers in a savory brown sauce.",
+      "unit": [
+        {
+          "price": "9.20",
+          "option": null,
+          "size": "Regular"
+        },
+        {
+          "size": "Large",
+          "price": "12.70",
+          "option": null
+        },
+        {
+          "option": null,
+          "size": "Lunch",
+          "price": "8.80"
+        },
+        {
+          "option": null,
+          "price": "10.20",
+          "size": "Combo"
+        }
+      ],
+      "chinese_name": "牛肉",
+      "category": "Beef",
+      "name": "Pepper Steak w. Onion",
+      "categoryOrder": 9
+    },
+    {
+      "_id": "QDT3bHMpMPawBeAYNqD9",
+      "note": "Served w. Steamed Rice (Fried Rice Substitution $0.50)",
+      "description": "Crispy, breaded chicken pieces in a sweet and spicy sauce.",
+      "category": "Chicken",
+      "categoryOrder": 8,
+      "name": "General Tso's Chicken",
+      "chinese_name": "雞肉",
+      "unit": [
+        {
+          "size": "Regular",
+          "option": null,
+          "price": "8.70"
+        },
+        {
+          "price": "11.70",
+          "option": null,
+          "size": "Large"
+        },
+        {
+          "size": "Lunch",
+          "price": "8.80",
+          "option": null
+        },
+        {
+          "option": null,
+          "price": "10.20",
+          "size": "Combo"
+        }
+      ],
+      "itemOrder": 9
+    },
+    {
+      "_id": "QQS0A8IErBSwFENafGGN",
+      "category": "Appetizers",
+      "itemOrder": 0,
+      "description": "A deep-fried roll filled with pork and vegetables.",
+      "categoryOrder": 0,
+      "note": "",
+      "name": "Pork Egg Roll",
+      "unit": [
+        {
+          "price": "2.10",
+          "option": null,
+          "size": "(1 Roll)"
+        },
+        {
+          "price": "3.85",
+          "size": "(2 Roll)",
+          "option": null
+        }
+      ],
+      "chinese_name": "頭盤"
+    },
+    {
+      "_id": "QSUW2VmBpICzPX2CcdHB",
+      "name": "Pork Mei Fun",
+      "category": "Mei Fun",
+      "itemOrder": 2,
+      "unit": [
+        {
+          "option": null,
+          "size": "Large",
+          "price": "10.50"
+        }
+      ],
+      "chinese_name": "米粉",
+      "description": "Thin rice noodles stir-fried with roast pork and vegetables.",
+      "note": "Thin Rice Noodles",
+      "categoryOrder": 5
+    },
+    {
+      "_id": "Qon3tbIosi03Wx1uElYf",
+      "itemOrder": 0,
+      "unit": [
+        {
+          "price": "7.20",
+          "option": null,
+          "size": "Large"
+        }
+      ],
+      "category": "Lo Mein",
+      "categoryOrder": 4,
+      "description": "Soft noodles with no vegetables.",
+      "name": "Plain",
+      "chinese_name": "撈麵",
+      "note": "Soft Noodles"
+    },
+    {
+      "_id": "R4RW7rQm4ckUGOJNR0IE",
+      "category": "Chicken",
+      "unit": [
+        {
+          "size": "Regular",
+          "option": null,
+          "price": "8.70"
+        },
+        {
+          "size": "Large",
+          "price": "11.70",
+          "option": null
+        },
+        {
+          "size": "Lunch",
+          "price": "8.80",
+          "option": null
+        },
+        {
+          "price": "10.20",
+          "size": "Combo",
+          "option": null
+        }
+      ],
+      "name": "Chicken Broccoli",
+      "categoryOrder": 8,
+      "description": "Tender slices of chicken and fresh broccoli in a classic brown sauce.",
+      "note": "Served w. Steamed Rice (Fried Rice Substitution $0.50)",
+      "chinese_name": "雞肉",
+      "itemOrder": 0
+    },
+    {
+      "_id": "RGNSdQeR54b9mJ3Q64yp",
+      "unit": [
+        {
+          "option": null,
+          "price": "10.70",
+          "size": "Large"
+        }
+      ],
+      "note": "",
+      "categoryOrder": 3,
+      "category": "Fried Rice",
+      "chinese_name": "炒飯",
+      "itemOrder": 6,
+      "name": "Beef Fried Rice",
+      "description": "Fried rice with sliced beef."
+    },
+    {
+      "_id": "SDM4GGhxhvfCN4YRj6Mk",
+      "price": "49.99",
+      "categoryOrder": 12,
+      "name": "PACK 3",
+      "note": "",
+      "itemOrder": 2,
+      "description": "Serves 6 or More. Includes One 2 Liter Drink, Three Large Entree By Menu, (15 PC) Crab Rangoon & 6 Egg Roll. Comes with Large White Rice. (Fried Rice Substitution $1.75 Extra)",
+      "category": "Family Menu",
+      "chinese_name": "家庭套餐"
+    },
+    {
+      "_id": "SIJmMXbFXPkoqQrn70xk",
+      "unit": [
+        {
+          "size": "Large",
+          "option": null,
+          "price": "12.70"
+        }
+      ],
+      "itemOrder": 6,
+      "categoryOrder": 14,
+      "category": "Steamed Healthy Dishes",
+      "name": "Steamed Chicken & Shrimp Mixed Vegetables",
+      "note": "All Dishes are Steamed, No Oil, and Sauce on the Side",
+      "description": "A light and healthy combination of steamed chicken, shrimp, and mixed vegetables, served with brown sauce on the side.",
+      "chinese_name": "健康菜"
+    },
+    {
+      "_id": "SbOuTHoLuA2pGP967mou",
+      "chinese_name": "頭盤",
+      "unit": [
+        {
+          "size": "(1 Roll)",
+          "option": null,
+          "price": "2.40"
+        },
+        {
+          "size": "(2 Roll)",
+          "option": null,
+          "price": "4.05"
+        }
+      ],
+      "categoryOrder": 0,
+      "name": "Shrimp Egg Roll",
+      "description": "A deep-fried roll filled with shrimp and vegetables.",
+      "note": "",
+      "category": "Appetizers",
+      "itemOrder": 1
+    },
+    {
+      "_id": "T7Ffs7zCqbJDa72mimuy",
+      "name": "Shrimp Mei Fun",
+      "categoryOrder": 5,
+      "note": "Thin Rice Noodles",
+      "category": "Mei Fun",
+      "chinese_name": "米粉",
+      "description": "Thin rice noodles stir-fried with tender shrimp and vegetables.",
+      "itemOrder": 4,
+      "unit": [
+        {
+          "size": "Large",
+          "price": "11.00",
+          "option": null
+        }
+      ]
+    },
+    {
+      "_id": "TQEgF95jOsxScc7VO69n",
+      "itemOrder": 0,
+      "note": "Sauce on the Side. Served with Steamed Rice (Fried Rice Substitution $0.50)",
+      "unit": [
+        {
+          "price": "8.70",
+          "option": null,
+          "size": "Regular"
+        },
+        {
+          "option": null,
+          "size": "Large",
+          "price": "11.2"
+        },
+        {
+          "size": "Lunch",
+          "option": null,
+          "price": "8.80"
+        },
+        {
+          "price": "10.20",
+          "size": "Combo",
+          "option": null
+        }
+      ],
+      "name": "Sweet & Sour Pork",
+      "categoryOrder": 11,
+      "description": "Crispy fried pork served with a tangy and sweet sauce on the side.",
+      "chinese_name": "甜酸",
+      "category": "Sweet & Sour"
+    },
+    {
+      "_id": "TxlW51MnrdpG3A78fzR3",
+      "itemOrder": 10,
+      "chinese_name": "雞肉",
+      "name": "Sesame Chicken",
+      "unit": [
+        {
+          "price": "8.70",
+          "option": null,
+          "size": "Regular"
+        },
+        {
+          "option": null,
+          "price": "11.70",
+          "size": "Large"
+        },
+        {
+          "size": "Lunch",
+          "price": "8.80",
+          "option": null
+        },
+        {
+          "option": null,
+          "size": "Combo",
+          "price": "10.20"
+        }
+      ],
+      "categoryOrder": 8,
+      "description": "Crispy, breaded chicken pieces in a sweet and savory sesame sauce, topped with sesame seeds.",
+      "note": "Served w. Steamed Rice (Fried Rice Substitution $0.50)",
+      "category": "Chicken"
+    },
+    {
+      "_id": "VGoGhzG5yWUc47HtbveE",
+      "chinese_name": "頭盤",
+      "note": "",
+      "description": "Crispy wontons filled with a minced imitation crab and cream cheese blend.",
+      "itemOrder": 8,
+      "category": "Appetizers",
+      "categoryOrder": 0,
+      "name": "Crab Rangoon (aka Cream Cheese Wontons)",
+      "unit": [
+        {
+          "size": "(8)",
+          "option": null,
+          "price": "7.20"
+        },
+        {
+          "option": null,
+          "price": "10.70",
+          "size": "(15)"
+        }
+      ]
+    },
+    {
+      "_id": "VWRSOilzc0uTqaiYWdX2",
+      "category": "Chicken",
+      "chinese_name": "雞肉",
+      "note": "Served w. Steamed Rice (Fried Rice Substitution $0.50)",
+      "categoryOrder": 8,
+      "name": "Chicken Mushroom",
+      "unit": [
+        {
+          "price": "8.70",
+          "option": null,
+          "size": "Regular"
+        },
+        {
+          "option": null,
+          "price": "11.70",
+          "size": "Large"
+        },
+        {
+          "price": "8.80",
+          "option": null,
+          "size": "Lunch"
+        },
+        {
+          "size": "Combo",
+          "option": null,
+          "price": "10.20"
+        }
+      ],
+      "description": "Tender sliced chicken and fresh mushrooms stir-fried in a savory sauce.",
+      "itemOrder": 2
+    },
+    {
+      "_id": "WjYc3TdbDpv7EMpgly5r",
+      "unit": [
+        {
+          "size": "Large",
+          "option": null,
+          "price": "11.70"
+        }
+      ],
+      "itemOrder": 2,
+      "chinese_name": "健康菜",
+      "note": "All Dishes are Steamed, No Oil, and Sauce on the Side",
+      "description": "Steamed chicken and a variety of mixed vegetables, served with brown sauce on the side.",
+      "name": "Steamed Chicken Mixed Veg",
+      "categoryOrder": 14,
+      "category": "Steamed Healthy Dishes"
+    },
+    {
+      "_id": "XQqI04zdkzimxUpQMjtG",
+      "name": "Moo Goo Gai Pan",
+      "note": "Served w. Steamed Rice (Fried Rice Substitution $0.50)",
+      "description": "Slices of chicken with a mix of fresh bamboo, carrots, mushrooms, onion, snow peas, water chestnuts, and zucchini in a light white sauce.",
+      "categoryOrder": 8,
+      "unit": [
+        {
+          "option": null,
+          "size": "Regular",
+          "price": "8.70"
+        },
+        {
+          "size": "Large",
+          "option": null,
+          "price": "11.70"
+        },
+        {
+          "option": null,
+          "price": "8.80",
+          "size": "Lunch"
+        },
+        {
+          "price": "10.20",
+          "option": null,
+          "size": "Combo"
+        }
+      ],
+      "chinese_name": "雞肉",
+      "itemOrder": 14,
+      "category": "Chicken"
+    },
+    {
+      "_id": "YPIRhlnLrrkb0ogr4CDf",
+      "categoryOrder": 4,
+      "unit": [
+        {
+          "size": "Large",
+          "option": null,
+          "price": "10.70"
+        },
+        {
+          "price": "8.8",
+          "option": null,
+          "size": "Lunch"
+        },
+        {
+          "option": null,
+          "price": "10.20",
+          "size": "Combo"
+        }
+      ],
+      "note": "Soft Noodles",
+      "category": "Lo Mein",
+      "chinese_name": "撈麵",
+      "name": "Shrimp Lo Mein",
+      "description": "Baby shrimp and soft noodles tossed in a savory sauce.",
+      "itemOrder": 5
+    },
+    {
+      "_id": "YtNWhPSyBYXKUHbzKDOG",
+      "note": "Served w. Steamed Rice (Fried Rice Substitution $0.50)",
+      "description": "Chicken with a variety of vegetables in a spicy Szechuan sauce.",
+      "chinese_name": "雞肉",
+      "unit": [
+        {
+          "option": null,
+          "size": "Regular",
+          "price": "8.70"
+        },
+        {
+          "price": "11.70",
+          "size": "Large",
+          "option": null
+        },
+        {
+          "price": "8.80",
+          "size": "Lunch",
+          "option": null
+        },
+        {
+          "price": "10.20",
+          "size": "Combo",
+          "option": null
+        }
+      ],
+      "name": "Szechuan Chicken",
+      "itemOrder": 6,
+      "category": "Chicken",
+      "categoryOrder": 8
+    },
+    {
+      "_id": "Z0Gzh6GyMKBO03gsf9qr",
+      "itemOrder": 1,
+      "categoryOrder": 9,
+      "category": "Beef",
+      "description": "Tender beef with a mix of baby corn, broccoli, carrot, mushroom, onion, snow peas, water chestnut, and zucchini.",
+      "note": "Served w. Steamed Rice (Fried Rice Substitution $0.50)",
+      "unit": [
+        {
+          "price": "9.20",
+          "option": null,
+          "size": "Regular"
+        },
+        {
+          "size": "Large",
+          "option": null,
+          "price": "12.70"
+        },
+        {
+          "price": "8.80",
+          "size": "Lunch",
+          "option": null
+        },
+        {
+          "price": "10.20",
+          "size": "Combo",
+          "option": null
+        }
+      ],
+      "chinese_name": "牛肉",
+      "name": "Beef & Mixed Veg"
+    },
+    {
+      "_id": "Z6e6GrWa89Tcpsx956EG",
+      "itemOrder": 7,
+      "chinese_name": "雞肉",
+      "note": "Served w. Steamed Rice (Fried Rice Substitution $0.50)",
+      "category": "Chicken",
+      "unit": [
+        {
+          "price": "8.70",
+          "option": null,
+          "size": "Regular"
+        },
+        {
+          "option": null,
+          "price": "11.70",
+          "size": "Large"
+        },
+        {
+          "option": null,
+          "price": "8.80",
+          "size": "Lunch"
+        },
+        {
+          "price": "10.20",
+          "option": null,
+          "size": "Combo"
+        }
+      ],
+      "name": "Chicken & Garlic Sauce",
+      "description": "Sliced chicken with a variety of vegetables in a sweet and sour garlic sauce.",
+      "categoryOrder": 8
+    },
+    {
+      "_id": "ZtFGIyzy3PBD7RQgMSw1",
+      "name": "House Special Lo Mein",
+      "categoryOrder": 4,
+      "category": "Lo Mein",
+      "unit": [
+        {
+          "price": "11",
+          "option": null,
+          "size": "Large"
+        },
+        {
+          "price": "8.8",
+          "option": null,
+          "size": "Lunch"
+        },
+        {
+          "size": "Combo",
+          "price": "10.2",
+          "option": null
+        }
+      ],
+      "description": "A combination of chicken, pork, and shrimp with soft noodles.",
+      "itemOrder": 7,
+      "chinese_name": "撈麵",
+      "note": "Soft Noodles"
+    },
+    {
+      "_id": "a32jjRwrMYIn2d6Hixi9",
+      "chinese_name": "牛肉",
+      "itemOrder": 0,
+      "note": "Served w. Steamed Rice (Fried Rice Substitution $0.50)",
+      "name": "Beef Broccoli",
+      "description": "Tender slices of beef, carrot, and broccoli in a savory brown sauce.",
+      "category": "Beef",
+      "categoryOrder": 9,
+      "unit": [
+        {
+          "size": "Regular",
+          "price": "9.20",
+          "option": null
+        },
+        {
+          "price": "12.70",
+          "option": null,
+          "size": "Large"
+        },
+        {
+          "option": null,
+          "price": "8.80",
+          "size": "Lunch"
+        },
+        {
+          "price": "10.20",
+          "option": null,
+          "size": "Combo"
+        }
+      ]
+    },
+    {
+      "_id": "aw6htDEjcCPPoa2qwbJx",
+      "category": "Shrimp",
+      "note": "Served w. Steamed Rice (Fried Rice Substitution $0.50)",
+      "unit": [
+        {
+          "option": null,
+          "price": "9.20",
+          "size": "Regular"
+        },
+        {
+          "price": "12.70",
+          "size": "Large",
+          "option": null
+        },
+        {
+          "option": null,
+          "size": "Lunch",
+          "price": "8.80"
+        },
+        {
+          "size": "Combo",
+          "price": "10.20",
+          "option": null
+        }
+      ],
+      "itemOrder": 5,
+      "categoryOrder": 10,
+      "description": "Tender shrimp with broccoli, carrots, green peppers, onions, water chestnuts, and zucchini in a spicy Hunan sauce.",
+      "name": "Hunan Shrimp",
+      "chinese_name": "海鮮"
+    },
+    {
+      "_id": "btdLca6k7PuAgiasliCj",
+      "unit": [
+        {
+          "size": "Regular",
+          "option": null,
+          "price": "8.70"
+        },
+        {
+          "price": "11.70",
+          "option": null,
+          "size": "Large"
+        },
+        {
+          "option": null,
+          "size": "Lunch",
+          "price": "8.80"
+        },
+        {
+          "option": null,
+          "price": "10.20",
+          "size": "Combo"
+        }
+      ],
+      "category": "Chicken",
+      "note": "Served w. Steamed Rice (Fried Rice Substitution $0.50)",
+      "categoryOrder": 8,
+      "name": "Kung Po Chicken",
+      "itemOrder": 8,
+      "description": "Diced chicken stir-fried with peanuts, carrots, green peppers, mushrooms, water chestnuts, and zucchini in a spicy sauce.",
+      "chinese_name": "雞肉"
+    },
+    {
+      "_id": "c8AaZ2or8ENVbaLMKWZM",
+      "note": "with Crispy Noodles",
+      "categoryOrder": 1,
+      "chinese_name": "湯",
+      "itemOrder": 2,
+      "name": "Wonton Egg Drop Soup",
+      "category": "Soup",
+      "unit": [
+        {
+          "option": null,
+          "price": "4.00",
+          "size": "Pint (16 oz)"
+        },
+        {
+          "size": "Quart (32 oz)",
+          "price": "7.00",
+          "option": null
+        }
+      ],
+      "description": "A combination of pork wontons and egg drop soup."
+    },
+    {
+      "_id": "cvQSmuzMVrF9RG1TiSwO",
+      "category": "Family Menu",
+      "description": "Serves 2 or More. Includes Two Small Drink, One Large Entree By Menu, (8 PC) Crab Rangoon & 2 Egg Roll. Comes with a Small White Rice. (Fried Rice Substitution $0.50 Extra)",
+      "categoryOrder": 12,
+      "note": "",
+      "price": "21.99",
+      "name": "PACK 1",
+      "chinese_name": "家庭套餐",
+      "itemOrder": 0
+    },
+    {
+      "_id": "d05hFyv4hDMSBNuJHJR5",
+      "description": "Tender shrimp with a mix of baby corn, broccoli, carrot, mushroom, onion, snow peas, water chestnut, and zucchini.",
+      "chinese_name": "海鮮",
+      "category": "Shrimp",
+      "categoryOrder": 10,
+      "unit": [
+        {
+          "price": "9.20",
+          "option": null,
+          "size": "Regular"
+        },
+        {
+          "option": null,
+          "size": "Large",
+          "price": "12.70"
+        },
+        {
+          "option": null,
+          "size": "Lunch",
+          "price": "8.80"
+        },
+        {
+          "size": "Combo",
+          "option": null,
+          "price": "10.20"
+        }
+      ],
+      "note": "Served w. Steamed Rice (Fried Rice Substitution $0.50)",
+      "name": "Shrimp Mixed Veg",
+      "itemOrder": 1
+    },
+    {
+      "_id": "dGyuKDljQJaoBn0rhP4q",
+      "category": "Fried Rice",
+      "chinese_name": "炒飯",
+      "itemOrder": 4,
+      "unit": [
+        {
+          "option": null,
+          "price": "10.40",
+          "size": "Large"
+        }
+      ],
+      "note": "",
+      "categoryOrder": 3,
+      "name": "Chicken Fried Rice",
+      "description": "Classic fried rice with chicken."
+    },
+    {
+      "_id": "dSv6iDt0GesJ5GzQfgeJ",
+      "name": "Beef Lo Mein",
+      "note": "Soft Noodles",
+      "chinese_name": "撈麵",
+      "description": "Sliced beef and soft noodles tossed in a savory sauce.",
+      "itemOrder": 6,
+      "category": "Lo Mein",
+      "categoryOrder": 4,
+      "unit": [
+        {
+          "option": null,
+          "size": "Large",
+          "price": "10.70"
+        },
+        {
+          "size": "Lunch",
+          "option": null,
+          "price": "8.8"
+        },
+        {
+          "size": "Combo",
+          "price": "10.2",
+          "option": null
+        }
+      ]
+    },
+    {
+      "_id": "fbnHNG04o9W0uvxtIPQS",
+      "chinese_name": "健康菜",
+      "itemOrder": 0,
+      "unit": [
+        {
+          "size": "Large",
+          "price": "10.00",
+          "option": null
+        }
+      ],
+      "name": "Steamed Mixed Vegetables",
+      "categoryOrder": 14,
+      "note": "All Dishes are Steamed, No Oil, and Sauce on the Side",
+      "category": "Steamed Healthy Dishes",
+      "description": "A light and healthy combination of steamed baby corn, broccoli, carrots, mushrooms, onions, snow peas, water chestnuts, and zucchini."
+    },
+    {
+      "_id": "h97sajmb2toC8aB5JDAh",
+      "chinese_name": "廚師特餐",
+      "itemOrder": 13,
+      "name": "Sa Cha Triple",
+      "note": "Served with Steamed Rice (Fried Rice Substitution $0.50)",
+      "unit": [
+        {
+          "size": "Large",
+          "option": null,
+          "price": "13.70"
+        }
+      ],
+      "category": "Chef's Special",
+      "categoryOrder": 7,
+      "description": "Chicken, beef, and shrimp stir-fried with vegetables in a savory and spicy Sa Cha sauce."
+    },
+    {
+      "_id": "hpwr37TRbzHScfT3wnUz",
+      "description": "Thin rice noodles stir-fried with sliced beef and vegetables.",
+      "itemOrder": 3,
+      "unit": [
+        {
+          "option": null,
+          "size": "Large",
+          "price": "11.00"
+        }
+      ],
+      "note": "Thin Rice Noodles",
+      "name": "Beef Mei Fun",
+      "chinese_name": "米粉",
+      "categoryOrder": 5,
+      "category": "Mei Fun"
+    },
+    {
+      "_id": "iQwUTCO8J4xbOJMy8LUn",
+      "chinese_name": "雞肉",
+      "categoryOrder": 8,
+      "category": "Chicken",
+      "itemOrder": 1,
+      "name": "Chicken Mixed Veg",
+      "note": "Served w. Steamed Rice (Fried Rice Substitution $0.50)",
+      "description": "Chicken with a colorful mix of baby corn, broccoli, carrot, mushroom, onion, snow peas, water chestnut, and zucchini.",
+      "unit": [
+        {
+          "option": null,
+          "size": "Regular",
+          "price": "8.70"
+        },
+        {
+          "option": null,
+          "size": "Large",
+          "price": "11.70"
+        },
+        {
+          "price": "8.80",
+          "size": "Lunch",
+          "option": null
+        },
+        {
+          "size": "Combo",
+          "option": null,
+          "price": "10.20"
+        }
+      ]
+    },
+    {
+      "_id": "j8bgjERiMPYrKKiWiTZ1",
+      "category": "Appetizers",
+      "categoryOrder": 0,
+      "chinese_name": "頭盤",
+      "itemOrder": 6,
+      "unit": [
+        {
+          "price": "7.20",
+          "size": "(4)",
+          "option": null
+        },
+        {
+          "price": "12.20",
+          "size": "(8)",
+          "option": null
+        }
+      ],
+      "note": "",
+      "description": "Skewers of grilled chicken marinated in a flavorful sauce.",
+      "name": "Chicken on a Sticks"
+    },
+    {
+      "_id": "jnpA4JXVHJ4WRGzU3x1y",
+      "itemOrder": 0,
+      "name": "Sauteed Broccoli",
+      "category": "Vegetable Dishes",
+      "unit": [
+        {
+          "price": "7.7",
+          "size": "Regular",
+          "option": null
+        },
+        {
+          "option": null,
+          "size": "Large",
+          "price": "10.30"
+        },
+        {
+          "size": "Lunch",
+          "price": "8.80",
+          "option": null
+        },
+        {
+          "size": "Combo",
+          "price": "10.20",
+          "option": null
+        }
+      ],
+      "description": "Broccoli sautéed in a brown sauce.",
+      "chinese_name": "素菜",
+      "categoryOrder": 13,
+      "note": "Served w. Steamed Rice (Fried Rice Substitution $0.50)"
+    },
+    {
+      "_id": "kGuivFY5xv51Yjd5Ahmv",
+      "unit": [
+        {
+          "price": "10.40",
+          "option": null,
+          "size": "Large"
+        },
+        {
+          "option": null,
+          "size": "Lunch",
+          "price": "8.80"
+        },
+        {
+          "option": null,
+          "size": "Combo",
+          "price": "10.20"
+        }
+      ],
+      "itemOrder": 4,
+      "name": "Chicken Lo Mein",
+      "category": "Lo Mein",
+      "description": "Sliced chicken and soft noodles tossed in a savory sauce.",
+      "chinese_name": "撈麵",
+      "note": "Soft Noodles",
+      "categoryOrder": 4
+    },
+    {
+      "_id": "kLRzKM1JLrrgmnX0lvkK",
+      "unit": [
+        {
+          "price": "9.20",
+          "option": null,
+          "size": "Regular"
+        },
+        {
+          "option": null,
+          "price": "12.70",
+          "size": "Large"
+        },
+        {
+          "price": "8.80",
+          "option": null,
+          "size": "Lunch"
+        },
+        {
+          "option": null,
+          "size": "Combo",
+          "price": "10.20"
+        }
+      ],
+      "chinese_name": "海鮮",
+      "name": "Sa Cha Shrimp",
+      "description": "Shrimp with a mix of vegetables in a savory and spicy Sa Cha sauce.",
+      "category": "Shrimp",
+      "itemOrder": 3,
+      "categoryOrder": 10,
+      "note": "Served w. Steamed Rice (Fried Rice Substitution $0.50)"
+    },
+    {
+      "_id": "l7waVoHOr4TcXdzKGIIh",
+      "note": "Sauce on the Side. Served with Steamed Rice (Fried Rice Substitution $0.50)",
+      "chinese_name": "甜酸",
+      "description": "Crispy fried shrimp served with a tangy and sweet sauce on the side.",
+      "categoryOrder": 11,
+      "category": "Sweet & Sour",
+      "unit": [
+        {
+          "price": "8.70",
+          "size": "Regular",
+          "option": null
+        },
+        {
+          "price": "11.2",
+          "size": "Large",
+          "option": null
+        },
+        {
+          "price": "8.80",
+          "size": "Lunch",
+          "option": null
+        },
+        {
+          "price": "10.20",
+          "size": "Combo",
+          "option": null
+        }
+      ],
+      "itemOrder": 2,
+      "name": "Sweet & Sour Shrimp"
+    },
+    {
+      "_id": "mNYh1xCH3USUrSZwcQUM",
+      "description": "A generous combination of chicken, beef, jumbo shrimp, and vegetables in a savory sauce.",
+      "categoryOrder": 7,
+      "category": "Chef's Special",
+      "chinese_name": "廚師特餐",
+      "note": "Served with Steamed Rice (Fried Rice Substitution $0.50)",
+      "unit": [
+        {
+          "price": "14.20",
+          "option": null,
+          "size": "Large"
+        }
+      ],
+      "itemOrder": 4,
+      "name": "Happy Family"
+    },
+    {
+      "_id": "mSDZ9tHLv61vsMpQhUAT",
+      "category": "Deep Fried",
+      "name": "Plain French Fries",
+      "unit": [
+        {
+          "size": "S",
+          "option": null,
+          "price": "3.50"
+        },
+        {
+          "price": "5.70",
+          "option": null,
+          "size": "L"
+        }
+      ],
+      "chinese_name": "炸物",
+      "note": "",
+      "description": "Crispy and golden French fries.",
+      "categoryOrder": 2,
+      "itemOrder": 5
+    },
+    {
+      "_id": "mqd3QzSRhZYJ7VEreeyU",
+      "categoryOrder": 6,
+      "description": "A stir-fry of fresh vegetables served with crispy noodles in white sauce.",
+      "unit": [
+        {
+          "size": "Regular",
+          "price": "8.20",
+          "option": null
+        },
+        {
+          "option": null,
+          "price": "10.20",
+          "size": "Large"
+        },
+        {
+          "option": null,
+          "price": "8.80",
+          "size": "Lunch"
+        },
+        {
+          "size": "Combo",
+          "price": "10.20",
+          "option": null
+        }
+      ],
+      "chinese_name": "炒麵",
+      "name": "Vegetable",
+      "note": "East Coast style with Crispy Noodles, Not a noodle dish",
+      "itemOrder": 0,
+      "category": "Chow Mein"
+    },
+    {
+      "_id": "n6q2KM3u7Idmn5KHPaa3",
+      "name": "Mongolian Triple",
+      "categoryOrder": 7,
+      "note": "Served with Steamed Rice (Fried Rice Substitution $0.50)",
+      "chinese_name": "廚師特餐",
+      "unit": [
+        {
+          "price": "13.70",
+          "option": null,
+          "size": "Large"
+        }
+      ],
+      "description": "A stir-fry with chicken, beef, and shrimp, along with green and white onions in a savory soy sauce.",
+      "category": "Chef's Special",
+      "itemOrder": 15
+    },
+    {
+      "_id": "nbcqcDGGtPTZWVv7uUQz",
+      "description": "Tender chicken with crunchy cashew nuts and mixed vegetables in a light sauce.",
+      "category": "Chicken",
+      "name": "Chicken Cashew Nuts",
+      "chinese_name": "雞肉",
+      "categoryOrder": 8,
+      "note": "Served w. Steamed Rice (Fried Rice Substitution $0.50)",
+      "unit": [
+        {
+          "option": null,
+          "size": "Regular",
+          "price": "8.70"
+        },
+        {
+          "option": null,
+          "size": "Large",
+          "price": "11.70"
+        },
+        {
+          "option": null,
+          "size": "Lunch",
+          "price": "8.80"
+        },
+        {
+          "price": "10.20",
+          "size": "Combo",
+          "option": null
+        }
+      ],
+      "itemOrder": 4
+    },
+    {
+      "_id": "oEQCgiB1XduwZWH8DDk4",
+      "unit": [
+        {
+          "price": "7.00",
+          "size": "10 Shrimp",
+          "option": "Plain/Only Shrimp"
+        },
+        {
+          "option": "w. Fried Rice/White Rice",
+          "price": "8.00",
+          "size": "10 Shrimp"
+        },
+        {
+          "price": "9.00",
+          "size": "10 Shrimp",
+          "option": "w. French Fries"
+        },
+        {
+          "size": "10 Shrimp",
+          "price": "9.00",
+          "option": "w. Chicken Fried Rice"
+        },
+        {
+          "price": "9.00",
+          "size": "10 Shrimp",
+          "option": "w. Pork Fried Rice"
+        },
+        {
+          "price": "9.60",
+          "option": "w. Shrimp Fried Rice",
+          "size": "10 Shrimp"
+        },
+        {
+          "option": "w. Beef Fried Rice",
+          "size": "10 Shrimp",
+          "price": "9.60"
+        }
+      ],
+      "name": "Fried Butterfly Shrimp",
+      "chinese_name": "炸物",
+      "note": "",
+      "categoryOrder": 2,
+      "category": "Deep Fried",
+      "description": "Crispy fried shrimp, golden and delicious.",
+      "itemOrder": 2
+    },
+    {
+      "_id": "p4E52fRBJneLM5YqTVTA",
+      "categoryOrder": 9,
+      "description": "Slices of beef with a variety of vegetables in a sweet and sour garlic sauce.",
+      "name": "Beef & Garlic Sauce",
+      "unit": [
+        {
+          "price": "9.20",
+          "size": "Regular",
+          "option": null
+        },
+        {
+          "price": "12.70",
+          "option": null,
+          "size": "Large"
+        },
+        {
+          "option": null,
+          "size": "Lunch",
+          "price": "8.80"
+        },
+        {
+          "size": "Combo",
+          "option": null,
+          "price": "10.20"
+        }
+      ],
+      "category": "Beef",
+      "note": "Served w. Steamed Rice (Fried Rice Substitution $0.50)",
+      "chinese_name": "牛肉",
+      "itemOrder": 6
+    },
+    {
+      "_id": "pa7QIWspRBRtMrjtLESt",
+      "description": "Crispy fried chicken nuggets, golden and delicious.",
+      "categoryOrder": 2,
+      "name": "Fried Chicken Nuggets",
+      "unit": [
+        {
+          "price": "4.90",
+          "size": "10 Nuggets",
+          "option": "Plain/Only Nugget"
+        },
+        {
+          "option": "w. Fried Rice/White Rice",
+          "price": "6.40",
+          "size": "10 Nuggets"
+        },
+        {
+          "size": "10 Nuggets",
+          "price": "6.90",
+          "option": "w. French Fries"
+        },
+        {
+          "option": "w. Chicken Fried Rice",
+          "size": "10 Nuggets",
+          "price": "6.90"
+        },
+        {
+          "size": "10 Nuggets",
+          "price": "6.90",
+          "option": "w. Pork Fried Rice"
+        },
+        {
+          "option": "w. Shrimp Fried Rice",
+          "size": "10 Nuggets",
+          "price": "7.40"
+        },
+        {
+          "option": "w. Beef Fried Rice",
+          "price": "7.40",
+          "size": "10 Nuggets"
+        }
+      ],
+      "chinese_name": "炸物",
+      "category": "Deep Fried",
+      "note": "",
+      "itemOrder": 0
+    },
+    {
+      "_id": "pwMtv2ymsxvxt4TxOCzP",
+      "description": "Broccoli in a sweet and sour garlic sauce.",
+      "note": "Served w. Steamed Rice (Fried Rice Substitution $0.50)",
+      "chinese_name": "素菜",
+      "unit": [
+        {
+          "size": "Regular",
+          "price": "7.7",
+          "option": null
+        },
+        {
+          "price": "10.30",
+          "option": null,
+          "size": "Large"
+        },
+        {
+          "option": null,
+          "size": "Lunch",
+          "price": "8.80"
+        },
+        {
+          "price": "10.20",
+          "size": "Combo",
+          "option": null
+        }
+      ],
+      "category": "Vegetable Dishes",
+      "itemOrder": 2,
+      "categoryOrder": 13,
+      "name": "Broccoli & Garlic Sauce"
+    },
+    {
+      "_id": "qR1DIdLAT8p7IWCMvGao",
+      "unit": [
+        {
+          "option": null,
+          "price": "13.50",
+          "size": "Large"
+        }
+      ],
+      "description": "Crispy beef with a sweet and tangy orange glaze, a delightful citrus twist on a classic.",
+      "note": "Served with Steamed Rice (Fried Rice Substitution $0.50)",
+      "categoryOrder": 7,
+      "category": "Chef's Special",
+      "itemOrder": 6,
+      "chinese_name": "廚師特餐",
+      "name": "Orange Flavored Beef"
+    },
+    {
+      "_id": "qiGccgDDXyi1I0mb5lMh",
+      "category": "Chef's Special",
+      "description": "Succulent shrimp and scallops stir-fried in a sweet and sour garlic sauce.",
+      "categoryOrder": 7,
+      "chinese_name": "廚師特餐",
+      "name": "Shrimp & Scallop with Garlic Sauce",
+      "note": "Served with Steamed Rice (Fried Rice Substitution $0.50)",
+      "itemOrder": 2,
+      "unit": [
+        {
+          "price": "14.20",
+          "size": "Large",
+          "option": null
+        }
+      ]
+    },
+    {
+      "_id": "quGVjPpxogXvoZgr30RM",
+      "name": "Pork",
+      "unit": [
+        {
+          "size": "Regular",
+          "option": null,
+          "price": "8.50"
+        },
+        {
+          "option": null,
+          "size": "Large",
+          "price": "10.40"
+        },
+        {
+          "size": "Lunch",
+          "price": "8.80",
+          "option": null
+        },
+        {
+          "size": "Combo",
+          "price": "10.20",
+          "option": null
+        }
+      ],
+      "chinese_name": "炒麵",
+      "itemOrder": 2,
+      "categoryOrder": 6,
+      "note": "East Coast style with Crispy Noodles, Not a noodle dish",
+      "category": "Chow Mein",
+      "description": "Roast pork stir-fried with vegetables and served with crispy noodles in white sauce."
+    },
+    {
+      "_id": "rJsSotXE3nynzDUynuzt",
+      "name": "Shrimp Cashew Nuts",
+      "note": "Served w. Steamed Rice (Fried Rice Substitution $0.50)",
+      "category": "Shrimp",
+      "categoryOrder": 10,
+      "unit": [
+        {
+          "option": null,
+          "size": "Regular",
+          "price": "9.20"
+        },
+        {
+          "size": "Large",
+          "option": null,
+          "price": "12.70"
+        },
+        {
+          "price": "8.80",
+          "size": "Lunch",
+          "option": null
+        },
+        {
+          "size": "Combo",
+          "option": null,
+          "price": "10.20"
+        }
+      ],
+      "description": "Tender shrimp with crunchy cashew nuts and mixed vegetables in a light sauce.",
+      "chinese_name": "海鮮",
+      "itemOrder": 4
+    },
+    {
+      "_id": "rYQNngWb8QiF3Y0x5KQD",
+      "description": "A spicy and tangy soup with mushrooms, tofu, and bamboo shoots.",
+      "itemOrder": 4,
+      "chinese_name": "湯",
+      "category": "Soup",
+      "name": "Hot & Sour Soup",
+      "categoryOrder": 1,
+      "unit": [
+        {
+          "size": "Pint (16 oz)",
+          "price": "4.00",
+          "option": null
+        },
+        {
+          "size": "Quart (32 oz)",
+          "option": null,
+          "price": "7.00"
+        }
+      ],
+      "note": "with Crispy Noodles"
+    },
+    {
+      "_id": "sH2OXw1ytjcLNN8AlDNm",
+      "name": "Chinese Donuts(Sugar Donuts)",
+      "note": "",
+      "category": "Appetizers",
+      "description": "Ten light and fluffy fried dough pieces coated in sugar, perfect for a sweet treat.",
+      "unit": [
+        {
+          "option": null,
+          "price": "6.20",
+          "size": "(10)"
+        }
+      ],
+      "categoryOrder": 0,
+      "itemOrder": 9,
+      "chinese_name": "頭盤"
+    },
+    {
+      "_id": "sR1Q36wv8Y5PH4hy8IQ1",
+      "category": "Chicken",
+      "itemOrder": 11,
+      "chinese_name": "雞肉",
+      "unit": [
+        {
+          "price": "8.70",
+          "size": "Regular",
+          "option": null
+        },
+        {
+          "price": "11.70",
+          "option": null,
+          "size": "Large"
+        },
+        {
+          "size": "Lunch",
+          "price": "8.80",
+          "option": null
+        },
+        {
+          "option": null,
+          "size": "Combo",
+          "price": "10.20"
+        }
+      ],
+      "categoryOrder": 8,
+      "description": "Crispy, breaded chicken pieces in a  and tangy orange glaze.",
+      "note": "Served w. Steamed Rice (Fried Rice Substitution $0.50)",
+      "name": "Orange Flavored Chicken"
+    },
+    {
+      "_id": "siymDCD10Tm7B9Bvaksi",
+      "description": "Crispy, breaded chicken in a sweet honey sauce.",
+      "name": "Honey Chicken",
+      "note": "Served w. Steamed Rice (Fried Rice Substitution $0.50)",
+      "unit": [
+        {
+          "price": "8.70",
+          "option": null,
+          "size": "Regular"
+        },
+        {
+          "option": null,
+          "price": "11.70",
+          "size": "Large"
+        },
+        {
+          "price": "8.80",
+          "size": "Lunch",
+          "option": null
+        },
+        {
+          "price": "10.20",
+          "size": "Combo",
+          "option": null
+        }
+      ],
+      "chinese_name": "雞肉",
+      "itemOrder": 12,
+      "categoryOrder": 8,
+      "category": "Chicken"
+    },
+    {
+      "_id": "skTFyDgSsS4qA8ztp4Im",
+      "name": "Vegetable Lo Mein",
+      "description": "Soft noodles tossed with a mix of vegetables in a savory sauce.",
+      "itemOrder": 2,
+      "categoryOrder": 4,
+      "unit": [
+        {
+          "price": "9.70",
+          "option": null,
+          "size": "Large"
+        },
+        {
+          "price": "8.80",
+          "option": null,
+          "size": "Lunch"
+        },
+        {
+          "price": "10.20",
+          "size": "Combo",
+          "option": null
+        }
+      ],
+      "category": "Lo Mein",
+      "chinese_name": "撈麵",
+      "note": "Soft Noodles"
+    },
+    {
+      "_id": "tFBnIEykgNiAixqOXJ5O",
+      "unit": [
+        {
+          "option": null,
+          "size": "Pint (16 oz)",
+          "price": "3.60"
+        },
+        {
+          "size": "Quart (32 oz)",
+          "option": null,
+          "price": "6.50"
+        }
+      ],
+      "itemOrder": 3,
+      "chinese_name": "湯",
+      "name": "Vegetable Soup",
+      "description": "A light soup with a variety of vegetables.",
+      "category": "Soup",
+      "categoryOrder": 1,
+      "note": "with Crispy Noodles"
+    },
+    {
+      "_id": "tgWJbb6fcqCKaFlsckDq",
+      "note": "",
+      "name": "Steamed Dumplings",
+      "description": "Eight steamed dumplings filled with a mixture of pork and vegetables.",
+      "chinese_name": "頭盤",
+      "unit": [
+        {
+          "price": "7.20",
+          "size": "(8)",
+          "option": null
+        }
+      ],
+      "category": "Appetizers",
+      "itemOrder": 3,
+      "categoryOrder": 0
+    },
+    {
+      "_id": "txEEF0myiyJXjCSUN3HG",
+      "unit": [
+        {
+          "price": "10.70",
+          "option": null,
+          "size": "Large"
+        }
+      ],
+      "itemOrder": 5,
+      "note": "",
+      "name": "Shrimp Fried Rice",
+      "categoryOrder": 3,
+      "category": "Fried Rice",
+      "chinese_name": "炒飯",
+      "description": "Fried rice with tender shrimp."
+    },
+    {
+      "_id": "ueUSLP6TW2BiSduryfNk",
+      "category": "Shrimp",
+      "description": "Tender shrimp with a variety of vegetables in a sweet and sour garlic sauce.",
+      "unit": [
+        {
+          "size": "Regular",
+          "option": null,
+          "price": "9.20"
+        },
+        {
+          "size": "Large",
+          "price": "12.70",
+          "option": null
+        },
+        {
+          "price": "8.80",
+          "option": null,
+          "size": "Lunch"
+        },
+        {
+          "size": "Combo",
+          "price": "10.20",
+          "option": null
+        }
+      ],
+      "itemOrder": 7,
+      "note": "Served w. Steamed Rice (Fried Rice Substitution $0.50)",
+      "name": "Shrimp & Garlic Sauce",
+      "categoryOrder": 10,
+      "chinese_name": "海鮮"
+    },
+    {
+      "_id": "uqTcjn8eCdiBm3Pcguk0",
+      "note": "Thin Rice Noodles",
+      "category": "Mei Fun",
+      "description": "Thin rice noodles stir-fried with a mix of vegetables.",
+      "categoryOrder": 5,
+      "chinese_name": "米粉",
+      "name": "Vegetable Mei Fun",
+      "unit": [
+        {
+          "price": "10.00",
+          "option": null,
+          "size": "Large"
+        }
+      ],
+      "itemOrder": 0
+    },
+    {
+      "_id": "v2RWlBKBxKnbTIK59L34",
+      "category": "Beef",
+      "note": "Served w. Steamed Rice (Fried Rice Substitution $0.50)",
+      "unit": [
+        {
+          "size": "Regular",
+          "price": "9.20",
+          "option": null
+        },
+        {
+          "option": null,
+          "price": "12.70",
+          "size": "Large"
+        },
+        {
+          "size": "Lunch",
+          "option": null,
+          "price": "8.80"
+        },
+        {
+          "price": "10.20",
+          "size": "Combo",
+          "option": null
+        }
+      ],
+      "itemOrder": 5,
+      "categoryOrder": 9,
+      "description": "Slices of beef with a variety of vegetables in a spicy Szechuan sauce.",
+      "name": "Szechuan Beef",
+      "chinese_name": "牛肉"
+    },
+    {
+      "_id": "vGtqlqK0QFpW2CQzI6t9",
+      "category": "Fried Rice",
+      "description": "Classic fried rice stir-fried with peas, onions, and carrots.",
+      "name": "Regular Fried Rice",
+      "note": "",
+      "itemOrder": 1,
+      "categoryOrder": 3,
+      "chinese_name": "炒飯",
+      "unit": [
+        {
+          "option": null,
+          "price": "7.20",
+          "size": "Large"
+        }
+      ]
+    },
+    {
+      "_id": "vUHQw2jXRc3ENsKKLpzi",
+      "category": "Chef's Special",
+      "description": "A fragrant and spicy curry sauce with chicken, beef, shrimp, and vegetables.",
+      "note": "Served with Steamed Rice (Fried Rice Substitution $0.50)",
+      "name": "Curry Triple",
+      "itemOrder": 14,
+      "unit": [
+        {
+          "price": "13.90",
+          "option": null,
+          "size": "Large"
+        }
+      ],
+      "chinese_name": "廚師特餐",
+      "categoryOrder": 7
+    },
+    {
+      "_id": "vkjleM0KMlrJPoOodIO2",
+      "categoryOrder": 14,
+      "itemOrder": 3,
+      "name": "Steamed Shrimp Broccoli",
+      "note": "All Dishes are Steamed, No Oil, and Sauce on the Side",
+      "category": "Steamed Healthy Dishes",
+      "description": "Steamed shrimp and broccoli, served with brown sauce on the side.",
+      "unit": [
+        {
+          "price": "12.70",
+          "option": null,
+          "size": "Large"
+        }
+      ],
+      "chinese_name": "健康菜"
+    },
+    {
+      "_id": "vrycH8wVnGF7pTV83E80",
+      "description": "Chicken, beef, and shrimp with a variety of vegetables in a spicy Szechuan sauce.",
+      "note": "Served with Steamed Rice (Fried Rice Substitution $0.50)",
+      "itemOrder": 12,
+      "categoryOrder": 7,
+      "category": "Chef's Special",
+      "chinese_name": "廚師特餐",
+      "name": "Szechuan Triple",
+      "unit": [
+        {
+          "price": "13.70",
+          "size": "Large",
+          "option": null
+        }
+      ]
+    },
+    {
+      "_id": "wIyNbRcMIjDUk3dwekDm",
+      "chinese_name": "廚師特餐",
+      "unit": [
+        {
+          "option": null,
+          "price": "13.50",
+          "size": "Large"
+        }
+      ],
+      "category": "Chef's Special",
+      "categoryOrder": 7,
+      "note": "Served with Steamed Rice (Fried Rice Substitution $0.50)",
+      "description": "Slices of beef stir-fried with green and white onions in a rich, savory soy sauce.",
+      "name": "Mongolian Beef",
+      "itemOrder": 9
+    },
+    {
+      "_id": "wMU8rzecjxKUNrpVuMrt",
+      "itemOrder": 8,
+      "category": "Chef's Special",
+      "unit": [
+        {
+          "price": "12.70",
+          "option": null,
+          "size": "Large"
+        }
+      ],
+      "name": "Mongolian Chicken",
+      "chinese_name": "廚師特餐",
+      "note": "Served with Steamed Rice (Fried Rice Substitution $0.50)",
+      "categoryOrder": 7,
+      "description": "Tender chicken with green and white onions in a rich, savory soy sauce."
+    },
+    {
+      "_id": "x1FsYw78UnyvWucwfJbO",
+      "description": "A light and crispy roll filled with vegetables.",
+      "unit": [
+        {
+          "option": null,
+          "price": "2.00",
+          "size": "(1 Roll)"
+        },
+        {
+          "size": "(2 Roll)",
+          "option": null,
+          "price": "3.45"
+        }
+      ],
+      "note": "",
+      "category": "Appetizers",
+      "categoryOrder": 0,
+      "chinese_name": "頭盤",
+      "itemOrder": 2,
+      "name": "Spring Egg Roll"
+    },
+    {
+      "_id": "x9bMSn7OppyRvnzMVNoT",
+      "categoryOrder": 0,
+      "unit": [
+        {
+          "size": "(8)",
+          "option": null,
+          "price": "8.20"
+        }
+      ],
+      "chinese_name": "頭盤",
+      "category": "Appetizers",
+      "note": "",
+      "itemOrder": 4,
+      "description": "Eight pan-fried dumplings with a crispy bottom and a pork and vegetable filling.",
+      "name": "Pan Fried Dumplings"
+    },
+    {
+      "_id": "xfvirAzAnByMrizcmCyi",
+      "unit": [
+        {
+          "option": null,
+          "size": "Large",
+          "price": "10.40"
+        },
+        {
+          "size": "Lunch",
+          "option": null,
+          "price": "8.80"
+        },
+        {
+          "size": "Combo",
+          "price": "10.20",
+          "option": null
+        }
+      ],
+      "categoryOrder": 4,
+      "description": "Roast pork and soft noodles tossed in a savory sauce.",
+      "name": "Pork Lo Mein",
+      "note": "Soft Noodles",
+      "itemOrder": 3,
+      "chinese_name": "撈麵",
+      "category": "Lo Mein"
+    },
+    {
+      "_id": "y4lcQQ0oM2JdvN9fHDJE",
+      "itemOrder": 4,
+      "categoryOrder": 14,
+      "note": "All Dishes are Steamed, No Oil, and Sauce on the Side",
+      "description": "Steamed shrimp and mixed vegetables, served with brown sauce on the side.",
+      "unit": [
+        {
+          "size": "Large",
+          "option": null,
+          "price": "12.70"
+        }
+      ],
+      "name": "Steamed Shrimp Mixed Veg",
+      "category": "Steamed Healthy Dishes",
+      "chinese_name": "健康菜"
+    },
+    {
+      "_id": "yLZ7YJf4Md6btXs1Zy11",
+      "description": "Tender shrimp stir-fried with peanuts and vegetables in a spicy sauce.",
+      "name": "Kung Po Shrimp",
+      "categoryOrder": 10,
+      "chinese_name": "海鮮",
+      "category": "Shrimp",
+      "unit": [
+        {
+          "size": "Regular",
+          "option": null,
+          "price": "9.20"
+        },
+        {
+          "option": null,
+          "price": "12.70",
+          "size": "Large"
+        },
+        {
+          "size": "Lunch",
+          "price": "8.80",
+          "option": null
+        },
+        {
+          "price": "10.20",
+          "option": null,
+          "size": "Combo"
+        }
+      ],
+      "itemOrder": 8,
+      "note": "Served w. Steamed Rice (Fried Rice Substitution $0.50)"
+    },
+    {
+      "_id": "ygiusRDKC0e5EYJ5eKlY",
+      "note": "with Crispy Noodles",
+      "chinese_name": "湯",
+      "category": "Soup",
+      "name": "Chicken Rice Soup",
+      "unit": [
+        {
+          "size": "Pint (16 oz)",
+          "option": null,
+          "price": "3.60"
+        },
+        {
+          "price": "6.50",
+          "size": "Quart (32 oz)",
+          "option": null
+        }
+      ],
+      "categoryOrder": 1,
+      "itemOrder": 6,
+      "description": "A soup with chicken and rice in a savory broth."
+    },
+    {
+      "_id": "zWyvud2kwPJ5keyfIzHj",
+      "categoryOrder": 7,
+      "chinese_name": "廚師特餐",
+      "itemOrder": 0,
+      "category": "Chef's Special",
+      "description": "A combination of spicy General Tso's Chicken and spicy stir-fried shrimp with mixed vegetables.",
+      "note": "Served with Steamed Rice (Fried Rice Substitution $0.50)",
+      "name": "Dragon & Phoenix",
+      "unit": [
+        {
+          "price": "13.60",
+          "option": null,
+          "size": "Large"
+        }
+      ]
+    },
+    {
+      "_id": "zdmbx9tSZqJKrFYEQa9u",
+      "name": "Szechuan Shrimp",
+      "chinese_name": "海鮮",
+      "categoryOrder": 10,
+      "unit": [
+        {
+          "size": "Regular",
+          "option": null,
+          "price": "9.20"
+        },
+        {
+          "price": "12.70",
+          "size": "Large",
+          "option": null
+        },
+        {
+          "size": "Lunch",
+          "option": null,
+          "price": "8.80"
+        },
+        {
+          "option": null,
+          "price": "10.20",
+          "size": "Combo"
+        }
+      ],
+      "description": "Shrimp with a variety of vegetables in a spicy Szechuan sauce.",
+      "note": "Served w. Steamed Rice (Fried Rice Substitution $0.50)",
+      "itemOrder": 6,
+      "category": "Shrimp"
+    },
+    {
+      "_id": "zmCoJptTaMgaKQj8VAG7",
+      "note": "Served with Steamed Rice (Fried Rice Substitution $0.50)",
+      "description": "A stir-fry featuring chicken, beef, and shrimp with broccoli, carrots, mushrooms, onions, snow peas, and zucchini.",
+      "categoryOrder": 7,
+      "chinese_name": "廚師特餐",
+      "unit": [
+        {
+          "price": "13.70",
+          "option": null,
+          "size": "Large"
+        }
+      ],
+      "itemOrder": 10,
+      "name": "Triple Delight",
+      "category": "Chef's Special"
+    }
+  ]
+}

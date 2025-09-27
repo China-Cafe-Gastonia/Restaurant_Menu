@@ -355,11 +355,32 @@
             if (restaurant) {
                 nameEl.textContent = restaurant.name || '';
                 // ...existing code for hours and info rendering...
+                // Convert HH:MM (24-hour) to 12-hour format with am/pm
+                function to12hr(t) {
+                    if (!t) return '';
+                    const s = String(t).trim();
+                    const m = s.match(/^(\d{1,2}):(\d{2})$/);
+                    if (!m) return s;
+                    let hh = parseInt(m[1], 10);
+                    const mm = m[2];
+                    const ampm = hh >= 12 ? 'pm' : 'am';
+                    hh = hh % 12;
+                    if (hh === 0) hh = 12;
+                    return `${hh}:${mm} ${ampm}`;
+                }
+
+                // Replace any HH:MM tokens in a string with 12-hour formatted tokens
+                function formatTimeString(s) {
+                    if (s === null || s === undefined) return s;
+                    // Only replace bare HH:MM occurrences that are NOT already followed by am/pm
+                    return String(s).replace(/(\d{1,2}:\d{2})(?!\s*(?:am|pm))/gi, (m) => to12hr(m));
+                }
+
                 function formatHours(hours) {
                     if (typeof hours === 'string') {
-                        return `<span class='block'><b>Hours:</b> ${hours}</span>`;
+                        return `<span class='block'><b>Hours:</b> ${formatTimeString(hours)}</span>`;
                     }
-                    // If admin saved hours as an array of lines, render them directly
+                    // If admin saved hours as an array of lines, render them directly (format times inside)
                     if (Array.isArray(hours)) {
                         return `<div class="flex flex-col items-center justify-center mt-2 mb-2">
                             <div class="flex items-center justify-center mb-1">
@@ -367,7 +388,7 @@
                                 <span class="hours-title text-lg" style="font-size:1.2rem;"><b>Hours:</b></span>
                             </div>
                             <div class="flex flex-col items-center">
-                                ${hours.map(line => `<div class="text-base" style="margin-bottom:2px;">${String(line)}</div>`).join('')}
+                                ${hours.map(line => `<div class="text-base" style="margin-bottom:2px;">${formatTimeString(String(line || ''))}</div>`).join('')}
                             </div>
                         </div>`;
                     }
@@ -377,7 +398,7 @@
                     let last = null, group = [];
                     for (const day of days) {
                         const h = hours ? hours[day] : null;
-                        const key = h && h.open && h.close ? `${h.open}-${h.close}` : "Closed";
+                        const key = (h && (h.open || h.close)) ? `${h.open ? to12hr(h.open) : ''}-${h.close ? to12hr(h.close) : ''}` : "Closed";
                         if (!last || last !== key) {
                             if (group.length) groups.push({days: group, key: last});
                             group = [day];
@@ -397,7 +418,8 @@
                                 const label = g.days.length > 1
                                     ? `<b>${g.days[0].slice(0,3)} - ${g.days[g.days.length-1].slice(0,3)}:</b>`
                                     : `<b>${g.days[0].slice(0,3)}:</b>`;
-                                return `<div class="text-base" style="margin-bottom:2px;">${label} ${g.key === 'Closed' ? '<span style="color:#b91c1c;font-weight:600;">Closed</span>' : g.key.replace('-', ' - ')}</div>`;
+                                const display = g.key === 'Closed' ? '<span style="color:#b91c1c;font-weight:600;">Closed</span>' : String(g.key).replace(/^-|-$/g, '').replace(/-/g, ' - ');
+                                return `<div class="text-base" style="margin-bottom:2px;">${label} ${display}</div>`;
                             }).join('')}
                         </div>
                     </div>`;
