@@ -129,6 +129,9 @@
                     <div id="editRestaurantNotes" class="mt-4 flex flex-col items-center">
                         <textarea id="editComboNote" class="w-full bg-yellow-50 border-l-4 border-yellow-400 rounded-lg p-2 mb-2 text-base text-red-700 font-semibold max-w-xl" rows="2" placeholder="Combo Plate Note"></textarea>
                         <textarea id="editLunchNote" class="w-full bg-yellow-50 border-l-4 border-yellow-400 rounded-lg p-2 text-base text-blue-700 font-semibold max-w-xl" rows="2" placeholder="Lunch Special Note"></textarea>
+                        <div class="mt-3">
+                            <button id="saveInfoBtn" class="bg-indigo-600 text-white font-semibold py-1 px-4 rounded-full shadow-md hover:bg-indigo-700">Save Info</button>
+                        </div>
                     </div>
                 </header>
                 <div id="loadingMessage" class="text-center text-gray-500 text-lg">Loading menu...</div>
@@ -887,7 +890,7 @@
                             } else {
                                 docRef = doc(menuRef);
                             }
-                            const saveObj = normalizeMenuItem({ name: it.name, description: it.description, unit: it.unit, category: it.category || '', categoryOrder: it.categoryOrder || 0, itemOrder: it.itemOrder || 0 });
+                            const saveObj = normalizeMenuItem({ name: it.name, description: it.description, unit: it.unit, spicy: !!it.spicy, ingredients: it.ingredients || null, category: it.category || '', categoryOrder: it.categoryOrder || 0, itemOrder: it.itemOrder || 0 });
                             batch.set(docRef, saveObj);
                             if (docRef.id) delete existingById[docRef.id];
                         });
@@ -924,6 +927,67 @@
             logStatus(`Error deleting public menu: ${error.message}`);
         }
     });
+
+            // Save Info (restaurant/notes) separately
+            const saveInfoBtn = document.getElementById('saveInfoBtn');
+            if (saveInfoBtn) {
+                saveInfoBtn.addEventListener('click', async () => {
+                    if (!db || !auth.currentUser) { logStatus('You must be logged in as admin.'); return; }
+                    try {
+                        logStatus('Saving restaurant info...');
+                        const restName = document.getElementById('editRestaurantName')?.value || '';
+                        const restAddr = document.getElementById('editRestaurantAddress')?.value || '';
+                        const restPhone = document.getElementById('editRestaurantPhone')?.value || '';
+                        const combo = document.getElementById('editComboNote')?.value || '';
+                        const lunch = document.getElementById('editLunchNote')?.value || '';
+                        const info = {};
+                        if (restName || restAddr || restPhone) {
+                            const restaurantObj = { name: restName };
+                            if (restAddr) { restaurantObj.address = restAddr; restaurantObj.location = restAddr; }
+                            if (restPhone) restaurantObj.phone = restPhone;
+                            // structured hours validation/collection
+                            const useStructured = document.getElementById('useStructuredHours');
+                            if (useStructured && useStructured.checked) {
+                                const structuredBlock = document.getElementById('structuredHours');
+                                if (structuredBlock) {
+                                    const rows = structuredBlock.querySelectorAll('.structured-hour-row');
+                                    const hoursObj = {};
+                                    const timeRegex = /^\d{2}:\d{2}$/;
+                                    let bad = null;
+                                    rows.forEach(r => {
+                                        const day = r.getAttribute('data-day');
+                                        const open = r.querySelector('.hours-open')?.value || '';
+                                        const close = r.querySelector('.hours-close')?.value || '';
+                                        const openVal = String(open || '').trim();
+                                        const closeVal = String(close || '').trim();
+                                        if (openVal && !timeRegex.test(openVal)) bad = bad || r.querySelector('.hours-open');
+                                        if (closeVal && !timeRegex.test(closeVal)) bad = bad || r.querySelector('.hours-close');
+                                        if (openVal || closeVal) hoursObj[day] = { open: openVal, close: closeVal };
+                                    });
+                                    if (bad) { if (typeof bad.scrollIntoView === 'function') bad.scrollIntoView({behavior:'smooth', block:'center'}); bad.style.border='2px solid #f87171'; logStatus('Invalid time format in structured hours. Use HH:MM. Save aborted.'); return; }
+                                    if (Object.keys(hoursObj).length) restaurantObj.hours = hoursObj;
+                                }
+                            } else {
+                                const hoursContainer = document.getElementById('editHoursLines');
+                                if (hoursContainer) {
+                                    const hourInputs = Array.from(hoursContainer.querySelectorAll('input')).map(i => i.value).map(s => String(s || '').trim()).filter(Boolean);
+                                    if (hourInputs.length) restaurantObj.hours = hourInputs;
+                                }
+                            }
+                            info.restaurant = restaurantObj;
+                        }
+                        if (combo || lunch) info.notes = { combination_plate: combo, lunch_special: lunch };
+                        // write _info doc
+                        const menuRef = collection(db, `artifacts/${firebaseConfig.appId}/private/data/menu_data_admin`);
+                        await writeBatch(db).set(doc(menuRef, '_info'), info).commit();
+                        logStatus('Restaurant info saved.');
+                        document.getElementById('loadMenuButton').click();
+                    } catch (err) {
+                        console.error(err);
+                        logStatus('Error saving restaurant info: ' + (err.message || err));
+                    }
+                });
+            }
 
     // Hide loading message after menu loads (if menu is loaded elsewhere, this should be called after render)
     function hideLoadingMessage() {
@@ -1063,6 +1127,9 @@
                 card.appendChild(ul);
                 menuContainer.appendChild(card);
             }
+            // Show the Save Menu row now that the menu is loaded
+            const saveRow = document.getElementById('saveMenuBtnRow');
+            if (saveRow) saveRow.style.display = '';
             hideLoadingMessage();
             logStatus('PRIVATE menu loaded.');
         } catch (err) {
