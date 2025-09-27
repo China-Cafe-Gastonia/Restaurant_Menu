@@ -82,6 +82,14 @@
                     Publish to Public Menu
                 </button>
             </div>
+                <div class="flex items-center gap-3">
+                    <input type="checkbox" id="skipNormalizationToggle" />
+                    <label for="skipNormalizationToggle" class="text-sm text-gray-700">Skip normalization (assume JSON already flattened)</label>
+                    <span title="If checked, admin actions will NOT auto-convert legacy nested 'unit' arrays into objects; only enable if you always use flattened JSON." class="ml-2 text-gray-400">ℹ️</span>
+                    <button id="normalizeDownloadBtn" class="ml-4 bg-indigo-500 text-white font-semibold py-1 px-3 rounded-full shadow hover:bg-indigo-600">Normalize &amp; Download JSON</button>
+                    <button id="downloadPrivateBtn" class="ml-2 bg-gray-700 text-white font-semibold py-1 px-3 rounded-full shadow hover:bg-gray-800">Download Private JSON</button>
+                    <button id="downloadPublicBtn" class="ml-2 bg-gray-600 text-white font-semibold py-1 px-3 rounded-full shadow hover:bg-gray-700">Download Public JSON</button>
+                </div>
             <div id="statusMessage" class="mt-6 text-sm font-medium"></div>
         </div>
 
@@ -201,6 +209,207 @@
         const db = getFirestore(app);
 
         const auth = getAuth(app);
+        // Helper: flatten any nested `unit` arrays into array of objects {size, option, price}
+        function flattenUnitField(unit) {
+            if (!Array.isArray(unit)) return unit;
+            // Already flattened if first element is object with size/price
+            if (unit.length > 0 && typeof unit[0] === 'object' && (unit[0].size !== undefined || unit[0].price !== undefined)) {
+                return unit;
+            }
+            const out = [];
+            unit.forEach(entry => {
+                if (!Array.isArray(entry)) {
+                    // scalar entry -> treat as size only
+                    out.push({ size: entry, option: null, price: null });
+                    return;
+                }
+                const size = entry[0];
+                const second = entry[1];
+                if (Array.isArray(second)) {
+                    // second is list of [option, price]
+                    second.forEach(opt => {
+                        if (Array.isArray(opt)) {
+                            out.push({ size: size, option: opt[0], price: opt[1] });
+                        } else {
+                            out.push({ size: size, option: opt, price: null });
+                        }
+                    });
+                } else {
+                    // second is scalar price
+                    out.push({ size: size, option: null, price: second });
+                }
+            });
+            return out;
+        }
+
+    // Keep last parsed/uploaded or loaded doc in memory so "Normalize & Download" can use it
+    let lastParsedDoc = null;
+
+    // Skip normalization when admin chooses to (persisted in localStorage)
+        const SKIP_KEY = 'skipNormalization';
+        // Restore toggle value on page load
+        window.addEventListener('DOMContentLoaded', () => {
+            const toggle = document.getElementById('skipNormalizationToggle');
+            try {
+                const val = localStorage.getItem(SKIP_KEY);
+                toggle.checked = val === '1';
+            } catch (e) {
+                // ignore storage errors
+            }
+            toggle.addEventListener('change', () => {
+                try {
+                    localStorage.setItem(SKIP_KEY, toggle.checked ? '1' : '0');
+                    logStatus(`Skip normalization set to: ${toggle.checked}`);
+                } catch (e) {
+                    console.warn('Failed to persist skipNormalization setting', e);
+                }
+            });
+        });
+
+        // Normalize a full menu document (either the original backup shape or the Firestore-friendly flattened list)
+        function normalizeWholeDoc(doc) {
+            if (!doc) return doc;
+            // If doc has top-level 'menu' array (original backup shape) -> transform its items
+            const out = JSON.parse(JSON.stringify(doc)); // deep copy
+            if (Array.isArray(out.menu)) {
+                out.menu = out.menu.map(cat => {
+                    const newCat = { ...cat };
+                    if (Array.isArray(newCat.items)) {
+                        newCat.items = newCat.items.map(it => {
+                            const copy = { ...it };
+                            if (copy.unit) copy.unit = flattenUnitField(copy.unit);
+                            return copy;
+                        });
+                    }
+                    return newCat;
+                });
+                return out;
+            }
+            // Else if it's the Firestore-flattened list (array of items)
+            if (Array.isArray(out)) {
+                return out.map(i => normalizeMenuItem(i));
+            }
+            // Else if it's an object that contains menu items as properties (like {restaurant, notes, menu: [...]})
+            if (Array.isArray(out.menuData)) {
+                out.menuData = out.menuData.map(i => normalizeMenuItem(i));
+                return out;
+            }
+            // Fallback: try to normalize any top-level fields that look like items
+            return out;
+        }
+
+        function downloadJson(obj, filename) {
+            const dataStr = JSON.stringify(obj, null, 2);
+            const blob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename || 'menu.normalized.json';
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            URL.revokeObjectURL(url);
+        }
+
+        // Wire Normalize & Download button
+        window.addEventListener('DOMContentLoaded', () => {
+            const btn = document.getElementById('normalizeDownloadBtn');
+            btn.addEventListener('click', () => {
+                const src = lastParsedDoc || null;
+                if (!src) {
+                    logStatus('No parsed menu available to normalize. Please upload a file or load the private menu first.');
+                    return;
+                }
+                const normalized = normalizeWholeDoc(src);
+                downloadJson(normalized, 'menu.normalized.json');
+                logStatus('Prepared normalized JSON and started download.');
+            });
+            // Download current private dataset from Firestore
+            const downloadPrivateBtn = document.getElementById('downloadPrivateBtn');
+            downloadPrivateBtn.addEventListener('click', async () => {
+                if (!db || !auth.currentUser) {
+                    logStatus('You must be logged in as admin.');
+                    return;
+                }
+                try {
+                    logStatus('Fetching PRIVATE menu from Firestore...');
+                    const menuRef = collection(db, `artifacts/${appId}/private/data/menu_data_admin`);
+                    const snap = await getDocs(menuRef);
+                    if (snap.empty) {
+                        logStatus('No private menu data found.');
+                        return;
+                    }
+                    const items = [];
+                    let info = null;
+                    snap.forEach(docSnap => {
+                        if (docSnap.id === '_info') info = docSnap.data();
+                        else items.push({ _id: docSnap.id, ...docSnap.data() });
+                    });
+                    // Normalize unless skipped
+                    const skip = (() => { try { return localStorage.getItem(SKIP_KEY) === '1'; } catch (e) { return false; }})();
+                    const out = {
+                        generatedAt: new Date().toISOString(),
+                        info: info || {},
+                        menu: skip ? items : items.map(normalizeMenuItem)
+                    };
+                    downloadJson(out, `menu_private_${new Date().toISOString().slice(0,19).replace(/[:T]/g,'-')}.json`);
+                    logStatus('Private menu downloaded.');
+                } catch (e) {
+                    console.error(e);
+                    logStatus('Error downloading private menu: ' + (e.message || e));
+                }
+            });
+            // Download current public dataset from Firestore
+            const downloadPublicBtn = document.getElementById('downloadPublicBtn');
+            downloadPublicBtn.addEventListener('click', async () => {
+                try {
+                    logStatus('Fetching PUBLIC menu from Firestore...');
+                    const menuRef = collection(db, `artifacts/${appId}/public/data/menu_data`);
+                    const snap = await getDocs(menuRef);
+                    if (snap.empty) {
+                        logStatus('No public menu data found.');
+                        return;
+                    }
+                    const items = [];
+                    let info = null;
+                    snap.forEach(docSnap => {
+                        if (docSnap.id === '_info') info = docSnap.data();
+                        else items.push({ _id: docSnap.id, ...docSnap.data() });
+                    });
+                    const skip = (() => { try { return localStorage.getItem(SKIP_KEY) === '1'; } catch (e) { return false; }})();
+                    const out = {
+                        generatedAt: new Date().toISOString(),
+                        info: info || {},
+                        menu: skip ? items : items.map(normalizeMenuItem)
+                    };
+                    downloadJson(out, `menu_public_${new Date().toISOString().slice(0,19).replace(/[:T]/g,'-')}.json`);
+                    logStatus('Public menu downloaded.');
+                } catch (e) {
+                    console.error(e);
+                    logStatus('Error downloading public menu: ' + (e.message || e));
+                }
+            });
+        });
+
+        function normalizeMenuItem(item) {
+            if (!item || typeof item !== 'object') return item;
+            try {
+                const skip = localStorage.getItem(SKIP_KEY) === '1';
+                if (skip) return item;
+            } catch (e) {
+                // fall through to normalization
+            }
+            const copy = { ...item };
+            if (copy.unit) {
+                try {
+                    copy.unit = flattenUnitField(copy.unit);
+                } catch (e) {
+                    // fallback: leave original unit
+                    console.warn('Failed to flatten unit for item', item, e);
+                }
+            }
+            return copy;
+        }
         // UI elements
         const loginCard = document.getElementById('loginCard');
         const loginForm = document.getElementById('loginForm');
@@ -291,6 +500,8 @@
                     let menuData;
                     try {
                         menuData = JSON.parse(event.target.result);
+                        // keep original parsed doc for download/normalize
+                        lastParsedDoc = menuData;
                     } catch (parseError) {
                         console.error("Error parsing JSON file:", parseError);
                         logStatus(`Error parsing JSON file: ${parseError.message}`);
@@ -337,8 +548,9 @@
                             });
                         }
                         menuData.forEach(item => {
+                            const newItem = normalizeMenuItem(item);
                             const newDocRef = doc(menuRef);
-                            newBatch.set(newDocRef, item);
+                            newBatch.set(newDocRef, newItem);
                         });
                         await newBatch.commit();
                         logStatus(`Menu uploaded to PRIVATE dataset! Added ${menuData.length} items.`);
@@ -417,6 +629,8 @@
                         menuItems.push({ _id: docSnap.id, ...docSnap.data() });
                     }
                 });
+                // keep a representation of the loaded private dataset so Normalize & Download can use it
+                lastParsedDoc = { menuData: menuItems, info: infoDoc };
                 menuItems.sort((a, b) => (a.categoryOrder - b.categoryOrder) || (a.itemOrder - b.itemOrder));
                 if (infoDoc && infoDoc.restaurant) {
                     document.getElementById('editRestaurantName').value = infoDoc.restaurant.name || '';
@@ -440,6 +654,8 @@
                     document.getElementById('editComboNote').value = infoDoc.notes.combination_plate || infoDoc.notes.combo || '';
                     document.getElementById('editLunchNote').value = infoDoc.notes.lunch_special || infoDoc.notes.lunch || '';
                 }
+                // Normalize items to ensure `unit` is an array of objects for rendering
+                menuItems = menuItems.map(i => normalizeMenuItem(i));
                 const groupedMenu = menuItems.reduce((acc, item) => {
                     (acc[item.category] = acc[item.category] || []).push(item);
                     return acc;
@@ -580,13 +796,18 @@
                 });
                 await deleteBatch.commit();
                 logStatus('All old public menu data deleted.');
-                // Write all private docs to public
+                // Write all private docs to public (normalize items to avoid nested arrays)
                 const publishBatch = writeBatch(db);
                 privateDocs.forEach((docSnap) => {
-                    const data = docSnap.data();
                     const id = docSnap.id;
+                    const raw = docSnap.data();
                     const newDocRef = id === '_info' ? doc(publicRef, '_info') : doc(publicRef);
-                    publishBatch.set(newDocRef, data);
+                    if (id === '_info') {
+                        // Info doc - write as-is
+                        publishBatch.set(newDocRef, raw);
+                    } else {
+                        publishBatch.set(newDocRef, normalizeMenuItem(raw));
+                    }
                 });
                 await publishBatch.commit();
                 logStatus('Publish complete! Public menu updated.');

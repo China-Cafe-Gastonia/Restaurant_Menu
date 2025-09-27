@@ -139,6 +139,55 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-app.js";
         import { getFirestore, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js";
 
+        // Helper: flatten any nested `unit` arrays into array of objects {size, option, price}
+        function flattenUnitField(unit) {
+            if (!Array.isArray(unit)) return unit;
+            if (unit.length > 0 && typeof unit[0] === 'object' && (unit[0].size !== undefined || unit[0].price !== undefined)) {
+                return unit; // already flattened
+            }
+            const out = [];
+            unit.forEach(entry => {
+                if (!Array.isArray(entry)) {
+                    out.push({ size: entry, option: null, price: null });
+                    return;
+                }
+                const size = entry[0];
+                const second = entry[1];
+                if (Array.isArray(second)) {
+                    second.forEach(opt => {
+                        if (Array.isArray(opt)) {
+                            out.push({ size: size, option: opt[0], price: opt[1] });
+                        } else {
+                            out.push({ size: size, option: opt, price: null });
+                        }
+                    });
+                } else {
+                    out.push({ size: size, option: null, price: second });
+                }
+            });
+            return out;
+        }
+
+        function normalizeMenuItem(item) {
+            if (!item || typeof item !== 'object') return item;
+            const copy = { ...item };
+            if (copy.unit) {
+                try {
+                    copy.unit = flattenUnitField(copy.unit);
+                } catch (e) {
+                    console.warn('Failed to flatten unit for item', item, e);
+                }
+            }
+            return copy;
+        }
+
+        function formatPrice(val) {
+            if (val === null || val === undefined || val === '') return '';
+            const n = Number(val);
+            if (Number.isFinite(n)) return `$${n.toFixed(2)}`;
+            return '';
+        }
+
         // IMPORTANT: REPLACE WITH YOUR OWN FIREBASE CONFIGURATION
         const firebaseConfig = {
             apiKey: "AIzaSyBEFimTV6zygaMki5VZQ9cqdcFTfPMaOj0",
@@ -351,10 +400,12 @@
             const menuRef = collection(db, `artifacts/${appId}/public/data/menu_data`);
             onSnapshot(menuRef, (querySnapshot) => {
                 // If using Firestore, expect flat array
-                const menuItems = [];
+                let menuItems = [];
                 querySnapshot.forEach((doc) => {
                     menuItems.push({ ...doc.data(), _id: doc.id });
                 });
+                // Normalize items to support both legacy nested-array and new flattened shapes
+                menuItems = menuItems.map(normalizeMenuItem);
                 renderMenu(menuItems);
                 document.getElementById('loadingMessage').classList.add('hidden');
             }, (error) => {
