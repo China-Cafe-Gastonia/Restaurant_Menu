@@ -60,8 +60,8 @@
           "name": "BBQ Boneless Ribs",
           "description": "Tender boneless ribs marinated in a sweet barbecue sauce.",
           "unit": {
-            "S": "7.20",
-            "L": "12.20"
+            "Small": "7.20",
+            "Large": "12.20"
           }
         },
         {
@@ -193,7 +193,7 @@
           "name": "Fried Butterfly Shrimp",
           "description": "Crispy fried shrimp, golden and delicious.",
             "unit": {
-              "8 Shrimp": {
+              "10 Shrimp": {
                 "Plain/Only Shrimp": "7.00",
                 "w. Fried Rice/White Rice": "8.00",
                 "w. French Fries": "9.00",
@@ -245,16 +245,20 @@
                 "w. Chicken Fried Rice": "12.80",
                 "w. Pork Fried Rice": "12.80",
                 "w. Shrimp Fried Rice": "13.30",
-                "w. Beef Fried Rice": "13.30"
+                "w. Beef Fried Rice": "13.30",
+                "w. Lo Mein": "13.80",
+                "w. Vegetable Lo Mein": "14.20"
               },
               "6 Wings": {
-                "Plain/Only Wing": "",
-                "w. Fried Rice/White Rice": "",
-                "w. French Fries": "",
-                "w. Chicken Fried Rice": "",
-                "w. Pork Fried Rice": "",
-                "w. Shrimp Fried Rice": "",
-                "w. Beef Fried Rice": ""
+                "Plain/Only Wing": "14.20",
+                "w. Fried Rice/White Rice": "15.70",
+                "w. French Fries": "16.70",
+                "w. Chicken Fried Rice": "16.70",
+                "w. Pork Fried Rice": "16.70",
+                "w. Shrimp Fried Rice": "17.20",
+                "w. Beef Fried Rice": "17.20"
+                "w. Lo Mein": "17.70",
+                "w. Vegetable Lo Mein": "18.20"
               }
             }
         },
@@ -435,7 +439,7 @@
         {
           "name": "Vegetable",
           "description": "A stir-fry of fresh vegetables served with crispy noodles in white sauce.",
-          "prices": {
+          "unit": {
             "Regular": "8.20",
             "Large": "10.20",
             "Lunch": "8.80",
@@ -445,7 +449,7 @@
         {
           "name": "Chicken",
           "description": "Chicken stir-fried with vegetables and served with crispy noodles in white sauce.",
-          "prices": {
+          "unit": {
             "Regular": "8.50",
             "Large": "10.40",
             "Lunch": "8.80",
@@ -455,7 +459,7 @@
         {
           "name": "Pork",
           "description": "Roast pork stir-fried with vegetables and served with crispy noodles in white sauce.",
-          "prices": {
+          "unit": {
             "Regular": "8.50",
             "Large": "10.40",
             "Lunch": "8.80",
@@ -465,7 +469,7 @@
         {
           "name": "Beef",
           "description": "Beef stir-fried with vegetables and served with crispy noodles in white sauce.",
-          "prices": {
+          "unit": {
             "Regular": "8.70",
             "Large": "11.00",
             "Lunch": "8.80",
@@ -475,7 +479,7 @@
         {
           "name": "Shrimp",
           "description": "Shrimp stir-fried with vegetables and served with crispy noodles in white sauce.",
-          "prices": {
+          "unit": {
             "Regular": "8.70",
             "Large": "11.00",
             "Lunch": "8.80",
@@ -741,7 +745,7 @@
         {
           "name": "Beef Broccoli",
           "description": "Tender slices of beef, carrot, and broccoli in a savory brown sauce.",
-          "prices": {
+          "unit": {
             "Regular": "9.20",
             "Large": "12.70",
             "Lunch": "8.80",
@@ -751,7 +755,7 @@
         {
           "name": "Beef & Mixed Veg",
           "description": "Tender beef with a mix of baby corn, broccoli, carrot, mushroom, onion, snow peas, water chestnut, and zucchini.",
-          "prices": {
+          "unit": {
             "Regular": "9.20",
             "Large": "12.70",
             "Lunch": "8.80",
@@ -761,7 +765,7 @@
         {
           "name": "Beef Mushroom",
           "description": "Tender sliced beef and fresh mushrooms stir-fried in a savory sauce.",
-          "prices": {
+          "unit": {
             "Regular": "9.20",
             "Large": "12.70",
             "Lunch": "8.80",
@@ -771,7 +775,7 @@
         {
           "name": "Sa Cha Beef",
           "description": "Tender beef with a mix of vegetables in a savory and spicy Sa Cha sauce.",
-          "prices": {
+          "unit": {
             "Regular": "9.20",
             "Large": "12.70",
             "Lunch": "8.80",
@@ -781,7 +785,7 @@
         {
           "name": "Hunan Beef",
           "description": "Slices of beef with broccoli, carrots, green peppers, onions, water chestnuts, and zucchini in a spicy Hunan sauce.",
-          "prices": {
+          "unit": {
             "Regular": "9.20",
             "Large": "12.70",
             "Lunch": "8.80",
@@ -791,7 +795,7 @@
         {
           "name": "Szechuan Beef",
           "description": "Slices of beef with a variety of vegetables in a spicy Szechuan sauce.",
-          "prices": {
+          "unit": {
             "Regular": "9.20",
             "Large": "12.70",
             "Lunch": "8.80",
@@ -801,7 +805,7 @@
         {
           "name": "Beef & Garlic Sauce",
           "description": "Slices of beef with a variety of vegetables in a sweet and sour garlic sauce.",
-          "prices": {
+          "unit": {
             "Regular": "9.20",
             "Large": "12.70",
             "Lunch": "8.80",
@@ -811,7 +815,7 @@
         {
           "name": "Pepper Steak w. Onion",
           "description": "Tender slices of steak and onions stir-fried with green peppers in a savory brown sauce.",
-          "prices": {
+          "unit": {
             "Regular": "9.20",
             "Large": "12.70",
             "Lunch": "8.80",
@@ -828,7 +832,7 @@
         {
           "name": "Shrimp Broccoli",
           "description": "Jumbo shrimp and broccoli in a classic brown sauce.",
-          "prices": {
+          "unit": {
             "Regular": "9.20",
             "Large": "12.70",
             "Lunch": "8.80",
@@ -838,7 +842,7 @@
         {
           "name": "Shrimp Mixed Veg",
           "description": "Tender shrimp with a mix of baby corn, broccoli, carrot, mushroom, onion, snow peas, water chestnut, and zucchini.",
-          "prices": {
+          "unit": {
             "Regular": "9.20",
             "Large": "12.70",
             "Lunch": "8.80",
@@ -848,7 +852,7 @@
         {
           "name": "Shrimp Mushroom",
           "description": "Tender shrimp and mushrooms stir-fried in a savory sauce.",
-          "prices": {
+          "unit": {
             "Regular": "9.20",
             "Large": "12.70",
             "Lunch": "8.80",
@@ -858,7 +862,7 @@
         {
           "name": "Sa Cha Shrimp",
           "description": "Shrimp with a mix of vegetables in a savory and spicy Sa Cha sauce.",
-          "prices": {
+          "unit": {
             "Regular": "9.20",
             "Large": "12.70",
             "Lunch": "8.80",
@@ -868,7 +872,7 @@
         {
           "name": "Shrimp Cashew Nuts",
           "description": "Tender shrimp with crunchy cashew nuts and mixed vegetables in a light sauce.",
-          "prices": {
+          "unit": {
             "Regular": "9.20",
             "Large": "12.70",
             "Lunch": "8.80",
@@ -878,7 +882,7 @@
         {
           "name": "Hunan Shrimp",
           "description": "Tender shrimp with broccoli, carrots, green peppers, onions, water chestnuts, and zucchini in a spicy Hunan sauce.",
-          "prices": {
+          "unit": {
             "Regular": "9.20",
             "Large": "12.70",
             "Lunch": "8.80",
@@ -888,7 +892,7 @@
         {
           "name": "Szechuan Shrimp",
           "description": "Shrimp with a variety of vegetables in a spicy Szechuan sauce.",
-          "prices": {
+          "unit": {
             "Regular": "9.20",
             "Large": "12.70",
             "Lunch": "8.80",
@@ -898,7 +902,7 @@
         {
           "name": "Shrimp & Garlic Sauce",
           "description": "Tender shrimp with a variety of vegetables in a sweet and sour garlic sauce.",
-          "prices": {
+          "unit": {
             "Regular": "9.20",
             "Large": "12.70",
             "Lunch": "8.80",
@@ -908,7 +912,7 @@
         {
           "name": "Kung Po Shrimp",
           "description": "Tender shrimp stir-fried with peanuts and vegetables in a spicy sauce.",
-          "prices": {
+          "unit": {
             "Regular": "9.20",
             "Large": "12.70",
             "Lunch": "8.80",
@@ -918,7 +922,7 @@
         {
           "name": "Shrimp with Lobster Sauce",
           "description": "Baby shrimp with pea pod and carrots in a soupy egg white sauce .",
-          "prices": {
+          "unit": {
             "Regular": "9.20",
             "Large": "12.70",
             "Lunch": "8.80",
@@ -935,7 +939,7 @@
         {
           "name": "Sweet & Sour Pork",
           "description": "Crispy fried pork served with a tangy and sweet sauce on the side.",
-          "prices": {
+          "unit": {
             "Regular": "8.70",
             "Large": "11.2",
             "Lunch": "8.80",
@@ -945,7 +949,7 @@
         {
           "name": "Sweet & Sour Chicken",
           "description": "Crispy fried chicken served with a tangy and sweet sauce on the side.",
-          "prices": {
+          "unit": {
             "Regular": "8.70",
             "Large": "11.2",
             "Lunch": "8.80",
@@ -955,7 +959,7 @@
         {
           "name": "Sweet & Sour Shrimp",
           "description": "Crispy fried shrimp served with a tangy and sweet sauce on the side.",
-          "prices": {
+          "unit": {
             "Regular": "8.70",
             "Large": "11.2",
             "Lunch": "8.80",
@@ -993,7 +997,7 @@
         {
           "name": "Sauteed Broccoli",
           "description": "Broccoli sautéed in a brown sauce.",
-          "prices": {
+          "unit": {
             "Regular": "7.7",
             "Large": "10.30",
             "Lunch": "8.80",
@@ -1003,7 +1007,7 @@
         {
           "name": "Sauteed Mixed Vegetables",
           "description": "A colorful mix of fresh vegetables sauteed in a savory sauce.",
-          "prices": {
+          "unit": {
             "Regular": "7.7",
             "Large": "10.30",
             "Lunch": "8.80",
@@ -1013,7 +1017,7 @@
         {
           "name": "Broccoli & Garlic Sauce",
           "description": "Broccoli in a sweet and sour garlic sauce.",
-          "prices": {
+          "unit": {
             "Regular": "7.7",
             "Large": "10.30",
             "Lunch": "8.80",
@@ -1023,7 +1027,7 @@
         {
           "name": "Bean Curd Home Style",
           "description": "A classic dish of fried tofu with mixed vegetables in a savory brown sauce.",
-          "prices": {
+          "unit": {
             "Large": "11"
           }
         }

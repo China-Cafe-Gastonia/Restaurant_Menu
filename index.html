@@ -186,59 +186,56 @@
                     menuDocs.push(item);
                 }
             }
-            // Render restaurant info
+            // Render restaurant info (unchanged)
             const nameEl = document.getElementById('restaurantName');
             const infoEl = document.getElementById('restaurantInfo');
             const notesEl = document.getElementById('restaurantNotes');
             if (restaurant) {
                 nameEl.textContent = restaurant.name || '';
-                    // Format hours if present (object or string)
-                    function formatHours(hours) {
-                        if (typeof hours === 'string') {
-                            // fallback for old format
-                            return `<span class='block'><b>Hours:</b> ${hours}</span>`;
-                        }
-                        // Group days by open/close times
-                        const days = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
-                        const groups = [];
-                        let last = null, group = [];
-                        for (const day of days) {
-                            const h = hours[day];
-                            const key = h && h.open && h.close ? `${h.open}-${h.close}` : "Closed";
-                            if (!last || last !== key) {
-                                if (group.length) groups.push({days: group, key: last});
-                                group = [day];
-                                last = key;
-                            } else {
-                                group.push(day);
-                            }
-                        }
-                        if (group.length) groups.push({days: group, key: last});
-                        // Centered, stacked format
-                        return `<div class="flex flex-col items-center justify-center mt-2 mb-2">
-                            <div class="flex items-center justify-center mb-1">
-                                <span class="hours-icon">🕒</span>
-                                <span class="hours-title text-lg" style="font-size:1.2rem;"><b>Hours:</b></span>
-                            </div>
-                            <div class="flex flex-col items-center">
-                                ${groups.map(g => {
-                                    const label = g.days.length > 1
-                                        ? `<b>${g.days[0].slice(0,3)} - ${g.days[g.days.length-1].slice(0,3)}:</b>`
-                                        : `<b>${g.days[0].slice(0,3)}:</b>`;
-                                    return `<div class="text-base" style="margin-bottom:2px;">${label} ${g.key === 'Closed' ? '<span style=\"color:#b91c1c;font-weight:600;\">Closed</span>' : g.key.replace('-', ' - ')}</div>`;
-                                }).join('')}
-                            </div>
-                        </div>`;
+                // ...existing code for hours and info rendering...
+                function formatHours(hours) {
+                    if (typeof hours === 'string') {
+                        return `<span class='block'><b>Hours:</b> ${hours}</span>`;
                     }
-                    let formattedHours = '';
-                    if (restaurant.hours) {
-                        formattedHours = formatHours(restaurant.hours);
+                    const days = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
+                    const groups = [];
+                    let last = null, group = [];
+                    for (const day of days) {
+                        const h = hours[day];
+                        const key = h && h.open && h.close ? `${h.open}-${h.close}` : "Closed";
+                        if (!last || last !== key) {
+                            if (group.length) groups.push({days: group, key: last});
+                            group = [day];
+                            last = key;
+                        } else {
+                            group.push(day);
+                        }
                     }
-                    infoEl.innerHTML = [
-                        restaurant.location ? `<span class='block'><b>Address:</b> ${restaurant.location}</span>` : '',
-                        restaurant.phone ? `<span class='block'><b>Phone:</b> ${restaurant.phone}</span>` : '',
-                        formattedHours
-                    ].filter(Boolean).join('');
+                    if (group.length) groups.push({days: group, key: last});
+                    return `<div class="flex flex-col items-center justify-center mt-2 mb-2">
+                        <div class="flex items-center justify-center mb-1">
+                            <span class="hours-icon">🕒</span>
+                            <span class="hours-title text-lg" style="font-size:1.2rem;"><b>Hours:</b></span>
+                        </div>
+                        <div class="flex flex-col items-center">
+                            ${groups.map(g => {
+                                const label = g.days.length > 1
+                                    ? `<b>${g.days[0].slice(0,3)} - ${g.days[g.days.length-1].slice(0,3)}:</b>`
+                                    : `<b>${g.days[0].slice(0,3)}:</b>`;
+                                return `<div class="text-base" style="margin-bottom:2px;">${label} ${g.key === 'Closed' ? '<span style=\"color:#b91c1c;font-weight:600;\">Closed</span>' : g.key.replace('-', ' - ')}</div>`;
+                            }).join('')}
+                        </div>
+                    </div>`;
+                }
+                let formattedHours = '';
+                if (restaurant.hours) {
+                    formattedHours = formatHours(restaurant.hours);
+                }
+                infoEl.innerHTML = [
+                    restaurant.location ? `<span class='block'><b>Address:</b> ${restaurant.location}</span>` : '',
+                    restaurant.phone ? `<span class='block'><b>Phone:</b> ${restaurant.phone}</span>` : '',
+                    formattedHours
+                ].filter(Boolean).join('');
             } else {
                 nameEl.textContent = '';
                 infoEl.innerHTML = '';
@@ -302,28 +299,18 @@
                     ${note ? `<div class='category-note'>${note}</div>` : ''}
                     <ul class="space-y-4">
                         ${groupedMenu[category].map(item => {
-                            // Render new unit/price structure
+                            // Only support array-based unit fields
                             let detailsHtml = '';
-                            if (item.unit && typeof item.unit === 'object' && !Array.isArray(item.unit)) {
-                                // unit is an object: could be {size: price} or {size: {option: price}}
-                                for (const unitKey in item.unit) {
-                                    const value = item.unit[unitKey];
-                                    if (typeof value === 'string' || typeof value === 'number') {
-                                        // Simple: {size: price}
-                                        detailsHtml += `<div class="flex justify-between"><span class="text-sm text-gray-700">${unitKey}</span><span class="text-orange-600 font-semibold">$${parseFloat(value).toFixed(2)}</span></div>`;
-                                    } else if (typeof value === 'object') {
-                                        // Nested: {size: {option: price}}
-                                        detailsHtml += `<div class="font-semibold text-gray-700 mt-1">${unitKey}</div>`;
-                                        for (const opt in value) {
-                                            detailsHtml += `<div class="flex justify-between pl-4"><span class="text-sm text-gray-500">${opt}</span><span class="text-orange-600">$${parseFloat(value[opt]).toFixed(2)}</span></div>`;
-                                        }
+                            if (Array.isArray(item.unit)) {
+                                detailsHtml += item.unit.map(u => {
+                                    if (typeof u === 'object' && u !== null) {
+                                        // Expect {label, price}
+                                        return `<div class="flex justify-between"><span class="text-sm text-gray-700">${u.label || ''}</span><span class="text-orange-600 font-semibold">$${parseFloat(u.price).toFixed(2)}</span></div>`;
+                                    } else if (typeof u === 'string' || typeof u === 'number') {
+                                        return `<span class="text-sm text-gray-700">${u}</span>`;
                                     }
-                                }
-                            } else if (Array.isArray(item.unit)) {
-                                // Array of units (rare)
-                                detailsHtml += item.unit.map(u => `<span class="text-sm text-gray-700">${u}</span>`).join(', ');
-                            } else if (typeof item.unit === 'string' || typeof item.unit === 'number') {
-                                detailsHtml += `<span class="text-sm text-gray-700">${item.unit}</span>`;
+                                    return '';
+                                }).join('');
                             }
                             // Fallback for price/prices
                             if (!detailsHtml) {

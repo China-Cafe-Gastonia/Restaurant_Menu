@@ -77,6 +77,9 @@
                 <button id="loadMenuButton" class="bg-blue-500 text-white font-semibold py-2 px-6 rounded-full shadow-md hover:bg-blue-600 transition-colors">
                     Load Menu
                 </button>
+                <button id="publishButton" class="bg-green-500 text-white font-semibold py-2 px-6 rounded-full shadow-md hover:bg-green-600 transition-colors">
+                    Publish to Public Menu
+                </button>
             </div>
             <div id="statusMessage" class="mt-6 text-sm font-medium"></div>
         </div>
@@ -268,21 +271,18 @@
             await signOut(auth);
         });
 
-        // Upload a JSON file to Firestore
-    uploadButton.addEventListener('click', async () => {
+        // Upload a JSON file to PRIVATE dataset
+        uploadButton.addEventListener('click', async () => {
             if (!db || !auth.currentUser) {
                 statusMessage.textContent = 'You must be logged in as admin.';
                 return;
             }
-
             const file = jsonFile.files[0];
             if (!file) {
                 statusMessage.textContent = 'Please select a JSON file to upload.';
                 return;
             }
-
-            logStatus('Uploading menu...');
-
+            logStatus('Uploading menu to PRIVATE dataset...');
             try {
                 const fileReader = new FileReader();
                 fileReader.onload = async (event) => {
@@ -298,12 +298,9 @@
                     let notesInfo = null;
                     // Accept both flat array and nested format
                     if (!Array.isArray(menuData)) {
-                        // Try to extract and flatten from nested format
                         if (menuData.menu && Array.isArray(menuData.menu)) {
-                            // Save restaurant and notes for special doc
                             if (menuData.restaurant) restaurantInfo = menuData.restaurant;
                             if (menuData.notes) notesInfo = menuData.notes;
-                            // Flatten all items from all categories, preserving order and meta
                             menuData = menuData.menu.flatMap((cat, catIdx) =>
                                 (cat.items || []).map((item, itemIdx) => ({
                                     ...item,
@@ -319,21 +316,16 @@
                             return;
                         }
                     } else {
-                        // Flat array: add order fields based on array index
                         menuData = menuData.map((item, idx) => ({ ...item, categoryOrder: 0, itemOrder: idx }));
                     }
                     try {
-                        // Reference to the collection
-                        const menuRef = collection(db, `artifacts/${firebaseConfig.appId}/public/data/menu_data`);
-                        // Delete all existing documents
+                        const menuRef = collection(db, `artifacts/${firebaseConfig.appId}/private/data/menu_data_admin`);
                         const existingDocs = await getDocs(menuRef);
                         const deleteBatch = writeBatch(db);
                         existingDocs.forEach((doc) => {
                             deleteBatch.delete(doc.ref);
                         });
                         await deleteBatch.commit();
-
-                        // Add special doc for restaurant info/notes if present
                         const newBatch = writeBatch(db);
                         if (restaurantInfo || notesInfo) {
                             const infoDocRef = doc(menuRef, '_info');
@@ -342,15 +334,12 @@
                                 ...(notesInfo ? { notes: notesInfo } : {})
                             });
                         }
-                        // Add new menu item documents
                         menuData.forEach(item => {
                             const newDocRef = doc(menuRef);
                             newBatch.set(newDocRef, item);
                         });
                         await newBatch.commit();
-
-                        logStatus(`Menu uploaded successfully! Added ${menuData.length} items.`);
-                        // Immediately reload menu edit table to reflect new data
+                        logStatus(`Menu uploaded to PRIVATE dataset! Added ${menuData.length} items.`);
                         document.getElementById('loadMenuButton').click();
                     } catch (uploadError) {
                         console.error("Error uploading menu:", uploadError);
@@ -377,21 +366,19 @@
         document.getElementById('loadMenuButton').addEventListener('click', loadAndRenderMenu);
 
         async function loadAndRenderMenu() {
-            logStatus('Load Menu button clicked. Starting menu load...');
+            logStatus('Load Menu button clicked. Loading PRIVATE menu...');
             const menuContainer = document.getElementById('menuContainer');
             const loadingMsg = document.getElementById('loadingMessage');
             if (loadingMsg) loadingMsg.style.display = '';
             menuContainer.innerHTML = '';
-            // Clear editable fields
             document.getElementById('editRestaurantName').value = '';
             document.getElementById('editRestaurantAddress').value = '';
             document.getElementById('editRestaurantPhone').value = '';
             document.getElementById('editComboNote').value = '';
             document.getElementById('editLunchNote').value = '';
             document.getElementById('editHoursLines').innerHTML = '';
-
             try {
-                const menuRef = collection(db, `artifacts/${firebaseConfig.appId}/public/data/menu_data`);
+                const menuRef = collection(db, `artifacts/${firebaseConfig.appId}/private/data/menu_data_admin`);
                 const snapshot = await getDocs(menuRef);
                 let menuItems = [];
                 let infoDoc = null;
@@ -402,15 +389,11 @@
                         menuItems.push({ _id: docSnap.id, ...docSnap.data() });
                     }
                 });
-                // Sort menu items by categoryOrder, then itemOrder
                 menuItems.sort((a, b) => (a.categoryOrder - b.categoryOrder) || (a.itemOrder - b.itemOrder));
-
-                // Fill restaurant info and notes if present
                 if (infoDoc && infoDoc.restaurant) {
                     document.getElementById('editRestaurantName').value = infoDoc.restaurant.name || '';
                     document.getElementById('editRestaurantAddress').value = infoDoc.restaurant.address || infoDoc.restaurant.location || '';
                     document.getElementById('editRestaurantPhone').value = infoDoc.restaurant.phone || '';
-                    // Render hours
                     const hoursLines = document.getElementById('editHoursLines');
                     hoursLines.innerHTML = '';
                     if (infoDoc.restaurant.hours && Array.isArray(infoDoc.restaurant.hours)) {
@@ -429,14 +412,10 @@
                     document.getElementById('editComboNote').value = infoDoc.notes.combination_plate || infoDoc.notes.combo || '';
                     document.getElementById('editLunchNote').value = infoDoc.notes.lunch_special || infoDoc.notes.lunch || '';
                 }
-
-                // Group menu items by category (like index.html)
                 const groupedMenu = menuItems.reduce((acc, item) => {
                     (acc[item.category] = acc[item.category] || []).push(item);
                     return acc;
                 }, {});
-
-                // Render categories and items (card-based, index.html style, but editable)
                 for (const category in groupedMenu) {
                     const items = groupedMenu[category];
                     const firstItem = items[0] || {};
@@ -444,23 +423,19 @@
                     const note = firstItem.note || '';
                     const card = document.createElement('div');
                     card.className = 'menu-card mb-8';
-                    // Category header
                     const headerDiv = document.createElement('div');
-                    headerDiv.className = 'category-header flex items-center gap-2 mb-2';
+                    headerDiv.className = 'category-header flex items-center';
                     const catInput = document.createElement('input');
                     catInput.type = 'text';
                     catInput.value = category;
-                    catInput.className = 'text-2xl font-bold text-gray-800 bg-gray-50 rounded px-2 py-1';
+                    catInput.className = 'text-2xl font-extrabold text-gray-900 bg-gray-50 rounded px-2 py-1';
                     headerDiv.appendChild(catInput);
-                    if (chineseName) {
-                        const catChinese = document.createElement('input');
-                        catChinese.type = 'text';
-                        catChinese.value = chineseName;
-                        catChinese.className = 'text-lg text-gray-500 bg-gray-50 rounded px-2 py-1';
-                        headerDiv.appendChild(catChinese);
-                    }
+                    const catChinese = document.createElement('input');
+                    catChinese.type = 'text';
+                    catChinese.value = chineseName;
+                    catChinese.className = 'text-lg text-gray-500 bg-gray-50 rounded px-2 py-1 ml-2';
+                    headerDiv.appendChild(catChinese);
                     card.appendChild(headerDiv);
-                    // Category note
                     if (note) {
                         const catNote = document.createElement('input');
                         catNote.type = 'text';
@@ -468,7 +443,6 @@
                         catNote.className = 'w-full text-base text-yellow-700 bg-yellow-50 border-l-4 border-yellow-400 rounded-lg p-2 mb-2';
                         card.appendChild(catNote);
                     }
-                    // Items list (styled like index.html, but editable)
                     const ul = document.createElement('ul');
                     ul.className = 'space-y-4';
                     items.forEach(item => {
@@ -476,19 +450,33 @@
                         li.className = 'border-b pb-2';
                         const flexDiv = document.createElement('div');
                         flexDiv.className = 'flex-grow';
-                        // Name
                         const nameInput = document.createElement('input');
                         nameInput.type = 'text';
                         nameInput.value = item.name || '';
                         nameInput.className = 'text-lg font-semibold text-gray-800 bg-gray-50 rounded px-2 py-1 mb-1 w-full';
                         flexDiv.appendChild(nameInput);
-                        // Description
                         const descInput = document.createElement('input');
                         descInput.type = 'text';
                         descInput.value = item.description || '';
                         descInput.className = 'text-sm text-gray-500 bg-gray-50 rounded px-2 py-1 mb-1 w-full';
                         flexDiv.appendChild(descInput);
-                        // Price
+                        if (Array.isArray(item.unit)) {
+                            item.unit.forEach(opt => {
+                                const unitDiv = document.createElement('div');
+                                unitDiv.className = 'flex justify-between';
+                                const unitLabel = document.createElement('input');
+                                unitLabel.type = 'text';
+                                unitLabel.value = opt.label || '';
+                                unitLabel.className = 'text-sm text-gray-700 bg-gray-50 rounded px-2 py-1';
+                                unitDiv.appendChild(unitLabel);
+                                const unitPrice = document.createElement('input');
+                                unitPrice.type = 'text';
+                                unitPrice.value = opt.price || '';
+                                unitPrice.className = 'w-20 bg-gray-50 rounded px-2 py-1 ml-2 text-orange-600 font-semibold';
+                                unitDiv.appendChild(unitPrice);
+                                flexDiv.appendChild(unitDiv);
+                            });
+                        }
                         const priceInput = document.createElement('input');
                         priceInput.type = 'text';
                         priceInput.value = item.price || '';
@@ -500,9 +488,8 @@
                     card.appendChild(ul);
                     menuContainer.appendChild(card);
                 }
-
                 hideLoadingMessage();
-                logStatus('Menu loaded.');
+                logStatus('PRIVATE menu loaded.');
             } catch (err) {
                 hideLoadingMessage();
                 logStatus('Error loading menu: ' + (err.message || err));
@@ -514,20 +501,54 @@
             }
 
             try {
-                logStatus('Deleting menu...');
-                const menuRef = collection(db, `artifacts/${appId}/public/data/menu_data`);
+                logStatus('Deleting PRIVATE menu...');
+                const menuRef = collection(db, `artifacts/${appId}/private/data/menu_data_admin`);
                 const existingDocs = await getDocs(menuRef);
                 const deleteBatch = writeBatch(db);
                 existingDocs.forEach((doc) => {
                     deleteBatch.delete(doc.ref);
                 });
                 await deleteBatch.commit();
-                logStatus('Menu deleted successfully!');
-                // Immediately reload menu edit table to reflect deletion
+                logStatus('PRIVATE menu deleted successfully!');
                 document.getElementById('loadMenuButton').click();
             } catch (error) {
                 console.error("Error deleting menu:", error);
                 logStatus(`Error deleting menu: ${error.message}`);
+            }
+        });
+
+        // Publish button logic: copy private dataset to public
+        document.getElementById('publishButton').addEventListener('click', async () => {
+            if (!db || !auth.currentUser) {
+                logStatus('You must be logged in as admin.');
+                return;
+            }
+            try {
+                logStatus('Publishing PRIVATE menu to PUBLIC...');
+                const privateRef = collection(db, `artifacts/${appId}/private/data/menu_data_admin`);
+                const publicRef = collection(db, `artifacts/${appId}/public/data/menu_data`);
+                // Get all private docs
+                const privateDocs = await getDocs(privateRef);
+                // Delete all public docs
+                const publicDocs = await getDocs(publicRef);
+                const deleteBatch = writeBatch(db);
+                publicDocs.forEach((doc) => {
+                    deleteBatch.delete(doc.ref);
+                });
+                await deleteBatch.commit();
+                logStatus('All old public menu data deleted.');
+                // Write all private docs to public
+                const publishBatch = writeBatch(db);
+                privateDocs.forEach((docSnap) => {
+                    const data = docSnap.data();
+                    const id = docSnap.id;
+                    const newDocRef = id === '_info' ? doc(publicRef, '_info') : doc(publicRef);
+                    publishBatch.set(newDocRef, data);
+                });
+                await publishBatch.commit();
+                logStatus('Publish complete! Public menu updated.');
+            } catch (err) {
+                logStatus('Error publishing menu: ' + (err.message || err));
             }
         });
 </script>
