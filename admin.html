@@ -57,7 +57,8 @@
             <div class="flex justify-between items-center mb-4">
                 <h2 class="text-2xl font-semibold">Menu Management</h2>
                 <div class="flex gap-2 items-center">
-                    <button id="deleteButton" class="bg-red-500 text-white font-semibold py-1 px-4 rounded-full shadow hover:bg-red-600">Reset</button>
+                    <button id="deleteButton" class="bg-red-500 text-white font-semibold py-1 px-4 rounded-full shadow hover:bg-red-600">Reset Private</button>
+                    <button id="deletePublicButton" class="bg-red-400 text-white font-semibold py-1 px-4 rounded-full shadow hover:bg-red-500">Reset Public</button>
                     <button id="logoutButton" class="bg-gray-300 text-gray-800 font-semibold py-1 px-4 rounded-full shadow hover:bg-gray-400">Logout</button>
                 </div>
             </div>
@@ -207,7 +208,8 @@
         const adminCard = document.getElementById('adminCard');
         const uploadButton = document.getElementById('uploadButton');
         const deleteButton = document.getElementById('deleteButton');
-        const logoutButton = document.getElementById('logoutButton');
+    const logoutButton = document.getElementById('logoutButton');
+    const deletePublicButton = document.getElementById('deletePublicButton');
         const statusMessage = document.getElementById('statusMessage');
         const jsonFile = document.getElementById('jsonFile');
 
@@ -353,8 +355,29 @@
             }
         });
 
-        // Delete the entire menu from Firestore
-        deleteButton.addEventListener('click', async () => {
+    // Delete the entire PRIVATE menu from Firestore
+    deleteButton.addEventListener('click', async () => {
+        // Delete the entire PUBLIC menu from Firestore
+        deletePublicButton.addEventListener('click', async () => {
+            if (!db || !auth.currentUser) {
+                statusMessage.textContent = 'You must be logged in as admin.';
+                return;
+            }
+            try {
+                logStatus('Deleting PUBLIC menu...');
+                const menuRef = collection(db, `artifacts/${appId}/public/data/menu_data`);
+                const existingDocs = await getDocs(menuRef);
+                const deleteBatch = writeBatch(db);
+                existingDocs.forEach((doc) => {
+                    deleteBatch.delete(doc.ref);
+                });
+                await deleteBatch.commit();
+                logStatus('PUBLIC menu deleted successfully!');
+            } catch (error) {
+                console.error("Error deleting public menu:", error);
+                logStatus(`Error deleting public menu: ${error.message}`);
+            }
+        });
 
         // Hide loading message after menu loads (if menu is loaded elsewhere, this should be called after render)
         function hideLoadingMessage() {
