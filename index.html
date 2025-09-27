@@ -359,11 +359,24 @@
                     if (typeof hours === 'string') {
                         return `<span class='block'><b>Hours:</b> ${hours}</span>`;
                     }
+                    // If admin saved hours as an array of lines, render them directly
+                    if (Array.isArray(hours)) {
+                        return `<div class="flex flex-col items-center justify-center mt-2 mb-2">
+                            <div class="flex items-center justify-center mb-1">
+                                <span class="hours-icon">🕒</span>
+                                <span class="hours-title text-lg" style="font-size:1.2rem;"><b>Hours:</b></span>
+                            </div>
+                            <div class="flex flex-col items-center">
+                                ${hours.map(line => `<div class="text-base" style="margin-bottom:2px;">${String(line)}</div>`).join('')}
+                            </div>
+                        </div>`;
+                    }
+                    // Otherwise expect an object keyed by weekday names
                     const days = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
                     const groups = [];
                     let last = null, group = [];
                     for (const day of days) {
-                        const h = hours[day];
+                        const h = hours ? hours[day] : null;
                         const key = h && h.open && h.close ? `${h.open}-${h.close}` : "Closed";
                         if (!last || last !== key) {
                             if (group.length) groups.push({days: group, key: last});
@@ -384,7 +397,7 @@
                                 const label = g.days.length > 1
                                     ? `<b>${g.days[0].slice(0,3)} - ${g.days[g.days.length-1].slice(0,3)}:</b>`
                                     : `<b>${g.days[0].slice(0,3)}:</b>`;
-                                return `<div class="text-base" style="margin-bottom:2px;">${label} ${g.key === 'Closed' ? '<span style=\"color:#b91c1c;font-weight:600;\">Closed</span>' : g.key.replace('-', ' - ')}</div>`;
+                                return `<div class="text-base" style="margin-bottom:2px;">${label} ${g.key === 'Closed' ? '<span style="color:#b91c1c;font-weight:600;">Closed</span>' : g.key.replace('-', ' - ')}</div>`;
                             }).join('')}
                         </div>
                     </div>`;
