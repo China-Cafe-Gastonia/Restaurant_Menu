@@ -403,6 +403,11 @@
             try {
                 const menuRef = collection(db, `artifacts/${firebaseConfig.appId}/private/data/menu_data_admin`);
                 const snapshot = await getDocs(menuRef);
+                if (snapshot.empty) {
+                    hideLoadingMessage();
+                    logStatus('No private menu data found.');
+                    return;
+                }
                 let menuItems = [];
                 let infoDoc = null;
                 snapshot.forEach(docSnap => {
@@ -486,16 +491,27 @@
                         if (Array.isArray(item.unit)) {
                             item.unit.forEach(opt => {
                                 const unitDiv = document.createElement('div');
-                                unitDiv.className = 'flex justify-between';
-                                const unitLabel = document.createElement('input');
-                                unitLabel.type = 'text';
-                                unitLabel.value = opt.label || '';
-                                unitLabel.className = 'text-sm text-gray-700 bg-gray-50 rounded px-2 py-1';
-                                unitDiv.appendChild(unitLabel);
+                                unitDiv.className = 'flex gap-2 mb-1';
+                                // Size
+                                const sizeInput = document.createElement('input');
+                                sizeInput.type = 'text';
+                                sizeInput.value = opt.size || '';
+                                sizeInput.placeholder = 'Size';
+                                sizeInput.className = 'text-sm text-gray-700 bg-gray-50 rounded px-2 py-1 w-28';
+                                unitDiv.appendChild(sizeInput);
+                                // Option
+                                const optionInput = document.createElement('input');
+                                optionInput.type = 'text';
+                                optionInput.value = opt.option || '';
+                                optionInput.placeholder = 'Option';
+                                optionInput.className = 'text-sm text-gray-700 bg-gray-50 rounded px-2 py-1 w-40';
+                                unitDiv.appendChild(optionInput);
+                                // Price
                                 const unitPrice = document.createElement('input');
                                 unitPrice.type = 'text';
                                 unitPrice.value = opt.price || '';
-                                unitPrice.className = 'w-20 bg-gray-50 rounded px-2 py-1 ml-2 text-orange-600 font-semibold';
+                                unitPrice.placeholder = 'Price';
+                                unitPrice.className = 'w-20 bg-gray-50 rounded px-2 py-1 text-orange-600 font-semibold';
                                 unitDiv.appendChild(unitPrice);
                                 flexDiv.appendChild(unitDiv);
                             });
@@ -552,6 +568,10 @@
                 const publicRef = collection(db, `artifacts/${appId}/public/data/menu_data`);
                 // Get all private docs
                 const privateDocs = await getDocs(privateRef);
+                if (privateDocs.empty) {
+                    logStatus('No private menu data to publish. Aborting.');
+                    return;
+                }
                 // Delete all public docs
                 const publicDocs = await getDocs(publicRef);
                 const deleteBatch = writeBatch(db);
