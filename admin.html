@@ -410,6 +410,32 @@
             }
             return copy;
         }
+
+        // Build admin-friendly HTML for an item with editable fields
+        function buildAdminItemHtml(item) {
+            // item is normalized (unit array of {size, option, price})
+            const name = item.name || '';
+            const desc = item.description || '';
+            const unitHtml = (Array.isArray(item.unit) ? item.unit : []).map(u => {
+                if (u && typeof u === 'object') {
+                    return `
+                        <div class="flex gap-2 mb-1">
+                            <input type="text" class="text-sm text-gray-700 bg-gray-50 rounded px-2 py-1 w-28" value="${u.size || ''}" placeholder="Size" />
+                            <input type="text" class="text-sm text-gray-700 bg-gray-50 rounded px-2 py-1 w-40" value="${u.option || ''}" placeholder="Option" />
+                            <input type="text" class="w-20 bg-gray-50 rounded px-2 py-1 text-orange-600 font-semibold" value="${u.price || ''}" placeholder="Price" />
+                        </div>`;
+                }
+                return `<div class="text-sm text-gray-700">${String(u)}</div>`;
+            }).join('');
+            return `
+                <div class="border-b pb-2">
+                    <div class="flex-grow">
+                        <input type="text" class="text-lg font-semibold text-gray-800 bg-gray-50 rounded px-2 py-1 mb-1 w-full" value="${name}" />
+                        <input type="text" class="text-sm text-gray-500 bg-gray-50 rounded px-2 py-1 mb-1 w-full" value="${desc}" />
+                        ${unitHtml}
+                    </div>
+                </div>`;
+        }
         // UI elements
         const loginCard = document.getElementById('loginCard');
         const loginForm = document.getElementById('loginForm');
@@ -687,57 +713,8 @@
                 }
                 const ul = document.createElement('ul');
                 ul.className = 'space-y-4';
-                items.forEach(item => {
-                    const li = document.createElement('li');
-                    li.className = 'border-b pb-2';
-                    const flexDiv = document.createElement('div');
-                    flexDiv.className = 'flex-grow';
-                    const nameInput = document.createElement('input');
-                    nameInput.type = 'text';
-                    nameInput.value = item.name || '';
-                    nameInput.className = 'text-lg font-semibold text-gray-800 bg-gray-50 rounded px-2 py-1 mb-1 w-full';
-                    flexDiv.appendChild(nameInput);
-                    const descInput = document.createElement('input');
-                    descInput.type = 'text';
-                    descInput.value = item.description || '';
-                    descInput.className = 'text-sm text-gray-500 bg-gray-50 rounded px-2 py-1 mb-1 w-full';
-                    flexDiv.appendChild(descInput);
-                    if (Array.isArray(item.unit)) {
-                        item.unit.forEach(opt => {
-                            const unitDiv = document.createElement('div');
-                            unitDiv.className = 'flex gap-2 mb-1';
-                            // Size
-                            const sizeInput = document.createElement('input');
-                            sizeInput.type = 'text';
-                            sizeInput.value = opt.size || '';
-                            sizeInput.placeholder = 'Size';
-                            sizeInput.className = 'text-sm text-gray-700 bg-gray-50 rounded px-2 py-1 w-28';
-                            unitDiv.appendChild(sizeInput);
-                            // Option
-                            const optionInput = document.createElement('input');
-                            optionInput.type = 'text';
-                            optionInput.value = opt.option || '';
-                            optionInput.placeholder = 'Option';
-                            optionInput.className = 'text-sm text-gray-700 bg-gray-50 rounded px-2 py-1 w-40';
-                            unitDiv.appendChild(optionInput);
-                            // Price
-                            const unitPrice = document.createElement('input');
-                            unitPrice.type = 'text';
-                            unitPrice.value = opt.price || '';
-                            unitPrice.placeholder = 'Price';
-                            unitPrice.className = 'w-20 bg-gray-50 rounded px-2 py-1 text-orange-600 font-semibold';
-                            unitDiv.appendChild(unitPrice);
-                            flexDiv.appendChild(unitDiv);
-                        });
-                    }
-                    const priceInput = document.createElement('input');
-                    priceInput.type = 'text';
-                    priceInput.value = item.price || '';
-                    priceInput.className = 'w-24 bg-gray-50 rounded px-2 py-1 ml-2 text-orange-600 font-semibold';
-                    flexDiv.appendChild(priceInput);
-                    li.appendChild(flexDiv);
-                    ul.appendChild(li);
-                });
+                // Use helper to produce admin-friendly HTML for each item
+                ul.innerHTML = items.map(it => buildAdminItemHtml(it)).join('');
                 card.appendChild(ul);
                 menuContainer.appendChild(card);
             }

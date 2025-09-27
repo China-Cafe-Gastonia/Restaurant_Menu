@@ -188,6 +188,55 @@
             return '';
         }
 
+        // Build details HTML for an item: group units by size and render options per-size
+        function buildDetailsHtml(item) {
+            // Units take precedence
+            if (Array.isArray(item.unit) && item.unit.length) {
+                // Group by size (stringify undefined sizes as empty string)
+                const groups = item.unit.reduce((acc, u) => {
+                    let key = '';
+                    if (u && typeof u === 'object') key = String(u.size || '');
+                    else key = String(u || '');
+                    (acc[key] = acc[key] || []).push(u);
+                    return acc;
+                }, {});
+                const html = Object.entries(groups).map(([size, opts]) => {
+                    const sizeLabel = size || '';
+                    const optsHtml = opts.map(u => {
+                        if (u && typeof u === 'object') {
+                            const parts = [];
+                            // show option if different from size
+                            if (u.option) parts.push(`<span class="text-sm text-gray-700">${u.option}</span>`);
+                            const priceHtml = `<span class="text-orange-600 font-semibold">${formatPrice(u.price)}</span>`;
+                            // If there's an option, list it on its own row; otherwise show price alongside size
+                            if (u.option) {
+                                return `<div class="flex justify-between"><div>${parts.join(' - ')}</div>${priceHtml}</div>`;
+                            }
+                            return `<div class="flex justify-between"><div class="text-sm text-gray-700">${sizeLabel}</div>${priceHtml}</div>`;
+                        } else {
+                            return `<div class="text-sm text-gray-700">${String(u)}</div>`;
+                        }
+                    }).join('');
+                    // If any opt had an explicit option, render size as a small header
+                    const hasOptions = opts.some(o => o && typeof o === 'object' && o.option);
+                    return `<div class="mb-1">${sizeLabel ? `<div class="text-sm font-semibold text-gray-800">${sizeLabel}</div>` : ''}${optsHtml}</div>`;
+                }).join('');
+                return `<div class="space-y-1">${html}</div>`;
+            }
+            // Fallbacks: price / prices
+            if (typeof item.price !== 'undefined') {
+                return `<div class="space-y-1"><span class="text-orange-600 font-semibold">${formatPrice(item.price)}</span></div>`;
+            }
+            if (item.prices && typeof item.prices === 'object') {
+                const html = Object.entries(item.prices).map(([k, v]) => `<div class="flex justify-between"><span class="text-sm text-gray-500">${k}</span><span class="text-orange-600">${formatPrice(v)}</span></div>`).join('');
+                return `<div class="space-y-1">${html}</div>`;
+            }
+            if (typeof item.prices === 'string' || typeof item.prices === 'number') {
+                return `<div class="space-y-1"><span class="text-orange-600 font-semibold">${formatPrice(item.prices)}</span></div>`;
+            }
+            return '';
+        }
+
         // IMPORTANT: REPLACE WITH YOUR OWN FIREBASE CONFIGURATION
         const firebaseConfig = {
             apiKey: "AIzaSyBEFimTV6zygaMki5VZQ9cqdcFTfPMaOj0",
@@ -348,38 +397,13 @@
                     ${note ? `<div class='category-note'>${note}</div>` : ''}
                     <ul class="space-y-4">
                         ${groupedMenu[category].map(item => {
-                            // Only support array-based unit fields
-                            let detailsHtml = '';
-                            if (Array.isArray(item.unit)) {
-                                detailsHtml += item.unit.map(u => {
-                                    if (typeof u === 'object' && u !== null) {
-                                        // Show size and option if present
-                                        let label = '';
-                                        if (u.size) label += `<span>${u.size}</span>`;
-                                        if (u.option) label += label ? ` - <span>${u.option}</span>` : `<span>${u.option}</span>`;
-                                        return `<div class="flex justify-between"><span class="text-sm text-gray-700">${label}</span><span class="text-orange-600 font-semibold">${formatPrice(u.price)}</span></div>`;
-                                    } else if (typeof u === 'string' || typeof u === 'number') {
-                                        return `<span class="text-sm text-gray-700">${u}</span>`;
-                                    }
-                                    return '';
-                                }).join('');
-                            }
-                            // Fallback for price/prices
-                            if (!detailsHtml) {
-                                if (typeof item.price !== 'undefined') {
-                                    detailsHtml = `<span class="text-orange-600 font-semibold">${formatPrice(item.price)}</span>`;
-                                } else if (item.prices && typeof item.prices === 'object') {
-                                    detailsHtml = Object.entries(item.prices).map(([k, v]) => `<div class="flex justify-between"><span class="text-sm text-gray-500">${k}</span><span class="text-orange-600">${formatPrice(v)}</span></div>`).join('');
-                                } else if (typeof item.prices === 'string' || typeof item.prices === 'number') {
-                                    detailsHtml = `<span class="text-orange-600 font-semibold">${formatPrice(item.prices)}</span>`;
-                                }
-                            }
+                            const details = buildDetailsHtml(item);
                             return `
                             <li class="border-b pb-2">
                                 <div class="flex-grow">
                                     <h3 class="text-lg font-semibold text-gray-800">${item.name}</h3>
                                     <p class="text-sm text-gray-500 mb-1">${item.description || ''}</p>
-                                    ${detailsHtml ? `<div class="space-y-1">${detailsHtml}</div>` : ''}
+                                    ${details ? details : ''}
                                 </div>
                             </li>
                             `;
