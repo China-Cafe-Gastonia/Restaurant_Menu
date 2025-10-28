@@ -248,59 +248,15 @@
             });
         }
     });
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-app.js";
-    import { getFirestore, collection, getDocs, writeBatch, doc } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js";
-    import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-auth.js";
-
-        // IMPORTANT: REPLACE WITH YOUR OWN FIREBASE CONFIGURATION
-        const firebaseConfig = {
-            apiKey: "AIzaSyBEFimTV6zygaMki5VZQ9cqdcFTfPMaOj0",
-            authDomain: "china-cafe-menu.firebaseapp.com",
-            projectId: "china-cafe-menu",
-            storageBucket: "china-cafe-menu.firebasestorage.app",
-            messagingSenderId: "233511471732",
-            appId: "1:233511471732:web:e2298d04ff590dcdd6df21"
-        };
-        const appId = firebaseConfig.appId;
-
-
-        // Initialize Firebase
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-
-        const auth = getAuth(app);
-        // Helper: flatten any nested `unit` arrays into array of objects {size, option, price}
-        function flattenUnitField(unit) {
-            if (!Array.isArray(unit)) return unit;
-            // Already flattened if first element is object with size/price
-            if (unit.length > 0 && typeof unit[0] === 'object' && (unit[0].size !== undefined || unit[0].price !== undefined)) {
-                return unit;
-            }
-            const out = [];
-            unit.forEach(entry => {
-                if (!Array.isArray(entry)) {
-                    // scalar entry -> treat as size only
-                    out.push({ size: entry, option: null, price: null });
-                    return;
-                }
-                const size = entry[0];
-                const second = entry[1];
-                if (Array.isArray(second)) {
-                    // second is list of [option, price]
-                    second.forEach(opt => {
-                        if (Array.isArray(opt)) {
-                            out.push({ size: size, option: opt[0], price: opt[1] });
-                        } else {
-                            out.push({ size: size, option: opt, price: null });
-                        }
-                    });
-                } else {
-                    // second is scalar price
-                    out.push({ size: size, option: null, price: second });
-                }
-            });
-            return out;
-        }
+    
+    // Import Firebase configuration and utilities
+    import { db, auth, appId } from './js/firebase-config.js';
+    import { collection, getDocs, writeBatch, doc } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js";
+    import { signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-auth.js";
+    
+    // Import utility functions
+    import { flattenUnitField, normalizeWholeDoc, normalizeMenuItem } from './js/utils/normalize.js';
+    import { formatPrice, to12Hour, normalizeIngredientToken, normalizeIngredientName } from './js/utils/formatters.js';
 
     // Keep last parsed/uploaded or loaded doc in memory so "Normalize & Download" can use it
     let lastParsedDoc = null;
@@ -327,37 +283,8 @@
         });
 
         // Normalize a full menu document (either the original backup shape or the Firestore-friendly flattened list)
-        function normalizeWholeDoc(doc) {
-            if (!doc) return doc;
-            // If doc has top-level 'menu' array (original backup shape) -> transform its items
-            const out = JSON.parse(JSON.stringify(doc)); // deep copy
-            if (Array.isArray(out.menu)) {
-                out.menu = out.menu.map(cat => {
-                    const newCat = { ...cat };
-                    if (Array.isArray(newCat.items)) {
-                        newCat.items = newCat.items.map(it => {
-                            const copy = { ...it };
-                            if (copy.unit) copy.unit = flattenUnitField(copy.unit);
-                            return copy;
-                        });
-                    }
-                    return newCat;
-                });
-                return out;
-            }
-            // Else if it's the Firestore-flattened list (array of items)
-            if (Array.isArray(out)) {
-                return out.map(i => normalizeMenuItem(i));
-            }
-            // Else if it's an object that contains menu items as properties (like {restaurant, notes, menu: [...]})
-            if (Array.isArray(out.menuData)) {
-                out.menuData = out.menuData.map(i => normalizeMenuItem(i));
-                return out;
-            }
-            // Fallback: try to normalize any top-level fields that look like items
-            return out;
-        }
-
+        // Note: normalizeWholeDoc is now imported from js/utils/normalize.js
+        
         function downloadJson(obj, filename) {
             const dataStr = JSON.stringify(obj, null, 2);
             const blob = new Blob([dataStr], { type: 'application/json' });
@@ -451,33 +378,9 @@
             });
         });
 
-        function normalizeMenuItem(item) {
-            if (!item || typeof item !== 'object') return item;
-            try {
-                const skip = localStorage.getItem(SKIP_KEY) === '1';
-                if (skip) return item;
-            } catch (e) {
-                // fall through to normalization
-            }
-            const copy = { ...item };
-            if (copy.unit) {
-                try {
-                    copy.unit = flattenUnitField(copy.unit);
-                } catch (e) {
-                    // fallback: leave original unit
-                    console.warn('Failed to flatten unit for item', item, e);
-                }
-            }
-            return copy;
-        }
+        // Note: normalizeMenuItem is now imported from js/utils/normalize.js
 
-        // Normalize ingredient name to Title Case (e.g., "water chestnut" -> "Water Chestnut")
-        function normalizeIngredientName(raw) {
-            if (!raw) return '';
-            return String(raw).trim().split(/\s+/).map(word => {
-                return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
-            }).join(' ');
-        }
+        // Note: normalizeIngredientName is now imported from js/utils/formatters.js
 
         // Build admin-friendly HTML for an item with editable fields
         function buildAdminItemHtml(item) {
