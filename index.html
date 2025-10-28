@@ -160,7 +160,7 @@
             document.getElementById('restaurantNotes').innerHTML = '';
         }
 
-        async function listenForMenuUpdates() {
+        function renderMenu(menuItems) {
             const menuContainer = document.getElementById('menuContainer');
             menuContainer.innerHTML = '';
             // Separate _info doc and menu items
