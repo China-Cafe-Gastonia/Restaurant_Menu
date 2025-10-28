@@ -1,0 +1,204 @@
+/* 
+ * Common Styles - Shared between public menu and admin
+ * Extracted from inline styles in HTML files
+ * Date: 2025-10-27
+ */
+
+/* Font Import */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+
+/* Base Styles */
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: #f3f4f6;
+}
+
+/* Container */
+.container {
+    max-width: 800px;
+    margin: auto;
+    padding: 2rem;
+}
+
+/* Cards */
+.card, .menu-card {
+    background-color: white;
+    border-radius: 1rem;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    padding: 2rem;
+    margin-bottom: 2rem;
+}
+
+/* Category Headers */
+.category-header {
+    display: flex;
+    align-items: center;
+    font-size: 2rem;
+    font-weight: 800;
+    color: #1e293b;
+    background: linear-gradient(90deg, #fef9c3 0%, #f0fdf4 100%);
+    border-left: 8px solid #fbbf24;
+    border-radius: 0.5rem 0 0 0.5rem;
+    padding: 0.5rem 1rem;
+    margin-bottom: 0.5rem;
+    margin-top: -1rem;
+}
+
+.category-chinese {
+    font-size: 1.25rem;
+    color: #64748b;
+    margin-left: 1rem;
+    font-weight: 600;
+}
+
+.category-note {
+    margin-bottom: 0.5rem;
+    color: #2563eb;
+    font-size: 1rem;
+}
+
+/* Restaurant Name */
+#restaurantName {
+    font-size: 2.75rem;
+    font-weight: 900;
+    color: #be123c;
+    letter-spacing: 1px;
+    text-shadow: 0 2px 8px #fca5a5;
+}
+
+/* Hours Block */
+.hours-block {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    margin-top: 0.5rem;
+    margin-bottom: 0.5rem;
+    width: 100%;
+}
+
+.hours-lines {
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+    align-items: center;
+}
+
+.hours-icon {
+    font-size: 1.3rem;
+    margin-right: 0.5rem;
+    margin-top: 0.1rem;
+}
+
+.hours-title {
+    font-weight: 900;
+    color: #2563eb;
+    margin-right: 0.5rem;
+}
+
+/* Important Note Boxes */
+.important-note-box {
+    display: flex;
+    align-items: flex-start;
+    background: linear-gradient(90deg, #fef9c3 0%, #f0fdf4 100%);
+    border-left: 8px solid #fbbf24;
+    border-radius: 0.75rem;
+    padding: 1rem 1.25rem;
+    margin-bottom: 1rem;
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: #b91c1c;
+    box-shadow: 0 2px 8px 0 #fbbf2433;
+}
+
+.important-note-icon {
+    font-size: 1.6rem;
+    margin-right: 0.75rem;
+    margin-top: 0.1rem;
+}
+
+.important-note-title {
+    color: #b91c1c;
+    font-weight: 900;
+    margin-right: 0.5rem;
+}
+
+.important-note-text {
+    color: #1e293b;
+    font-weight: 600;
+}
+
+/* Accessibility - Skip to content */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+}
+
+.sr-only:focus,
+.focus\:not-sr-only:focus {
+    position: static;
+    width: auto;
+    height: auto;
+    padding: 0.5rem 1rem;
+    margin: 0;
+    overflow: visible;
+    clip: auto;
+    white-space: normal;
+    background-color: #3b82f6;
+    color: white;
+    font-weight: 600;
+    z-index: 9999;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 640px) {
+    .container {
+        padding: 1rem;
+    }
+    
+    #restaurantName {
+        font-size: 2rem !important;
+    }
+    
+    .category-header {
+        font-size: 1.5rem !important;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .category-chinese {
+        margin-left: 0;
+        margin-top: 0.25rem;
+    }
+    
+    .hours-block {
+        font-size: 0.875rem;
+    }
+    
+    .important-note-box {
+        font-size: 1rem;
+    }
+}
+
+/* Print Styles */
+@media print {
+    body {
+        background-color: white;
+    }
+    
+    .card, .menu-card {
+        box-shadow: none;
+        border: 1px solid #e5e7eb;
+    }
+    
+    /* Hide admin-specific elements when printing */
+    button, .no-print {
+        display: none !important;
+    }
+}
