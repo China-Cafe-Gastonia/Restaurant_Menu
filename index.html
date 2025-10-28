@@ -32,59 +32,18 @@
     </div>
     
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-app.js";
-        import { getFirestore, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js";
-
-        // Helper: flatten any nested `unit` arrays into array of objects {size, option, price}
-        function flattenUnitField(unit) {
-            if (!Array.isArray(unit)) return unit;
-            if (unit.length > 0 && typeof unit[0] === 'object' && (unit[0].size !== undefined || unit[0].price !== undefined)) {
-                return unit; // already flattened
-            }
-            const out = [];
-            unit.forEach(entry => {
-                if (!Array.isArray(entry)) {
-                    out.push({ size: entry, option: null, price: null });
-                    return;
-                }
-                const size = entry[0];
-                const second = entry[1];
-                if (Array.isArray(second)) {
-                    second.forEach(opt => {
-                        if (Array.isArray(opt)) {
-                            out.push({ size: size, option: opt[0], price: opt[1] });
-                        } else {
-                            out.push({ size: size, option: opt, price: null });
-                        }
-                    });
-                } else {
-                    out.push({ size: size, option: null, price: second });
-                }
-            });
-            return out;
-        }
-
-        function normalizeMenuItem(item) {
-            if (!item || typeof item !== 'object') return item;
-            const copy = { ...item };
-            if (copy.unit) {
-                try {
-                    copy.unit = flattenUnitField(copy.unit);
-                } catch (e) {
-                    console.warn('Failed to flatten unit for item', item, e);
-                }
-            }
-            return copy;
-        }
+        // Import Firebase configuration
+        import { db, appId } from './js/firebase-config.js';
+        import { collection, onSnapshot } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js";
+        
+        // Import utility functions
+        import { normalizeMenuItem } from './js/utils/normalize.js';
+        import { formatPrice, to12Hour, normalizeIngredientToken } from './js/utils/formatters.js';
 
         // Filtering state for public page
         let _cachedMenuItems = [];
         const ingredientFilters = new Set();
         let spicyOnlyFilter = false;
-
-        function normalizeIngredientToken(s) {
-            return String(s || '').trim().toLowerCase();
-        }
 
         function renderFilterBar(menuDocs) {
             // Collect unique ingredients
@@ -135,13 +94,6 @@
                     renderMenu(_cachedMenuItems);
                 });
             }
-        }
-
-        function formatPrice(val) {
-            if (val === null || val === undefined || val === '') return '';
-            const n = Number(val);
-            if (Number.isFinite(n)) return `$${n.toFixed(2)}`;
-            return '';
         }
 
         // Build details HTML for an item: group units by size and render options per-size
@@ -197,18 +149,8 @@
             return '';
         }
 
-        // IMPORTANT: REPLACE WITH YOUR OWN FIREBASE CONFIGURATION
-        const firebaseConfig = {
-            apiKey: "AIzaSyBEFimTV6zygaMki5VZQ9cqdcFTfPMaOj0",
-            authDomain: "china-cafe-menu.firebaseapp.com",
-            projectId: "china-cafe-menu",
-            storageBucket: "china-cafe-menu.firebasestorage.app",
-            messagingSenderId: "233511471732",
-            appId: "1:233511471732:web:e2298d04ff590dcdd6df21",
-        };
-        const appId = firebaseConfig.appId;
-
-        let db;
+        // Firebase already initialized in firebase-config.js
+        // db and appId are imported at the top
 
         async function fetchRestaurantData() {
             // Only fetch restaurant info/notes from Firestore in the future, or remove this if not needed
@@ -218,18 +160,7 @@
             document.getElementById('restaurantNotes').innerHTML = '';
         }
 
-        async function initializeFirebase() {
-            try {
-                const app = initializeApp(firebaseConfig);
-                db = getFirestore(app);
-                console.log("Firebase initialized successfully.");
-            } catch (error) {
-                console.error("Failed to connect to Firebase:", error);
-                document.getElementById('loadingMessage').textContent = 'Failed to connect to Firebase. Check console for details.';
-            }
-        }
-
-        function renderMenu(menuItems) {
+        async function listenForMenuUpdates() {
             const menuContainer = document.getElementById('menuContainer');
             menuContainer.innerHTML = '';
             // Separate _info doc and menu items
@@ -251,25 +182,12 @@
             if (restaurant) {
                 nameEl.textContent = restaurant.name || '';
                 // ...existing code for hours and info rendering...
-                // Convert HH:MM (24-hour) to 12-hour format with am/pm
-                function to12hr(t) {
-                    if (!t) return '';
-                    const s = String(t).trim();
-                    const m = s.match(/^(\d{1,2}):(\d{2})$/);
-                    if (!m) return s;
-                    let hh = parseInt(m[1], 10);
-                    const mm = m[2];
-                    const ampm = hh >= 12 ? 'pm' : 'am';
-                    hh = hh % 12;
-                    if (hh === 0) hh = 12;
-                    return `${hh}:${mm} ${ampm}`;
-                }
-
+                
                 // Replace any HH:MM tokens in a string with 12-hour formatted tokens
                 function formatTimeString(s) {
                     if (s === null || s === undefined) return s;
                     // Only replace bare HH:MM occurrences that are NOT already followed by am/pm
-                    return String(s).replace(/(\d{1,2}:\d{2})(?!\s*(?:am|pm))/gi, (m) => to12hr(m));
+                    return String(s).replace(/(\d{1,2}:\d{2})(?!\s*(?:am|pm))/gi, (m) => to12Hour(m));
                 }
 
                 function formatHours(hours) {
@@ -294,7 +212,7 @@
                     let last = null, group = [];
                     for (const day of days) {
                         const h = hours ? hours[day] : null;
-                        const key = (h && (h.open || h.close)) ? `${h.open ? to12hr(h.open) : ''}-${h.close ? to12hr(h.close) : ''}` : "Closed";
+                        const key = (h && (h.open || h.close)) ? `${h.open ? to12Hour(h.open) : ''}-${h.close ? to12Hour(h.close) : ''}` : "Closed";
                         if (!last || last !== key) {
                             if (group.length) groups.push({days: group, key: last});
                             group = [day];
@@ -433,12 +351,7 @@
         }
 
         async function listenForMenuUpdates() {
-            if (!db) {
-                console.log("Database not initialized, retrying...");
-                await new Promise(resolve => setTimeout(resolve, 500));
-                return listenForMenuUpdates();
-            }
-
+            // db is already initialized from firebase-config.js import
             const menuRef = collection(db, `artifacts/${appId}/public/data/menu_data`);
             onSnapshot(menuRef, (querySnapshot) => {
                 // If using Firestore, expect flat array
@@ -457,7 +370,7 @@
         }
 
         window.onload = async () => {
-            await initializeFirebase();
+            // Firebase already initialized in firebase-config.js
             await fetchRestaurantData();
             listenForMenuUpdates();
         };
