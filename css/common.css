@@ -31,10 +31,11 @@ body {
 
 /* Menu items list - add indentation */
 .menu-card ul {
-    padding-left: 1.5rem;
+    padding-left: 2rem !important;
+    margin-left: 1rem !important;
 }
 
-.menu-card li {
+.menu-card ul li {
     margin-left: 0;
     padding-left: 0;
 }
