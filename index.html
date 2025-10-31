@@ -471,36 +471,40 @@
             const scrollToTopBtn = document.getElementById('scrollToTop');
             
             function openSidebar() {
+                if (!categoryNav || !overlay) return;
                 categoryNav.classList.remove('-translate-x-full');
                 categoryNav.classList.add('translate-x-0');
                 overlay.classList.remove('hidden');
             }
             
             function closeSidebarFunc() {
+                if (!categoryNav || !overlay) return;
                 categoryNav.classList.remove('translate-x-0');
                 categoryNav.classList.add('-translate-x-full');
                 overlay.classList.add('hidden');
             }
             
             // Scroll to top functionality
-            window.addEventListener('scroll', () => {
-                if (window.pageYOffset > 300) {
-                    scrollToTopBtn.classList.add('visible');
-                } else {
-                    scrollToTopBtn.classList.remove('visible');
-                }
-            });
-            
-            scrollToTopBtn.addEventListener('click', () => {
-                window.scrollTo({
-                    top: 0,
-                    behavior: 'smooth'
+            if (scrollToTopBtn) {
+                window.addEventListener('scroll', () => {
+                    if (window.pageYOffset > 300) {
+                        scrollToTopBtn.classList.add('visible');
+                    } else {
+                        scrollToTopBtn.classList.remove('visible');
+                    }
                 });
-            });
+                
+                scrollToTopBtn.addEventListener('click', () => {
+                    window.scrollTo({
+                        top: 0,
+                        behavior: 'smooth'
+                    });
+                });
+            }
             
-            mobileToggle.addEventListener('click', openSidebar);
-            closeSidebar.addEventListener('click', closeSidebarFunc);
-            overlay.addEventListener('click', closeSidebarFunc);
+            if (mobileToggle) mobileToggle.addEventListener('click', openSidebar);
+            if (closeSidebar) closeSidebar.addEventListener('click', closeSidebarFunc);
+            if (overlay) overlay.addEventListener('click', closeSidebarFunc);
         };
     </script>
 </body>

@@ -29,6 +29,16 @@ body {
     margin-bottom: 2rem;
 }
 
+/* Menu items list - add indentation */
+.menu-card ul {
+    padding-left: 1.5rem;
+}
+
+.menu-card li {
+    margin-left: 0;
+    padding-left: 0;
+}
+
 /* Category Headers */
 .category-header {
     display: flex;
