@@ -202,3 +202,39 @@ body {
         display: none !important;
     }
 }
+
+/* Category Navigation Sidebar */
+#categoryNav {
+    scrollbar-width: thin;
+    scrollbar-color: #cbd5e1 #f1f5f9;
+}
+
+#categoryNav::-webkit-scrollbar {
+    width: 6px;
+}
+
+#categoryNav::-webkit-scrollbar-track {
+    background: #f1f5f9;
+}
+
+#categoryNav::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 3px;
+}
+
+#categoryNav::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}
+
+/* Smooth scrolling for anchor links */
+html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 100px; /* Account for sticky header */
+}
+
+/* Active category highlight in navigation */
+#categoryList a:hover {
+    transform: translateX(4px);
+    transition: all 0.2s ease-in-out;
+}
+
