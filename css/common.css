@@ -229,7 +229,7 @@ body {
 /* Smooth scrolling for anchor links */
 html {
     scroll-behavior: smooth;
-    scroll-padding-top: 100px; /* Account for sticky header */
+    scroll-padding-top: 20px; /* Reduced since no sticky header */
 }
 
 /* Active category highlight in navigation */
