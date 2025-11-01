@@ -29,6 +29,18 @@ body {
     margin-bottom: 2rem;
 }
 
+/* Menu items list - add indentation */
+.menu-card ul {
+    padding-left: 3rem !important;
+    list-style-type: disc !important;
+}
+
+.menu-card ul li {
+    display: list-item !important;
+    margin-left: 0 !important;
+    padding-left: 0.5rem !important;
+}
+
 /* Category Headers */
 .category-header {
     display: flex;
@@ -38,10 +50,12 @@ body {
     color: #1e293b;
     background: linear-gradient(90deg, #fef9c3 0%, #f0fdf4 100%);
     border-left: 8px solid #fbbf24;
-    border-radius: 0.5rem 0 0 0.5rem;
-    padding: 0.5rem 1rem;
-    margin-bottom: 0.5rem;
-    margin-top: -1rem;
+    border-radius: 0.5rem;
+    padding: 1rem 1.5rem;
+    margin-bottom: 1rem;
+    margin-top: 0;
+    margin-left: 0;
+    margin-right: 0;
 }
 
 .category-chinese {
@@ -202,3 +216,214 @@ body {
         display: none !important;
     }
 }
+
+/* Category Navigation Sidebar */
+#categoryNav {
+    scrollbar-width: thin;
+    scrollbar-color: #cbd5e1 #f1f5f9;
+}
+
+#categoryNav::-webkit-scrollbar {
+    width: 6px;
+}
+
+#categoryNav::-webkit-scrollbar-track {
+    background: #f1f5f9;
+}
+
+#categoryNav::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 3px;
+}
+
+#categoryNav::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}
+
+/* Smooth scrolling for anchor links */
+html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 20px;
+}
+
+/* Category navigation links - Modern style */
+#categoryList a {
+    display: block;
+    padding: 12px 16px;
+    color: #374151;
+    font-weight: 500;
+    border-radius: 12px;
+    transition: all 0.2s ease-in-out;
+    position: relative;
+    overflow: hidden;
+}
+
+#categoryList a::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    width: 3px;
+    background: linear-gradient(to bottom, #3b82f6, #8b5cf6);
+    transform: scaleY(0);
+    transition: transform 0.2s ease-in-out;
+}
+
+#categoryList a:hover {
+    background: linear-gradient(to right, #eff6ff, #f5f3ff);
+    color: #1e40af;
+    transform: translateX(4px);
+    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.1);
+}
+
+#categoryList a:hover::before {
+    transform: scaleY(1);
+}
+
+#categoryList a:active {
+    transform: translateX(2px);
+}
+
+/* Scroll to Top Button */
+#scrollToTop {
+    position: fixed;
+    bottom: 80px;
+    right: 20px;
+    width: 48px;
+    height: 48px;
+    background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+    cursor: pointer;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease-in-out;
+    z-index: 45;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#scrollToTop.visible,
+#scrollToTop.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+#scrollToTop:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 6px 16px rgba(59, 130, 246, 0.5);
+    background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
+}
+
+#scrollToTop:active {
+    transform: translateY(-2px);
+}
+
+@media (max-width: 1024px) {
+    #scrollToTop {
+        bottom: 20px;
+        right: 20px; /* place at bottom-right on mobile */
+        z-index: 999; /* raise above main content but below toasts */
+    }
+}
+
+/* Notification Animations */
+@keyframes slideInRight {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideOutRight {
+    from {
+        transform: translateX(0);
+        opacity: 1;
+    }
+    to {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+}
+
+/* Notification Styles */
+.notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 1rem 1.5rem;
+    border-radius: 0.5rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    z-index: 9999;
+    max-width: 400px;
+    animation: slideInRight 0.3s ease-out;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.notification-success {
+    background-color: #10b981;
+    color: white;
+}
+
+.notification-error {
+    background-color: #ef4444;
+    color: white;
+}
+
+.notification-warning {
+    background-color: #f59e0b;
+    color: white;
+}
+
+.notification-info {
+    background-color: #3b82f6;
+    color: white;
+}
+
+/* Loading States */
+.loading-skeleton {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: loading 1.5s ease-in-out infinite;
+    border-radius: 0.5rem;
+}
+
+@keyframes loading {
+    0% {
+        background-position: 200% 0;
+    }
+    100% {
+        background-position: -200% 0;
+    }
+}
+
+.spinner {
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    border-top: 3px solid white;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    animation: spin 1s linear infinite;
+    display: inline-block;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
