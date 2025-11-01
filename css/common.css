@@ -307,7 +307,8 @@ html {
     justify-content: center;
 }
 
-#scrollToTop.visible {
+#scrollToTop.visible,
+#scrollToTop.show {
     opacity: 1;
     visibility: visible;
 }
@@ -325,7 +326,8 @@ html {
 @media (max-width: 1024px) {
     #scrollToTop {
         bottom: 20px;
-        right: 80px;
+        right: 20px; /* place at bottom-right on mobile */
+        z-index: 999; /* raise above main content but below toasts */
     }
 }
 
