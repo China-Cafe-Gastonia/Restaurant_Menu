@@ -276,6 +276,10 @@
     // Import utility functions
     import { flattenUnitField, normalizeWholeDoc, normalizeMenuItem } from './js/utils/normalize.js';
     import { formatPrice, to12Hour, normalizeIngredientToken, normalizeIngredientName } from './js/utils/formatters.js';
+    import { setupGlobalErrorHandlers, logError, logInfo, logWarning, showNotification } from './js/utils/error-handling.js';
+
+    // Initialize global error handlers
+    setupGlobalErrorHandlers();
 
     // Keep last parsed/uploaded or loaded doc in memory so "Normalize & Download" can use it
     let lastParsedDoc = null;

@@ -104,6 +104,10 @@
         // Import utility functions
         import { normalizeMenuItem } from './js/utils/normalize.js';
         import { formatPrice, to12Hour, normalizeIngredientToken } from './js/utils/formatters.js';
+        import { setupGlobalErrorHandlers, logError, logInfo, showNotification } from './js/utils/error-handling.js';
+
+        // Initialize global error handlers
+        setupGlobalErrorHandlers();
 
         // Filtering state for public page
         let _cachedMenuItems = [];
@@ -218,11 +222,17 @@
         // db and appId are imported at the top
 
         async function fetchRestaurantData() {
-            // Only fetch restaurant info/notes from Firestore in the future, or remove this if not needed
-            // For now, clear info/notes
-            document.getElementById('restaurantName').textContent = '';
-            document.getElementById('restaurantInfo').innerHTML = '';
-            document.getElementById('restaurantNotes').innerHTML = '';
+            try {
+                // Only fetch restaurant info/notes from Firestore in the future, or remove this if not needed
+                // For now, clear info/notes
+                document.getElementById('restaurantName').textContent = '';
+                document.getElementById('restaurantInfo').innerHTML = '';
+                document.getElementById('restaurantNotes').innerHTML = '';
+                logInfo('Restaurant data initialized');
+            } catch (error) {
+                logError('Error initializing restaurant data', { error });
+                // Non-critical error, continue loading
+            }
         }
 
         function renderMenu(menuItems) {
@@ -440,71 +450,109 @@
         }
 
         async function listenForMenuUpdates() {
-            // db is already initialized from firebase-config.js import
-            const menuRef = collection(db, `artifacts/${appId}/public/data/menu_data`);
-            onSnapshot(menuRef, (querySnapshot) => {
-                // If using Firestore, expect flat array
-                let menuItems = [];
-                querySnapshot.forEach((doc) => {
-                    menuItems.push({ ...doc.data(), _id: doc.id });
+            try {
+                // db is already initialized from firebase-config.js import
+                const menuRef = collection(db, `artifacts/${appId}/public/data/menu_data`);
+                
+                onSnapshot(menuRef, (querySnapshot) => {
+                    try {
+                        // If using Firestore, expect flat array
+                        let menuItems = [];
+                        querySnapshot.forEach((doc) => {
+                            menuItems.push({ ...doc.data(), _id: doc.id });
+                        });
+                        // Normalize items to support both legacy nested-array and new flattened shapes
+                        menuItems = menuItems.map(normalizeMenuItem);
+                        renderMenu(menuItems);
+                        
+                        const loadingMsg = document.getElementById('loadingMessage');
+                        if (loadingMsg) {
+                            loadingMsg.classList.add('hidden');
+                        }
+                        
+                        logInfo('Menu data loaded successfully', { itemCount: menuItems.length });
+                    } catch (error) {
+                        logError('Error processing menu data', { error });
+                        showNotification('Failed to display menu. Please refresh the page.', 'error');
+                    }
+                }, (error) => {
+                    logError('Error listening to Firestore', { error });
+                    const loadingMsg = document.getElementById('loadingMessage');
+                    if (loadingMsg) {
+                        loadingMsg.textContent = 'Error loading menu. Please try again later.';
+                        loadingMsg.classList.remove('hidden');
+                    }
+                    showNotification('Failed to load menu data. Please check your connection.', 'error');
                 });
-                // Normalize items to support both legacy nested-array and new flattened shapes
-                menuItems = menuItems.map(normalizeMenuItem);
-                renderMenu(menuItems);
-                document.getElementById('loadingMessage').classList.add('hidden');
-            }, (error) => {
-                console.error("Error listening to Firestore:", error);
-                document.getElementById('loadingMessage').textContent = 'Error fetching menu data.';
-            });
+            } catch (error) {
+                logError('Error initializing menu listener', { error });
+                showNotification('Failed to initialize menu. Please refresh the page.', 'error');
+            }
         }
 
         window.onload = async () => {
-            // Firebase already initialized in firebase-config.js
-            await fetchRestaurantData();
-            listenForMenuUpdates();
-            
-            // Mobile menu toggle functionality
-            const mobileToggle = document.getElementById('mobileMenuToggle');
-            const closeSidebar = document.getElementById('closeSidebar');
-            const categoryNav = document.getElementById('categoryNav');
-            const overlay = document.getElementById('sidebarOverlay');
-            const scrollToTopBtn = document.getElementById('scrollToTop');
-            
-            function openSidebar() {
-                if (!categoryNav || !overlay) return;
-                categoryNav.classList.remove('-translate-x-full');
-                categoryNav.classList.add('translate-x-0');
-                overlay.classList.remove('hidden');
-            }
-            
-            function closeSidebarFunc() {
-                if (!categoryNav || !overlay) return;
-                categoryNav.classList.remove('translate-x-0');
-                categoryNav.classList.add('-translate-x-full');
-                overlay.classList.add('hidden');
-            }
-            
-            // Scroll to top functionality
-            if (scrollToTopBtn) {
-                window.addEventListener('scroll', () => {
-                    if (window.pageYOffset > 300) {
-                        scrollToTopBtn.classList.add('visible');
-                    } else {
-                        scrollToTopBtn.classList.remove('visible');
-                    }
-                });
+            try {
+                // Firebase already initialized in firebase-config.js
+                await fetchRestaurantData();
+                listenForMenuUpdates();
                 
-                scrollToTopBtn.addEventListener('click', () => {
-                    window.scrollTo({
-                        top: 0,
-                        behavior: 'smooth'
+                // Mobile menu toggle functionality
+                const mobileToggle = document.getElementById('mobileMenuToggle');
+                const closeSidebar = document.getElementById('closeSidebar');
+                const categoryNav = document.getElementById('categoryNav');
+                const overlay = document.getElementById('sidebarOverlay');
+                const scrollToTopBtn = document.getElementById('scrollToTop');
+                
+                function openSidebar() {
+                    if (!categoryNav || !overlay) return;
+                    categoryNav.classList.remove('-translate-x-full');
+                    categoryNav.classList.add('translate-x-0');
+                    overlay.classList.remove('hidden');
+                }
+                
+                function closeSidebarFunc() {
+                    if (!categoryNav || !overlay) return;
+                    categoryNav.classList.remove('translate-x-0');
+                    categoryNav.classList.add('-translate-x-full');
+                    overlay.classList.add('hidden');
+                }
+                
+                // Event listeners with null checks
+                if (mobileToggle) {
+                    mobileToggle.addEventListener('click', openSidebar);
+                }
+                
+                if (closeSidebar) {
+                    closeSidebar.addEventListener('click', closeSidebarFunc);
+                }
+                
+                if (overlay) {
+                    overlay.addEventListener('click', closeSidebarFunc);
+                }
+                
+                // Scroll to top button
+                if (scrollToTopBtn) {
+                    window.addEventListener('scroll', () => {
+                        if (window.pageYOffset > 300) {
+                            scrollToTopBtn.classList.add('show');
+                        } else {
+                            scrollToTopBtn.classList.remove('show');
+                        }
                     });
-                });
+                    
+                    scrollToTopBtn.addEventListener('click', () => {
+                        window.scrollTo({
+                            top: 0,
+                            behavior: 'smooth'
+                        });
+                    });
+                }
+                
+                logInfo('Application initialized successfully');
+            } catch (error) {
+                logError('Critical error during initialization', { error });
+                showNotification('Failed to initialize application. Please refresh the page.', 'error');
             }
-            
-            if (mobileToggle) mobileToggle.addEventListener('click', openSidebar);
-            if (closeSidebar) closeSidebar.addEventListener('click', closeSidebarFunc);
-            if (overlay) overlay.addEventListener('click', closeSidebarFunc);
         };
     </script>
 </body>
