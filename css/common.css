@@ -656,3 +656,51 @@ html {
 .floating-output-arrow.show {
     display: block;
 }
+
+/* ==========================================
+   SEARCH STYLES
+   ========================================== */
+
+/* Search Container */
+#searchContainer {
+    position: relative;
+}
+
+/* Search Input */
+#menuSearch {
+    background-color: white;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+#menuSearch:focus {
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
+}
+
+#menuSearch::placeholder {
+    color: #9ca3af;
+}
+
+/* Clear Search Button */
+#clearSearch {
+    padding: 4px;
+    min-width: auto;
+    min-height: auto;
+}
+
+#clearSearch:hover {
+    background-color: #f3f4f6;
+    border-radius: 50%;
+}
+
+/* Search Results Text */
+#searchResults {
+    font-size: 0.875rem;
+    color: #6b7280;
+}
+
+/* Highlight matching text (optional future enhancement) */
+.search-highlight {
+    background-color: #fef08a;
+    padding: 0 2px;
+    border-radius: 2px;
+}

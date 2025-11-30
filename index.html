@@ -105,6 +105,32 @@
                     <div id="restaurantNotes" class="mt-4"></div>
                 </header>
 
+                <!-- Search Bar -->
+                <div id="searchContainer" class="mb-6">
+                    <div class="relative max-w-md mx-auto">
+                        <input 
+                            type="search" 
+                            id="menuSearch" 
+                            placeholder="Search menu items..." 
+                            class="w-full px-4 py-3 pl-12 rounded-xl border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all text-gray-700"
+                            aria-label="Search menu items"
+                        >
+                        <svg class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                        </svg>
+                        <button 
+                            id="clearSearch" 
+                            class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 hidden"
+                            aria-label="Clear search"
+                        >
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                            </svg>
+                        </button>
+                    </div>
+                    <div id="searchResults" class="text-center text-sm text-gray-500 mt-2 hidden"></div>
+                </div>
+
                 <div id="loadingMessage" class="text-center text-gray-500 text-lg" role="status" aria-live="polite">
                     Loading menu...
                 </div>
@@ -130,10 +156,98 @@
         // Track page view with additional context
         trackEvent('menu_view', { page: 'public_menu' });
 
-        // Filtering state for public page
+        // Filtering and search state for public page
         let _cachedMenuItems = [];
         const ingredientFilters = new Set();
         let spicyOnlyFilter = false;
+        let searchQuery = '';
+
+        // Search functionality
+        function initSearch() {
+            const searchInput = document.getElementById('menuSearch');
+            const clearBtn = document.getElementById('clearSearch');
+            const searchResults = document.getElementById('searchResults');
+            
+            if (!searchInput) return;
+
+            // Debounce search for better performance
+            let debounceTimer;
+            searchInput.addEventListener('input', (e) => {
+                clearTimeout(debounceTimer);
+                debounceTimer = setTimeout(() => {
+                    searchQuery = e.target.value.trim().toLowerCase();
+                    
+                    // Show/hide clear button
+                    if (clearBtn) {
+                        clearBtn.classList.toggle('hidden', !searchQuery);
+                    }
+                    
+                    // Re-render menu with search filter
+                    if (_cachedMenuItems.length > 0) {
+                        renderMenuCategories(_cachedMenuItems);
+                        updateSearchResults();
+                    }
+                    
+                    // Track search if query is meaningful
+                    if (searchQuery.length >= 3) {
+                        trackEvent('menu_search', { query: searchQuery });
+                    }
+                }, 200);
+            });
+
+            // Clear search
+            if (clearBtn) {
+                clearBtn.addEventListener('click', () => {
+                    searchInput.value = '';
+                    searchQuery = '';
+                    clearBtn.classList.add('hidden');
+                    searchResults.classList.add('hidden');
+                    if (_cachedMenuItems.length > 0) {
+                        renderMenuCategories(_cachedMenuItems);
+                    }
+                    searchInput.focus();
+                });
+            }
+
+            // Handle Escape key
+            searchInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && searchQuery) {
+                    clearBtn?.click();
+                }
+            });
+        }
+
+        function updateSearchResults() {
+            const searchResults = document.getElementById('searchResults');
+            if (!searchResults) return;
+
+            if (!searchQuery) {
+                searchResults.classList.add('hidden');
+                return;
+            }
+
+            const matchingItems = _cachedMenuItems.filter(item => itemMatchesSearch(item));
+            const totalItems = _cachedMenuItems.length;
+            
+            searchResults.textContent = `Found ${matchingItems.length} of ${totalItems} items`;
+            searchResults.classList.remove('hidden');
+        }
+
+        function itemMatchesSearch(item) {
+            if (!searchQuery) return true;
+            
+            const name = (item.name || '').toLowerCase();
+            const description = (item.description || '').toLowerCase();
+            const ingredients = Array.isArray(item.ingredients) 
+                ? item.ingredients.join(' ').toLowerCase() 
+                : (item.ingredients || '').toLowerCase();
+            const category = (item.category || '').toLowerCase();
+            
+            return name.includes(searchQuery) || 
+                   description.includes(searchQuery) || 
+                   ingredients.includes(searchQuery) ||
+                   category.includes(searchQuery);
+        }
 
         function renderFilterBar(menuDocs) {
             // Collect unique ingredients
@@ -378,6 +492,9 @@
 
             // Apply filters (spicy and ingredient tags)
             let filteredDocs = menuDocs.filter(it => {
+                // Apply search filter first
+                if (!itemMatchesSearch(it)) return false;
+                
                 if (spicyOnlyFilter && !it.spicy) return false;
                 if (ingredientFilters.size > 0) {
                     const ing = it.ingredients || null;
@@ -516,6 +633,9 @@
                 // Firebase already initialized in firebase-config.js
                 await fetchRestaurantData();
                 listenForMenuUpdates();
+                
+                // Initialize search functionality
+                initSearch();
                 
                 // Mobile menu toggle functionality
                 const mobileToggle = document.getElementById('mobileMenuToggle');
