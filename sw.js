@@ -4,21 +4,22 @@
  * and network-first strategy for menu data
  */
 
-const CACHE_NAME = 'china-cafe-menu-v1';
-const STATIC_CACHE = 'static-v1';
+const CACHE_NAME = 'china-cafe-menu-v2';
+const STATIC_CACHE = 'static-v2';
 const DATA_CACHE = 'data-v1';
 
 // Static assets to cache immediately on install
+// Use relative paths for GitHub Pages compatibility
 const STATIC_ASSETS = [
-  '/',
-  '/index.html',
-  '/admin.html',
-  '/css/common.css',
-  '/js/firebase-config.js',
-  '/js/utils/normalize.js',
-  '/js/utils/formatters.js',
-  '/js/utils/error-handling.js',
-  '/js/utils/sanitize.js'
+  './',
+  './index.html',
+  './admin.html',
+  './css/common.css',
+  './js/firebase-config.js',
+  './js/utils/normalize.js',
+  './js/utils/formatters.js',
+  './js/utils/error-handling.js',
+  './js/utils/sanitize.js'
 ];
 
 // External resources to cache
