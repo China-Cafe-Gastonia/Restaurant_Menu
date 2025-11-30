@@ -554,3 +554,105 @@ html {
         opacity: 0;
     }
 }
+
+/* ==========================================
+   EXTRACTED INLINE STYLES
+   Moved from HTML style="" attributes
+   ========================================== */
+
+/* Hours Display */
+.hours-title {
+    font-size: 1.2rem;
+}
+
+.hours-line {
+    margin-bottom: 2px;
+}
+
+.hours-closed {
+    color: #b91c1c;
+    font-weight: 600;
+}
+
+/* Spicy Indicator */
+.spicy-icon {
+    color: #be123c;
+    margin-right: 0.5rem;
+    display: inline-block;
+    vertical-align: middle;
+}
+
+/* Spicy Item Name (admin) */
+.admin-item-name.is-spicy {
+    color: #be123c;
+}
+
+/* ==========================================
+   ADMIN PAGE SPECIFIC STYLES
+   ========================================== */
+
+/* Login Container */
+.login-container {
+    min-height: 100vh;
+}
+
+/* Admin Main (initially hidden) */
+.admin-main-hidden {
+    display: none;
+}
+
+/* Structured Hours Input */
+.structured-hours-hidden {
+    display: none;
+    max-width: 520px;
+}
+
+/* Save Menu Button Row (initially hidden) */
+.save-menu-hidden {
+    display: none;
+}
+
+/* Confirm Modal */
+.confirm-modal {
+    display: none;
+    z-index: 200;
+}
+
+.confirm-modal.show {
+    display: flex;
+}
+
+/* Output Box (fixed bottom panel) */
+.output-box {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 50;
+    margin: 0 auto;
+    max-width: 900px;
+    box-shadow: 0 -2px 16px 0 rgba(0, 0, 0, 0.07);
+    transition: transform 0.3s cubic-bezier(.4, 0, .2, 1);
+}
+
+/* Toggle Output Button */
+.toggle-output-btn {
+    z-index: 51;
+}
+
+/* Status Output */
+.status-output {
+    white-space: pre-wrap;
+    max-height: 160px;
+    overflow-y: auto;
+}
+
+/* Floating Output Arrow */
+.floating-output-arrow {
+    z-index: 100;
+    display: none;
+}
+
+.floating-output-arrow.show {
+    display: block;
+}

@@ -295,10 +295,10 @@
                         return `<div class="flex flex-col items-center justify-center mt-2 mb-2">
                             <div class="flex items-center justify-center mb-1">
                                 <span class="hours-icon">🕒</span>
-                                <span class="hours-title text-lg" style="font-size:1.2rem;"><b>Hours:</b></span>
+                                <span class="hours-title text-lg"><b>Hours:</b></span>
                             </div>
                             <div class="flex flex-col items-center">
-                                ${hours.map(line => `<div class="text-base" style="margin-bottom:2px;">${escapeHtml(formatTimeString(String(line || '')))}</div>`).join('')}
+                                ${hours.map(line => `<div class="text-base hours-line">${escapeHtml(formatTimeString(String(line || '')))}</div>`).join('')}
                             </div>
                         </div>`;
                     }
@@ -321,15 +321,15 @@
                     return `<div class="flex flex-col items-center justify-center mt-2 mb-2">
                         <div class="flex items-center justify-center mb-1">
                             <span class="hours-icon">🕒</span>
-                            <span class="hours-title text-lg" style="font-size:1.2rem;"><b>Hours:</b></span>
+                            <span class="hours-title text-lg"><b>Hours:</b></span>
                         </div>
                         <div class="flex flex-col items-center">
                             ${groups.map(g => {
                                 const label = g.days.length > 1
                                     ? `<b>${g.days[0].slice(0,3)} - ${g.days[g.days.length-1].slice(0,3)}:</b>`
                                     : `<b>${g.days[0].slice(0,3)}:</b>`;
-                                const display = g.key === 'Closed' ? '<span style="color:#b91c1c;font-weight:600;">Closed</span>' : String(g.key).replace(/^-|-$/g, '').replace(/-/g, ' - ');
-                                return `<div class="text-base" style="margin-bottom:2px;">${label} ${display}</div>`;
+                                const display = g.key === 'Closed' ? '<span class="hours-closed">Closed</span>' : String(g.key).replace(/^-|-$/g, '').replace(/-/g, ' - ');
+                                return `<div class="text-base hours-line">${label} ${display}</div>`;
                             }).join('')}
                         </div>
                     </div>`;
@@ -455,7 +455,7 @@
                             <li class="border-b pb-2">
                                 <div class="flex-grow">
                                     <h3 class="text-lg font-semibold">
-                                        ${item.spicy ? `<span role="img" aria-label="spicy" title="Spicy" style="color:#be123c; margin-right:0.5rem; display:inline-block; vertical-align:middle;">🌶️</span>` : ''}${escapeHtml(item.name)}
+                                        ${item.spicy ? `<span class="spicy-icon" role="img" aria-label="spicy" title="Spicy">🌶️</span>` : ''}${escapeHtml(item.name)}
                                     </h3>
                                     <p class="text-sm text-gray-500 mb-1">${escapeHtml(item.description || '')}</p>
                                     ${((Array.isArray(item.ingredients) && item.ingredients.length > 0) || (typeof item.ingredients === 'string' && item.ingredients.trim().length > 0)) ? `<div class="text-sm text-gray-600 mb-1"><b>Ingredients:</b> ${Array.isArray(item.ingredients) ? item.ingredients.map(i => escapeHtml(i)).join(', ') : escapeHtml(String(item.ingredients))}</div>` : ''}

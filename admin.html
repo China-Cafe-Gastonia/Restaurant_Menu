@@ -38,7 +38,7 @@
 
 
     <!-- Login Form (centered vertically) -->
-    <div id="loginContainer" class="flex items-center justify-center min-h-screen" style="min-height:100vh;">
+    <div id="loginContainer" class="flex items-center justify-center min-h-screen login-container">
         <div id="loginCard" class="card" role="region" aria-labelledby="login-heading">
             <h2 id="login-heading" class="text-2xl font-semibold mb-4">Admin Login</h2>
             <form id="loginForm" class="space-y-4" aria-label="Login form">
@@ -58,7 +58,7 @@
 
     <!-- Admin UI (hidden until logged in) -->
     <main id="main-content">
-    <div id="adminMain" style="display:none;" role="region" aria-label="Admin controls">
+    <div id="adminMain" class="admin-main-hidden" role="region" aria-label="Admin controls">
 
         <!-- Field/Form 1: Menu Management Controls -->
         <div id="adminControls" class="card mb-4">
@@ -120,7 +120,7 @@
                                     <span class="text-sm text-gray-600">Use structured hours (weekday open/close)</span>
                                 </label>
                             </div>
-                            <div id="structuredHours" class="w-full mb-2" style="display:none; max-width:520px;">
+                            <div id="structuredHours" class="w-full mb-2 structured-hours-hidden">
                                 <div class="grid grid-cols-3 gap-2 text-sm text-gray-700 font-semibold mb-1"><div>Day</div><div>Open</div><div>Close</div></div>
                                 <div class="grid grid-cols-3 gap-2 items-center mb-1 structured-hour-row" data-day="Monday">
                                     <div class="text-sm">Monday</div>
@@ -176,12 +176,12 @@
         </div>
 
         <!-- Save Menu Button (hidden by default, shown when menu is edited) -->
-        <div class="flex justify-end mb-4" id="saveMenuBtnRow" style="display:none;">
+        <div class="flex justify-end mb-4 save-menu-hidden" id="saveMenuBtnRow">
             <button id="saveMenuBtn" class="bg-green-600 text-white font-bold py-2 px-8 rounded-full shadow hover:bg-green-700">Save Menu</button>
         </div>
 
         <!-- Confirmation Modal for Save -->
-        <div id="confirmModal" class="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center" style="display:none; z-index:200;">
+        <div id="confirmModal" class="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center confirm-modal">
             <div class="bg-white rounded-lg p-6 w-96 shadow-lg">
                 <h3 class="text-lg font-semibold mb-3">Confirm Save</h3>
                 <p class="text-sm text-gray-700 mb-4">This will update the private menu. Do you want to continue?</p>
@@ -193,17 +193,17 @@
         </div>
 
         <!-- Field/Form 3: Output Box (always visible, toggle with arrow) -->
-        <div id="outputBox" class="card" style="position:fixed;left:0;right:0;bottom:0;z-index:50;margin:0 auto;max-width:900px;box-shadow:0 -2px 16px 0 #0001;transition:transform 0.3s cubic-bezier(.4,0,.2,1);">
+        <div id="outputBox" class="card output-box">
             <div class="flex items-center justify-between mb-2 relative">
                 <h2 class="text-xl font-semibold mb-0">Output</h2>
-                <button id="toggleOutputBtn" class="absolute top-1/2 right-0 -translate-y-1/2 bg-white rounded-full shadow px-2 py-1 text-gray-500 hover:text-gray-800 text-2xl focus:outline-none border border-gray-200" style="z-index:51;" title="Show/Hide Output">
+                <button id="toggleOutputBtn" class="absolute top-1/2 right-0 -translate-y-1/2 bg-white rounded-full shadow px-2 py-1 text-gray-500 hover:text-gray-800 text-2xl focus:outline-none border border-gray-200 toggle-output-btn" title="Show/Hide Output">
                     <span id="outputArrow">▼</span>
                 </button>
             </div>
-            <div id="statusOutput" class="bg-gray-100 border rounded p-2 font-mono text-sm text-gray-700" role="log" aria-live="polite" style="white-space:pre-wrap; max-height:160px; overflow-y:auto;"></div>
+            <div id="statusOutput" class="bg-gray-100 border rounded p-2 font-mono text-sm text-gray-700 status-output" role="log" aria-live="polite"></div>
         </div>
         <!-- Floating outputArrow for when output box is hidden -->
-        <button id="floatingOutputArrow" class="fixed right-4 bottom-2 bg-white rounded-full shadow px-2 py-1 text-gray-500 hover:text-gray-800 text-2xl focus:outline-none border border-gray-200" style="z-index:100;display:none;" title="Show Output" aria-label="Show output panel">
+        <button id="floatingOutputArrow" class="fixed right-4 bottom-2 bg-white rounded-full shadow px-2 py-1 text-gray-500 hover:text-gray-800 text-2xl focus:outline-none border border-gray-200 floating-output-arrow" title="Show Output" aria-label="Show output panel">
             <span aria-hidden="true">▲</span>
         </button>
     </div>
@@ -460,7 +460,7 @@
                         </div>
                         <div class="flex-grow">
                             <input type="hidden" class="admin-item-id" value="${escapeAttr(item._id || '')}" />
-                            <input type="text" class="text-lg font-semibold bg-gray-50 rounded px-2 py-1 mb-1 w-full admin-item-name" value="${escapeAttr(name)}" style="${item.spicy ? 'color:#be123c;' : ''}" />
+                            <input type="text" class="text-lg font-semibold bg-gray-50 rounded px-2 py-1 mb-1 w-full admin-item-name ${item.spicy ? 'is-spicy' : ''}" value="${escapeAttr(name)}" />
                             <input type="text" class="text-sm text-gray-500 bg-gray-50 rounded px-2 py-1 mb-1 w-full admin-item-desc" value="${escapeAttr(desc)}" />
                             <textarea class="text-sm text-gray-600 bg-gray-50 rounded px-2 py-1 mb-1 w-full admin-item-ingredients" placeholder="Ingredients (comma or newline separated)">${escapeHtml(Array.isArray(item.ingredients) ? item.ingredients.join(', ') : (item.ingredients || ''))}</textarea>
                             ${unitHtml}
