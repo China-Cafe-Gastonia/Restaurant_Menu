@@ -277,6 +277,8 @@
     import { flattenUnitField, normalizeWholeDoc, normalizeMenuItem } from './js/utils/normalize.js';
     import { formatPrice, to12Hour, normalizeIngredientToken, normalizeIngredientName } from './js/utils/formatters.js';
     import { setupGlobalErrorHandlers, logError, logInfo, logWarning, showNotification } from './js/utils/error-handling.js';
+    import { escapeHtml, escapeAttr } from './js/utils/sanitize.js';
+    import { setButtonLoading } from './js/utils/ui-helpers.js';
 
     // Initialize global error handlers
     setupGlobalErrorHandlers();
@@ -422,21 +424,21 @@
                     if (hasOptions) {
                     const optsHtml = opts.map(u => `
                         <div class="admin-unit-row admin-unit-option flex items-center gap-3 mb-0.5">
-                            <input type="hidden" class="admin-unit-size" value="${size}" />
-                            <input type="text" class="text-sm text-gray-700 bg-gray-50 rounded px-2 py-1 w-40 admin-unit-option-input" value="${u.option || ''}" placeholder="Option" />
-                            <input type="text" class="w-20 bg-gray-50 rounded px-2 py-1 text-orange-600 font-semibold admin-unit-price-input" value="${u.price || ''}" placeholder="Price" />
+                            <input type="hidden" class="admin-unit-size" value="${escapeAttr(size)}" />
+                            <input type="text" class="text-sm text-gray-700 bg-gray-50 rounded px-2 py-1 w-40 admin-unit-option-input" value="${escapeAttr(u.option || '')}" placeholder="Option" />
+                            <input type="text" class="w-20 bg-gray-50 rounded px-2 py-1 text-orange-600 font-semibold admin-unit-price-input" value="${escapeAttr(u.price || '')}" placeholder="Price" />
                         </div>`).join('');
                     return `
                         <div class="mb-1 admin-unit-group">
-                            ${size ? `<div class="text-sm font-semibold text-gray-800 mb-0.5">${size}</div>` : ''}
+                            ${size ? `<div class="text-sm font-semibold text-gray-800 mb-0.5">${escapeHtml(size)}</div>` : ''}
                             ${optsHtml}
                         </div>`;
                 }
                 // No options: show size with price(s)
                 const rows = opts.map(u => `
                     <div class="admin-unit-row admin-unit-simple flex items-center gap-3 mb-0.5">
-                        <input type="text" class="text-sm text-gray-700 bg-gray-50 rounded px-2 py-1 w-28 admin-unit-size-input" value="${size}" placeholder="Size" />
-                        <input type="text" class="w-20 bg-gray-50 rounded px-2 py-1 text-orange-600 font-semibold admin-unit-price-input" value="${u && u.price ? u.price : ''}" placeholder="Price" />
+                        <input type="text" class="text-sm text-gray-700 bg-gray-50 rounded px-2 py-1 w-28 admin-unit-size-input" value="${escapeAttr(size)}" placeholder="Size" />
+                        <input type="text" class="w-20 bg-gray-50 rounded px-2 py-1 text-orange-600 font-semibold admin-unit-price-input" value="${escapeAttr(u && u.price ? u.price : '')}" placeholder="Price" />
                     </div>`).join('');
                 return `<div class="mb-1 admin-unit-group">${rows}</div>`;
             }).join('');
@@ -450,10 +452,10 @@
                             </label>
                         </div>
                         <div class="flex-grow">
-                            <input type="hidden" class="admin-item-id" value="${item._id || ''}" />
-                            <input type="text" class="text-lg font-semibold bg-gray-50 rounded px-2 py-1 mb-1 w-full admin-item-name" value="${name}" style="${item.spicy ? 'color:#be123c;' : ''}" />
-                            <input type="text" class="text-sm text-gray-500 bg-gray-50 rounded px-2 py-1 mb-1 w-full admin-item-desc" value="${desc}" />
-                            <textarea class="text-sm text-gray-600 bg-gray-50 rounded px-2 py-1 mb-1 w-full admin-item-ingredients" placeholder="Ingredients (comma or newline separated)">${Array.isArray(item.ingredients) ? item.ingredients.join(', ') : (item.ingredients || '')}</textarea>
+                            <input type="hidden" class="admin-item-id" value="${escapeAttr(item._id || '')}" />
+                            <input type="text" class="text-lg font-semibold bg-gray-50 rounded px-2 py-1 mb-1 w-full admin-item-name" value="${escapeAttr(name)}" style="${item.spicy ? 'color:#be123c;' : ''}" />
+                            <input type="text" class="text-sm text-gray-500 bg-gray-50 rounded px-2 py-1 mb-1 w-full admin-item-desc" value="${escapeAttr(desc)}" />
+                            <textarea class="text-sm text-gray-600 bg-gray-50 rounded px-2 py-1 mb-1 w-full admin-item-ingredients" placeholder="Ingredients (comma or newline separated)">${escapeHtml(Array.isArray(item.ingredients) ? item.ingredients.join(', ') : (item.ingredients || ''))}</textarea>
                             ${unitHtml}
                         </div>
                     </div>
@@ -542,6 +544,7 @@
                 statusMessage.textContent = 'Please select a JSON file to upload.';
                 return;
             }
+            setButtonLoading(uploadButton, true, 'Uploading...');
             logStatus('Uploading menu to PRIVATE dataset...');
             try {
                 const fileReader = new FileReader();
@@ -554,6 +557,7 @@
                     } catch (parseError) {
                         console.error("Error parsing JSON file:", parseError);
                         logStatus(`Error parsing JSON file: ${parseError.message}`);
+                        setButtonLoading(uploadButton, false);
                         return;
                     }
                     let restaurantInfo = null;
@@ -575,13 +579,14 @@
                             );
                         } else {
                             logStatus('Error: The uploaded file is not a valid JSON array or menu format.');
+                            setButtonLoading(uploadButton, false);
                             return;
                         }
                     } else {
                         menuData = menuData.map((item, idx) => ({ ...item, categoryOrder: 0, itemOrder: idx }));
                     }
                     try {
-                        const menuRef = collection(db, `artifacts/${firebaseConfig.appId}/private/data/menu_data_admin`);
+                        const menuRef = collection(db, `artifacts/${appId}/private/data/menu_data_admin`);
                         const existingDocs = await getDocs(menuRef);
                         const deleteBatch = writeBatch(db);
                         existingDocs.forEach((doc) => {
@@ -603,16 +608,19 @@
                         });
                         await newBatch.commit();
                         logStatus(`Menu uploaded to PRIVATE dataset! Added ${menuData.length} items.`);
+                        setButtonLoading(uploadButton, false);
                         document.getElementById('loadMenuButton').click();
                     } catch (uploadError) {
                         console.error("Error uploading menu:", uploadError);
                         logStatus(`Error uploading menu: ${uploadError.message}`);
+                        setButtonLoading(uploadButton, false);
                     }
                 };
                 fileReader.readAsText(file);
             } catch (error) {
                 console.error("Error uploading menu:", error);
                 logStatus(`Error uploading menu: ${error.message}`);
+                setButtonLoading(uploadButton, false);
             }
         });
 
@@ -636,6 +644,7 @@
                         logStatus('You must be logged in as admin.');
                         return;
                     }
+                    setButtonLoading(saveMenuBtn, true, 'Saving...');
                     try {
                         logStatus('Preparing to save edited menu (upsert) to PRIVATE dataset...');
 
@@ -717,6 +726,7 @@
                         if (hasInvalid) {
                             logStatus('One or more price fields are invalid. Fix highlighted fields and retry save.');
                             if (firstInvalidEl && typeof firstInvalidEl.scrollIntoView === 'function') firstInvalidEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                            setButtonLoading(saveMenuBtn, false);
                             return;
                         }
 
@@ -778,7 +788,7 @@
                         if (combo || lunch) info.notes = { combination_plate: combo, lunch_special: lunch };
 
                         // Prepare Firestore refs
-                        const menuRef = collection(db, `artifacts/${firebaseConfig.appId}/private/data/menu_data_admin`);
+                        const menuRef = collection(db, `artifacts/${appId}/private/data/menu_data_admin`);
 
                         // Fetch existing docs to decide which to update/delete and to create a backup
                         const existingDocsSnap = await getDocs(menuRef);
@@ -836,10 +846,12 @@
                         Object.values(existingById).forEach(ref => batch.delete(ref));
                         await batch.commit();
                         logStatus(`Saved ${items.length} items to PRIVATE dataset (upsert).`);
+                        setButtonLoading(saveMenuBtn, false);
                         document.getElementById('loadMenuButton').click();
                     } catch (e) {
                         console.error(e);
                         logStatus('Error saving menu: ' + (e.message || e));
+                        setButtonLoading(saveMenuBtn, false);
                     }
                 });
 
@@ -849,6 +861,7 @@
             statusMessage.textContent = 'You must be logged in as admin.';
             return;
         }
+        setButtonLoading(deletePublicButton, true, 'Deleting...');
         try {
             logStatus('Deleting PUBLIC menu...');
             const menuRef = collection(db, `artifacts/${appId}/public/data/menu_data`);
@@ -859,9 +872,11 @@
             });
             await deleteBatch.commit();
             logStatus('PUBLIC menu deleted successfully!');
+            setButtonLoading(deletePublicButton, false);
         } catch (error) {
             console.error("Error deleting public menu:", error);
             logStatus(`Error deleting public menu: ${error.message}`);
+            setButtonLoading(deletePublicButton, false);
         }
     });
 
@@ -870,6 +885,7 @@
             if (saveInfoBtn) {
                 saveInfoBtn.addEventListener('click', async () => {
                     if (!db || !auth.currentUser) { logStatus('You must be logged in as admin.'); return; }
+                    setButtonLoading(saveInfoBtn, true, 'Saving...');
                     try {
                         logStatus('Saving restaurant info...');
                         const restName = document.getElementById('editRestaurantName')?.value || '';
@@ -901,7 +917,7 @@
                                         if (closeVal && !timeRegex.test(closeVal)) bad = bad || r.querySelector('.hours-close');
                                         if (openVal || closeVal) hoursObj[day] = { open: openVal, close: closeVal };
                                     });
-                                    if (bad) { if (typeof bad.scrollIntoView === 'function') bad.scrollIntoView({behavior:'smooth', block:'center'}); bad.style.border='2px solid #f87171'; logStatus('Invalid time format in structured hours. Use HH:MM. Save aborted.'); return; }
+                                    if (bad) { if (typeof bad.scrollIntoView === 'function') bad.scrollIntoView({behavior:'smooth', block:'center'}); bad.style.border='2px solid #f87171'; logStatus('Invalid time format in structured hours. Use HH:MM. Save aborted.'); setButtonLoading(saveInfoBtn, false); return; }
                                     if (Object.keys(hoursObj).length) restaurantObj.hours = hoursObj;
                                 }
                             } else {
@@ -915,13 +931,15 @@
                         }
                         if (combo || lunch) info.notes = { combination_plate: combo, lunch_special: lunch };
                         // write _info doc
-                        const menuRef = collection(db, `artifacts/${firebaseConfig.appId}/private/data/menu_data_admin`);
+                        const menuRef = collection(db, `artifacts/${appId}/private/data/menu_data_admin`);
                         await writeBatch(db).set(doc(menuRef, '_info'), info).commit();
                         logStatus('Restaurant info saved.');
+                        setButtonLoading(saveInfoBtn, false);
                         document.getElementById('loadMenuButton').click();
                     } catch (err) {
                         console.error(err);
                         logStatus('Error saving restaurant info: ' + (err.message || err));
+                        setButtonLoading(saveInfoBtn, false);
                     }
                 });
             }
@@ -933,9 +951,11 @@
     }
 
     // --- MENU LOADING AND RENDERING LOGIC ---
-    document.getElementById('loadMenuButton').addEventListener('click', loadAndRenderMenu);
+    const loadMenuButton = document.getElementById('loadMenuButton');
+    loadMenuButton.addEventListener('click', loadAndRenderMenu);
 
     async function loadAndRenderMenu() {
+        setButtonLoading(loadMenuButton, true, 'Loading...');
         logStatus('Load Menu button clicked. Loading PRIVATE menu...');
         const menuContainer = document.getElementById('menuContainer');
         const loadingMsg = document.getElementById('loadingMessage');
@@ -953,6 +973,7 @@
             if (snapshot.empty) {
                 hideLoadingMessage();
                 logStatus('No private menu data found.');
+                setButtonLoading(loadMenuButton, false);
                 return;
             }
             let menuItems = [];
@@ -1069,9 +1090,11 @@
             if (saveRow) saveRow.style.display = '';
             hideLoadingMessage();
             logStatus('PRIVATE menu loaded.');
+            setButtonLoading(loadMenuButton, false);
         } catch (err) {
             hideLoadingMessage();
             logStatus('Error loading menu: ' + (err.message || err));
+            setButtonLoading(loadMenuButton, false);
         }
     }
 
@@ -1081,6 +1104,7 @@
             statusMessage.textContent = 'You must be logged in as admin.';
             return;
         }
+        setButtonLoading(deleteButton, true, 'Deleting...');
         try {
             logStatus('Deleting PRIVATE menu...');
             const menuRef = collection(db, `artifacts/${appId}/private/data/menu_data_admin`);
@@ -1091,19 +1115,23 @@
             });
             await deleteBatch.commit();
             logStatus('PRIVATE menu deleted successfully!');
-            document.getElementById('loadMenuButton').click();
+            setButtonLoading(deleteButton, false);
+            loadMenuButton.click();
         } catch (error) {
             console.error("Error deleting menu:", error);
             logStatus(`Error deleting menu: ${error.message}`);
+            setButtonLoading(deleteButton, false);
         }
     });
 
         // Publish button logic: copy private dataset to public
-        document.getElementById('publishButton').addEventListener('click', async () => {
+        const publishButton = document.getElementById('publishButton');
+        publishButton.addEventListener('click', async () => {
             if (!db || !auth.currentUser) {
                 logStatus('You must be logged in as admin.');
                 return;
             }
+            setButtonLoading(publishButton, true, 'Publishing...');
             try {
                 logStatus('Publishing PRIVATE menu to PUBLIC...');
                 const privateRef = collection(db, `artifacts/${appId}/private/data/menu_data_admin`);
@@ -1112,6 +1140,7 @@
                 const privateDocs = await getDocs(privateRef);
                 if (privateDocs.empty) {
                     logStatus('No private menu data to publish. Aborting.');
+                    setButtonLoading(publishButton, false);
                     return;
                 }
                 // Delete all public docs
@@ -1137,8 +1166,10 @@
                 });
                 await publishBatch.commit();
                 logStatus('Publish complete! Public menu updated.');
+                setButtonLoading(publishButton, false);
             } catch (err) {
                 logStatus('Error publishing menu: ' + (err.message || err));
+                setButtonLoading(publishButton, false);
             }
         });
 </script>

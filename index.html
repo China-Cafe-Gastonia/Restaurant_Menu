@@ -104,6 +104,7 @@
         import { normalizeMenuItem } from './js/utils/normalize.js';
         import { formatPrice, to12Hour, normalizeIngredientToken } from './js/utils/formatters.js';
         import { setupGlobalErrorHandlers, logError, logInfo, showNotification } from './js/utils/error-handling.js';
+        import { escapeHtml, escapeAttr } from './js/utils/sanitize.js';
 
         // Initialize global error handlers
         setupGlobalErrorHandlers();
@@ -142,7 +143,7 @@
             // Ingredient tags
             Array.from(ingredientSet.entries()).sort((a,b)=> a[1].localeCompare(b[1])).forEach(([token, display]) => {
                 const active = ingredientFilters.has(token);
-                parts.push(`<button data-ingredient="${encodeURIComponent(token)}" class="px-3 py-1 rounded-full text-sm ${active ? 'bg-yellow-100 text-yellow-800' : 'bg-gray-100 text-gray-700'}">${display}</button>`);
+                parts.push(`<button data-ingredient="${encodeURIComponent(token)}" class="px-3 py-1 rounded-full text-sm ${active ? 'bg-yellow-100 text-yellow-800' : 'bg-gray-100 text-gray-700'}">${escapeHtml(display)}</button>`);
             });
 
             filterBar.innerHTML = parts.join('');
@@ -184,20 +185,20 @@
                         const optsHtml = opts.map(u => {
                             if (u && typeof u === 'object') {
                                 const priceHtml = `<div class="text-orange-600 font-semibold">${formatPrice(u.price)}</div>`;
-                                const label = u.option ? `${u.option}` : '';
+                                const label = u.option ? escapeHtml(u.option) : '';
                                 return `<div class="flex items-center gap-3 mb-0.5"><div class="text-sm text-gray-700">${label}</div>${priceHtml}</div>`;
                             }
-                            return `<div class="text-sm text-gray-700 mb-0.5">${String(u)}</div>`;
+                            return `<div class="text-sm text-gray-700 mb-0.5">${escapeHtml(String(u))}</div>`;
                         }).join('');
-                        return `<div class="mb-1">${sizeLabel ? `<div class="text-sm font-semibold text-gray-800 mb-0.5">${sizeLabel}</div>` : ''}${optsHtml}</div>`;
+                        return `<div class="mb-1">${sizeLabel ? `<div class="text-sm font-semibold text-gray-800 mb-0.5">${escapeHtml(sizeLabel)}</div>` : ''}${optsHtml}</div>`;
                     }
                     // No options: render rows with size and price (no extra header)
                     const rows = opts.map(u => {
                         if (u && typeof u === 'object') {
                             const priceHtml = `<div class="text-orange-600 font-semibold">${formatPrice(u.price)}</div>`;
-                            return `<div class="flex items-center gap-3 mb-0.5"><div class="text-sm text-gray-700">${sizeLabel}</div>${priceHtml}</div>`;
+                            return `<div class="flex items-center gap-3 mb-0.5"><div class="text-sm text-gray-700">${escapeHtml(sizeLabel)}</div>${priceHtml}</div>`;
                         }
-                        return `<div class="text-sm text-gray-700 mb-0.5">${String(u)}</div>`;
+                        return `<div class="text-sm text-gray-700 mb-0.5">${escapeHtml(String(u))}</div>`;
                     }).join('');
                     return `<div class="mb-1">${rows}</div>`;
                 }).join('');
@@ -208,7 +209,7 @@
                 return `<div class="space-y-1"><span class="text-orange-600 font-semibold">${formatPrice(item.price)}</span></div>`;
             }
             if (item.prices && typeof item.prices === 'object') {
-                const html = Object.entries(item.prices).map(([k, v]) => `<div class="flex justify-between"><span class="text-sm text-gray-500">${k}</span><span class="text-orange-600">${formatPrice(v)}</span></div>`).join('');
+                const html = Object.entries(item.prices).map(([k, v]) => `<div class="flex justify-between"><span class="text-sm text-gray-500">${escapeHtml(k)}</span><span class="text-orange-600">${formatPrice(v)}</span></div>`).join('');
                 return `<div class="space-y-1">${html}</div>`;
             }
             if (typeof item.prices === 'string' || typeof item.prices === 'number') {
@@ -266,7 +267,7 @@
 
                 function formatHours(hours) {
                     if (typeof hours === 'string') {
-                        return `<span class='block'><b>Hours:</b> ${formatTimeString(hours)}</span>`;
+                        return `<span class='block'><b>Hours:</b> ${escapeHtml(formatTimeString(hours))}</span>`;
                     }
                     // If admin saved hours as an array of lines, render them directly (format times inside)
                     if (Array.isArray(hours)) {
@@ -276,7 +277,7 @@
                                 <span class="hours-title text-lg" style="font-size:1.2rem;"><b>Hours:</b></span>
                             </div>
                             <div class="flex flex-col items-center">
-                                ${hours.map(line => `<div class="text-base" style="margin-bottom:2px;">${formatTimeString(String(line || ''))}</div>`).join('')}
+                                ${hours.map(line => `<div class="text-base" style="margin-bottom:2px;">${escapeHtml(formatTimeString(String(line || '')))}</div>`).join('')}
                             </div>
                         </div>`;
                     }
@@ -317,8 +318,8 @@
                     formattedHours = formatHours(restaurant.hours);
                 }
                 infoEl.innerHTML = [
-                    restaurant.location ? `<span class='block'><b>Address:</b> ${restaurant.location}</span>` : '',
-                    restaurant.phone ? `<span class='block'><b>Phone:</b> ${restaurant.phone}</span>` : '',
+                    restaurant.location ? `<span class='block'><b>Address:</b> ${escapeHtml(restaurant.location)}</span>` : '',
+                    restaurant.phone ? `<span class='block'><b>Phone:</b> ${escapeHtml(restaurant.phone)}</span>` : '',
                     formattedHours
                 ].filter(Boolean).join('');
             } else {
@@ -332,7 +333,7 @@
                 <div class="important-note-box">
                     <span class="important-note-icon">🍱</span>
                     <span class="important-note-title">Combo Plate:</span>
-                    <span class="important-note-text">${notes.combination_plate}</span>
+                    <span class="important-note-text">${escapeHtml(notes.combination_plate)}</span>
                 </div>
             `;
         }
@@ -341,7 +342,7 @@
                 <div class="important-note-box">
                     <span class="important-note-icon">⏰</span>
                     <span class="important-note-title">Lunch Special:</span>
-                    <span class="important-note-text">${notes.lunch_special}</span>
+                    <span class="important-note-text">${escapeHtml(notes.lunch_special)}</span>
                 </div>
             `;
         }
@@ -422,10 +423,10 @@
                 const note = firstItem.note || '';
                 categoryCard.innerHTML = `
                     <div class="category-header">
-                        ${category}
-                        ${chineseName ? `<span class='category-chinese'>${chineseName}</span>` : ''}
+                        ${escapeHtml(category)}
+                        ${chineseName ? `<span class='category-chinese'>${escapeHtml(chineseName)}</span>` : ''}
                     </div>
-                    ${note ? `<div class='category-note'>${note}</div>` : ''}
+                    ${note ? `<div class='category-note'>${escapeHtml(note)}</div>` : ''}
                     <ul class="space-y-4">
                         ${groupedMenu[category].map(item => {
                             const details = buildDetailsHtml(item);
@@ -433,10 +434,10 @@
                             <li class="border-b pb-2">
                                 <div class="flex-grow">
                                     <h3 class="text-lg font-semibold">
-                                        ${item.spicy ? `<span role="img" aria-label="spicy" title="Spicy" style="color:#be123c; margin-right:0.5rem; display:inline-block; vertical-align:middle;">🌶️</span>` : ''}${item.name}
+                                        ${item.spicy ? `<span role="img" aria-label="spicy" title="Spicy" style="color:#be123c; margin-right:0.5rem; display:inline-block; vertical-align:middle;">🌶️</span>` : ''}${escapeHtml(item.name)}
                                     </h3>
-                                    <p class="text-sm text-gray-500 mb-1">${item.description || ''}</p>
-                                    ${((Array.isArray(item.ingredients) && item.ingredients.length > 0) || (typeof item.ingredients === 'string' && item.ingredients.trim().length > 0)) ? `<div class="text-sm text-gray-600 mb-1"><b>Ingredients:</b> ${Array.isArray(item.ingredients) ? item.ingredients.join(', ') : String(item.ingredients)}</div>` : ''}
+                                    <p class="text-sm text-gray-500 mb-1">${escapeHtml(item.description || '')}</p>
+                                    ${((Array.isArray(item.ingredients) && item.ingredients.length > 0) || (typeof item.ingredients === 'string' && item.ingredients.trim().length > 0)) ? `<div class="text-sm text-gray-600 mb-1"><b>Ingredients:</b> ${Array.isArray(item.ingredients) ? item.ingredients.map(i => escapeHtml(i)).join(', ') : escapeHtml(String(item.ingredients))}</div>` : ''}
                                     ${details ? details : ''}
                                 </div>
                             </li>

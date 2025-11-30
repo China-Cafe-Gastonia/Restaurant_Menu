@@ -6,6 +6,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-app.js";
 import { getFirestore } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js";
 import { getAuth } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-auth.js";
+import { initializeAppCheck, ReCaptchaV3Provider } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-app-check.js";
 
 // Firebase configuration
 // Note: These keys are safe to expose in client-side code
@@ -19,21 +20,23 @@ const firebaseConfig = {
   appId: "1:233511471732:web:e2298d04ff590dcdd6df21",
 };
 
+// Enable debug mode for localhost testing
+// IMPORTANT: This only activates on localhost, production uses real reCAPTCHA
+const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+if (isLocalhost) {
+  self.FIREBASE_APPCHECK_DEBUG_TOKEN = true;
+}
+
 // Initialize Firebase
 export const app = initializeApp(firebaseConfig);
 export const db = getFirestore(app);
 export const auth = getAuth(app);
 export const appId = firebaseConfig.appId;
 
-// Optional: Initialize App Check for additional security
-// Uncomment and configure when ready
-/*
-import { initializeAppCheck, ReCaptchaV3Provider } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-app-check.js";
-
+// Initialize App Check for additional security
 export const appCheck = initializeAppCheck(app, {
-  provider: new ReCaptchaV3Provider('YOUR-RECAPTCHA-SITE-KEY'),
+  provider: new ReCaptchaV3Provider('6Lc2MB0sAAAAANJw8ynBc0mZ51MAOQ6RwyZVcs35'),
   isTokenAutoRefreshEnabled: true
 });
-*/
 
-console.log('Firebase initialized successfully');
+console.log('Firebase initialized with App Check' + (isLocalhost ? ' (debug mode)' : ''));
