@@ -97,13 +97,17 @@
   - ✅ Screen reader only (.sr-only) utility class
   - ✅ Autocomplete attributes on login form
 
-### Day 5: Service Worker
-- [ ] **Create service worker for offline support** (3 hours)
-  - Create `sw.js` in root
-  - Register in both HTML files
-  - Cache static assets
-  - Implement cache-first strategy for menu data
-  - Test offline functionality
+### Day 5: Service Worker ✅ COMPLETED
+- [x] **Create service worker for offline support** (3 hours)
+  - ✅ Created `sw.js` in root with full offline support
+  - ✅ Registered in both index.html and admin.html
+  - ✅ Cache static assets on install (HTML, CSS, JS)
+  - ✅ Cache-first strategy for static assets
+  - ✅ Network-first strategy for HTML pages
+  - ✅ Background cache updates (stale-while-revalidate)
+  - ✅ Automatic old cache cleanup on activate
+  - ✅ New version notification to users
+  - ✅ Respects reduced motion and handles Firebase API calls
 
 ### Day 6-7: Performance Optimization
 - [ ] **Run Lighthouse audit**
