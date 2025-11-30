@@ -7,6 +7,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/12.2.1/firebas
 import { getFirestore } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js";
 import { getAuth } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-auth.js";
 import { initializeAppCheck, ReCaptchaV3Provider } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-app-check.js";
+import { getAnalytics, logEvent } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-analytics.js";
 
 // Firebase configuration
 // Note: These keys are safe to expose in client-side code
@@ -33,10 +34,18 @@ export const db = getFirestore(app);
 export const auth = getAuth(app);
 export const appId = firebaseConfig.appId;
 
+// Initialize Analytics (tracks page views automatically)
+export const analytics = getAnalytics(app);
+
 // Initialize App Check for additional security
 export const appCheck = initializeAppCheck(app, {
   provider: new ReCaptchaV3Provider('6Lc2MB0sAAAAANJw8ynBc0mZ51MAOQ6RwyZVcs35'),
   isTokenAutoRefreshEnabled: true
 });
 
-console.log('Firebase initialized with App Check' + (isLocalhost ? ' (debug mode)' : ''));
+// Helper function to log custom events
+export function trackEvent(eventName, params = {}) {
+  logEvent(analytics, eventName, params);
+}
+
+console.log('Firebase initialized with App Check & Analytics' + (isLocalhost ? ' (debug mode)' : ''));

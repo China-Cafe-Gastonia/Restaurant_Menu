@@ -115,7 +115,7 @@
         </main>
     <script type="module">
         // Import Firebase configuration
-        import { db, appId } from './js/firebase-config.js';
+        import { db, appId, trackEvent } from './js/firebase-config.js';
         import { collection, onSnapshot } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js";
         
         // Import utility functions
@@ -126,6 +126,9 @@
 
         // Initialize global error handlers
         setupGlobalErrorHandlers();
+        
+        // Track page view with additional context
+        trackEvent('menu_view', { page: 'public_menu' });
 
         // Filtering state for public page
         let _cachedMenuItems = [];
