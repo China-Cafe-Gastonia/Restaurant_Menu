@@ -60,6 +60,53 @@
     <main id="main-content">
     <div id="adminMain" class="admin-main-hidden" role="region" aria-label="Admin controls">
 
+        <!-- Dashboard Statistics -->
+        <div id="dashboardStats" class="card mb-4">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-2xl font-semibold">📊 Dashboard</h2>
+                <a href="https://console.firebase.google.com/project/china-cafe-menu/analytics" 
+                   target="_blank" 
+                   class="text-blue-600 hover:text-blue-800 text-sm flex items-center gap-1">
+                    <span>View Full Analytics</span>
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+                    </svg>
+                </a>
+            </div>
+            
+            <!-- Stats Grid -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+                <!-- Total Categories -->
+                <div class="bg-blue-50 rounded-xl p-4 text-center">
+                    <div class="text-3xl font-bold text-blue-600" id="statCategories">-</div>
+                    <div class="text-sm text-gray-600">Categories</div>
+                </div>
+                <!-- Total Items -->
+                <div class="bg-green-50 rounded-xl p-4 text-center">
+                    <div class="text-3xl font-bold text-green-600" id="statItems">-</div>
+                    <div class="text-sm text-gray-600">Menu Items</div>
+                </div>
+                <!-- Spicy Items -->
+                <div class="bg-red-50 rounded-xl p-4 text-center">
+                    <div class="text-3xl font-bold text-red-600" id="statSpicy">-</div>
+                    <div class="text-sm text-gray-600">🌶️ Spicy Items</div>
+                </div>
+                <!-- Last Updated -->
+                <div class="bg-purple-50 rounded-xl p-4 text-center">
+                    <div class="text-xl font-bold text-purple-600" id="statLastUpdate">-</div>
+                    <div class="text-sm text-gray-600">Last Updated</div>
+                </div>
+            </div>
+
+            <!-- Category Breakdown -->
+            <div class="border-t pt-4">
+                <h3 class="text-sm font-semibold text-gray-700 mb-2">Items per Category</h3>
+                <div id="categoryBreakdown" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 text-sm">
+                    <!-- Populated by JavaScript -->
+                </div>
+            </div>
+        </div>
+
         <!-- Field/Form 1: Menu Management Controls -->
         <div id="adminControls" class="card mb-4">
             <div class="flex justify-between items-center mb-4">
@@ -289,6 +336,49 @@
 
     // Initialize global error handlers
     setupGlobalErrorHandlers();
+
+    // Dashboard statistics function
+    function updateDashboardStats(menuItems, infoDoc) {
+        // Count categories
+        const categories = new Set(menuItems.map(item => item.category).filter(Boolean));
+        document.getElementById('statCategories').textContent = categories.size;
+        
+        // Count total items
+        document.getElementById('statItems').textContent = menuItems.length;
+        
+        // Count spicy items
+        const spicyCount = menuItems.filter(item => item.spicy).length;
+        document.getElementById('statSpicy').textContent = spicyCount;
+        
+        // Last updated (from info doc or current time)
+        const lastUpdate = infoDoc?.updatedAt || infoDoc?.generatedAt || new Date().toISOString();
+        const updateDate = new Date(lastUpdate);
+        const formattedDate = updateDate.toLocaleDateString('en-US', { 
+            month: 'short', 
+            day: 'numeric',
+            year: updateDate.getFullYear() !== new Date().getFullYear() ? 'numeric' : undefined
+        });
+        document.getElementById('statLastUpdate').textContent = formattedDate;
+        
+        // Category breakdown
+        const categoryCounts = {};
+        menuItems.forEach(item => {
+            const cat = item.category || 'Uncategorized';
+            categoryCounts[cat] = (categoryCounts[cat] || 0) + 1;
+        });
+        
+        const breakdownEl = document.getElementById('categoryBreakdown');
+        if (breakdownEl) {
+            breakdownEl.innerHTML = Object.entries(categoryCounts)
+                .sort((a, b) => b[1] - a[1]) // Sort by count descending
+                .map(([cat, count]) => `
+                    <div class="flex justify-between items-center bg-gray-50 rounded px-2 py-1">
+                        <span class="text-gray-700 truncate">${escapeHtml(cat)}</span>
+                        <span class="text-gray-500 font-semibold ml-2">${count}</span>
+                    </div>
+                `).join('');
+        }
+    }
 
     // Keep last parsed/uploaded or loaded doc in memory so "Normalize & Download" can use it
     let lastParsedDoc = null;
@@ -1058,6 +1148,10 @@
                 (acc[item.category] = acc[item.category] || []).push(item);
                 return acc;
             }, {});
+            
+            // Update dashboard statistics
+            updateDashboardStats(menuItems, infoDoc);
+            
             for (const category in groupedMenu) {
                 const items = groupedMenu[category];
                 const firstItem = items[0] || {};
