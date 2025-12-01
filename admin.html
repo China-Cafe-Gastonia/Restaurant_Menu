@@ -587,10 +587,6 @@
                                 <input type="checkbox" class="admin-item-vegan mr-1" ${item.vegan ? 'checked' : ''} />
                                 <span class="text-sm" title="Vegan">🌱</span>
                             </label>
-                            <label class="inline-flex items-center text-sm">
-                                <input type="checkbox" class="admin-item-glutenfree mr-1" ${item.glutenFree ? 'checked' : ''} />
-                                <span class="text-sm" title="Gluten-Free">🌾</span>
-                            </label>
                         </div>
                         <div class="flex-grow">
                             <input type="hidden" class="admin-item-id" value="${escapeAttr(item._id || '')}" />
@@ -907,7 +903,6 @@
                                 const spicy = !!li.querySelector('.admin-item-spicy')?.checked;
                                 const vegetarian = !!li.querySelector('.admin-item-vegetarian')?.checked;
                                 const vegan = !!li.querySelector('.admin-item-vegan')?.checked;
-                                const glutenFree = !!li.querySelector('.admin-item-glutenfree')?.checked;
                                 const ingredientsRaw = li.querySelector('.admin-item-ingredients')?.value || '';
                                 const ingredients = (ingredientsRaw || '').split(/[\n,]/).map(s => s.trim()).filter(Boolean).map(normalizeIngredientName);
                                 // dedupe while preserving order
@@ -931,7 +926,6 @@
                                 // Only include dietary flags if true (to save space)
                                 if (vegetarian) itemData.vegetarian = true;
                                 if (vegan) itemData.vegan = true;
-                                if (glutenFree) itemData.glutenFree = true;
                                 items.push(itemData);
                             });
                         });

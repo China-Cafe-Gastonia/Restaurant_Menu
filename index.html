@@ -597,7 +597,6 @@
                                         ${item.spicy ? `<span class="spicy-icon" role="img" aria-label="spicy" title="Spicy">🌶️</span>` : ''}${escapeHtml(item.name)}
                                         ${item.vegetarian ? `<span class="dietary-tag dietary-vegetarian" role="img" aria-label="vegetarian" title="Vegetarian">🥬</span>` : ''}
                                         ${item.vegan ? `<span class="dietary-tag dietary-vegan" role="img" aria-label="vegan" title="Vegan">🌱</span>` : ''}
-                                        ${item.glutenFree ? `<span class="dietary-tag dietary-gf" role="img" aria-label="gluten-free" title="Gluten-Free">🌾</span>` : ''}
                                     </h3>
                                     <p class="text-sm text-gray-500 mb-1">${escapeHtml(item.description || '')}</p>
                                     ${((Array.isArray(item.ingredients) && item.ingredients.length > 0) || (typeof item.ingredients === 'string' && item.ingredients.trim().length > 0)) ? `<div class="text-sm text-gray-600 mb-1"><b>Ingredients:</b> ${Array.isArray(item.ingredients) ? item.ingredients.map(i => escapeHtml(i)).join(', ') : escapeHtml(String(item.ingredients))}</div>` : ''}
