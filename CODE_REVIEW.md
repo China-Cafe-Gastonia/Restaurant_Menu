@@ -40,9 +40,12 @@
 
 ### 📋 Optional/Future Items
 - [ ] Automated testing implementation
-- [ ] Print-friendly menu view
-- [ ] Admin dashboard with statistics
-- [ ] Menu item popularity tracking
+- [ ] QR code generator for menu link
+- [ ] Customer favorites (localStorage)
+- [ ] Item popularity tracking
+- [ ] Dietary tags (vegetarian, gluten-free)
+
+See [ROADMAP.md](ROADMAP.md) for detailed future plans.
 
 ---
 
