@@ -11,6 +11,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/common.css">
+    <!-- QR Code Library -->
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
 </head>
 <body class="bg-gray-100 text-gray-800">
     <!-- Skip to main content link for keyboard/screen reader users -->
@@ -103,6 +105,36 @@
                 <h3 class="text-sm font-semibold text-gray-700 mb-2">Items per Category</h3>
                 <div id="categoryBreakdown" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 text-sm">
                     <!-- Populated by JavaScript -->
+                </div>
+            </div>
+        </div>
+
+        <!-- QR Code Generator -->
+        <div id="qrCodeSection" class="card mb-4">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-2xl font-semibold">📱 QR Code for Menu</h2>
+            </div>
+            <p class="text-gray-600 text-sm mb-4">Print this QR code for customers to scan and view the menu on their phones.</p>
+            <div class="flex flex-col md:flex-row gap-6 items-start">
+                <div class="bg-white p-4 rounded-lg shadow-inner border-2 border-gray-200">
+                    <canvas id="qrCodeCanvas" width="200" height="200"></canvas>
+                </div>
+                <div class="flex flex-col gap-3">
+                    <div class="text-sm text-gray-600">
+                        <strong>Menu URL:</strong><br>
+                        <a href="https://china-cafe-gastonia.github.io/Restaurant_Menu/" target="_blank" class="text-blue-600 hover:underline break-all">
+                            https://china-cafe-gastonia.github.io/Restaurant_Menu/
+                        </a>
+                    </div>
+                    <div class="flex gap-2">
+                        <button id="downloadQrBtn" class="bg-blue-500 text-white font-semibold py-2 px-4 rounded-full shadow hover:bg-blue-600 transition-colors">
+                            ⬇️ Download PNG
+                        </button>
+                        <button id="printQrBtn" class="bg-gray-500 text-white font-semibold py-2 px-4 rounded-full shadow hover:bg-gray-600 transition-colors">
+                            🖨️ Print
+                        </button>
+                    </div>
+                    <p class="text-xs text-gray-500">Tip: Print at 2-3 inches for table tents, or larger for posters.</p>
                 </div>
             </div>
         </div>
@@ -542,10 +574,22 @@
             return `
                 <li class="border-b pb-2 admin-item">
                     <div class="flex items-start gap-3">
-                        <div class="flex-shrink-0 mt-1">
+                        <div class="flex-shrink-0 mt-1 space-y-1">
                             <label class="inline-flex items-center text-sm">
-                                <input type="checkbox" class="admin-item-spicy mr-2" ${item.spicy ? 'checked' : ''} />
-                                <span class="text-sm text-gray-600">Spicy</span>
+                                <input type="checkbox" class="admin-item-spicy mr-1" ${item.spicy ? 'checked' : ''} />
+                                <span class="text-sm" title="Spicy">🌶️</span>
+                            </label>
+                            <label class="inline-flex items-center text-sm">
+                                <input type="checkbox" class="admin-item-vegetarian mr-1" ${item.vegetarian ? 'checked' : ''} />
+                                <span class="text-sm" title="Vegetarian">🥬</span>
+                            </label>
+                            <label class="inline-flex items-center text-sm">
+                                <input type="checkbox" class="admin-item-vegan mr-1" ${item.vegan ? 'checked' : ''} />
+                                <span class="text-sm" title="Vegan">🌱</span>
+                            </label>
+                            <label class="inline-flex items-center text-sm">
+                                <input type="checkbox" class="admin-item-glutenfree mr-1" ${item.glutenFree ? 'checked' : ''} />
+                                <span class="text-sm" title="Gluten-Free">🌾</span>
                             </label>
                         </div>
                         <div class="flex-grow">
@@ -569,6 +613,60 @@
     const deletePublicButton = document.getElementById('deletePublicButton');
         const statusMessage = document.getElementById('statusMessage');
         const jsonFile = document.getElementById('jsonFile');
+
+        // QR Code Generation
+        const menuUrl = 'https://china-cafe-gastonia.github.io/Restaurant_Menu/';
+        const qrCanvas = document.getElementById('qrCodeCanvas');
+        
+        // Generate QR code on page load
+        if (typeof QRCode !== 'undefined' && qrCanvas) {
+            QRCode.toCanvas(qrCanvas, menuUrl, {
+                width: 200,
+                margin: 2,
+                color: { dark: '#1f2937', light: '#ffffff' }
+            }, function(error) {
+                if (error) console.error('QR Code generation error:', error);
+            });
+        }
+        
+        // Download QR code as PNG
+        document.getElementById('downloadQrBtn')?.addEventListener('click', function() {
+            if (!qrCanvas) return;
+            const link = document.createElement('a');
+            link.download = 'china-cafe-menu-qr.png';
+            link.href = qrCanvas.toDataURL('image/png');
+            link.click();
+        });
+        
+        // Print QR code
+        document.getElementById('printQrBtn')?.addEventListener('click', function() {
+            if (!qrCanvas) return;
+            const printWindow = window.open('', '_blank');
+            printWindow.document.write(`
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>China Cafe Menu QR Code</title>
+                    <style>
+                        body { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; margin: 0; font-family: Arial, sans-serif; }
+                        img { max-width: 300px; }
+                        h1 { font-size: 24px; margin-bottom: 10px; }
+                        p { color: #666; margin-top: 10px; }
+                    </style>
+                </head>
+                <body>
+                    <h1>🍜 China Cafe Menu</h1>
+                    <img src="${qrCanvas.toDataURL('image/png')}" alt="QR Code">
+                    <p>Scan to view our menu</p>
+                </body>
+                </html>
+            `);
+            printWindow.document.close();
+            printWindow.onload = function() {
+                printWindow.print();
+                printWindow.close();
+            };
+        });
 
         // Auth state observer
         onAuthStateChanged(auth, (user) => {
@@ -807,6 +905,9 @@
                                 });
 
                                 const spicy = !!li.querySelector('.admin-item-spicy')?.checked;
+                                const vegetarian = !!li.querySelector('.admin-item-vegetarian')?.checked;
+                                const vegan = !!li.querySelector('.admin-item-vegan')?.checked;
+                                const glutenFree = !!li.querySelector('.admin-item-glutenfree')?.checked;
                                 const ingredientsRaw = li.querySelector('.admin-item-ingredients')?.value || '';
                                 const ingredients = (ingredientsRaw || '').split(/[\n,]/).map(s => s.trim()).filter(Boolean).map(normalizeIngredientName);
                                 // dedupe while preserving order
@@ -816,7 +917,22 @@
                                     const key = i.toLowerCase();
                                     if (!seen.has(key)) { seen.add(key); dedup.push(i); }
                                 });
-                                items.push({ _id: id, name, description, unit, spicy, ingredients: dedup.length ? dedup : null, category: categoryName, categoryOrder: catIdx, itemOrder: itemIdx });
+                                const itemData = { 
+                                    _id: id, 
+                                    name, 
+                                    description, 
+                                    unit, 
+                                    spicy, 
+                                    ingredients: dedup.length ? dedup : null, 
+                                    category: categoryName, 
+                                    categoryOrder: catIdx, 
+                                    itemOrder: itemIdx 
+                                };
+                                // Only include dietary flags if true (to save space)
+                                if (vegetarian) itemData.vegetarian = true;
+                                if (vegan) itemData.vegan = true;
+                                if (glutenFree) itemData.glutenFree = true;
+                                items.push(itemData);
                             });
                         });
 

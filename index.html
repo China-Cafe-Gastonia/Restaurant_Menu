@@ -141,6 +141,14 @@
                     <div id="searchResults" class="text-center text-sm text-gray-500 mt-2 hidden"></div>
                 </div>
 
+                <!-- Dietary Legend -->
+                <div class="dietary-legend" id="dietaryLegend">
+                    <span class="dietary-legend-item"><span>🌶️</span> Spicy</span>
+                    <span class="dietary-legend-item"><span class="dietary-vegetarian">🥬</span> Vegetarian</span>
+                    <span class="dietary-legend-item"><span class="dietary-vegan">🌱</span> Vegan</span>
+                    <span class="dietary-legend-item"><span class="dietary-gf">🌾</span> Gluten-Free</span>
+                </div>
+
                 <div id="loadingMessage" class="text-center text-gray-500 text-lg" role="status" aria-live="polite">
                     Loading menu...
                 </div>
@@ -579,10 +587,17 @@
                         ${groupedMenu[category].map(item => {
                             const details = buildDetailsHtml(item);
                             return `
-                            <li class="border-b pb-2">
+                            <li class="border-b pb-2 menu-item-card" 
+                                data-name="${escapeAttr(item.name)}" 
+                                data-desc="${escapeAttr(item.description || '')}" 
+                                data-ingredients="${escapeAttr(Array.isArray(item.ingredients) ? item.ingredients.join(' ') : (item.ingredients || ''))}"
+                                data-category="${escapeAttr(category)}">
                                 <div class="flex-grow">
-                                    <h3 class="text-lg font-semibold">
+                                    <h3 class="text-lg font-semibold flex items-center flex-wrap gap-1">
                                         ${item.spicy ? `<span class="spicy-icon" role="img" aria-label="spicy" title="Spicy">🌶️</span>` : ''}${escapeHtml(item.name)}
+                                        ${item.vegetarian ? `<span class="dietary-tag dietary-vegetarian" role="img" aria-label="vegetarian" title="Vegetarian">🥬</span>` : ''}
+                                        ${item.vegan ? `<span class="dietary-tag dietary-vegan" role="img" aria-label="vegan" title="Vegan">🌱</span>` : ''}
+                                        ${item.glutenFree ? `<span class="dietary-tag dietary-gf" role="img" aria-label="gluten-free" title="Gluten-Free">🌾</span>` : ''}
                                     </h3>
                                     <p class="text-sm text-gray-500 mb-1">${escapeHtml(item.description || '')}</p>
                                     ${((Array.isArray(item.ingredients) && item.ingredients.length > 0) || (typeof item.ingredients === 'string' && item.ingredients.trim().length > 0)) ? `<div class="text-sm text-gray-600 mb-1"><b>Ingredients:</b> ${Array.isArray(item.ingredients) ? item.ingredients.map(i => escapeHtml(i)).join(', ') : escapeHtml(String(item.ingredients))}</div>` : ''}
