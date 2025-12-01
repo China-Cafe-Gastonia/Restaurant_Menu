@@ -133,12 +133,20 @@
   - ✅ Searches name, description, ingredients, category
   - ✅ Shows result count
   - ✅ Clear button and Escape key support
-- [ ] Print-friendly menu view
+- [x] **Print-friendly menu view** ✅
+  - ✅ Print button in sidebar
+  - ✅ @media print styles hide navigation, buttons
+  - ✅ Clean layout for printing
+  - ✅ Proper page breaks between categories
 - [x] **Analytics integration** ✅
   - ✅ Firebase Analytics integrated
   - ✅ Tracks page views and menu searches
   - ✅ View stats at Firebase Console
-- [ ] Admin dashboard with statistics
+- [x] **Admin dashboard with statistics** ✅
+  - ✅ Total categories, items, spicy items counts
+  - ✅ Last updated timestamp
+  - ✅ Items per category breakdown
+  - ✅ Link to Firebase Analytics Console
 - [ ] Menu item popularity tracking
 - [ ] Customer feedback system
 
