@@ -529,7 +529,12 @@
             menuDocs = filteredDocs;
 
             if (!menuDocs || menuDocs.length === 0) {
-                menuContainer.innerHTML = '<div class="text-center text-gray-400 text-xl py-12">Menu not available or under maintenance.</div>';
+                // Check if this is due to search/filter or if menu is actually empty
+                if (searchQuery || spicyOnlyFilter || ingredientFilters.size > 0) {
+                    menuContainer.innerHTML = '<div class="text-center text-gray-500 text-xl py-12">No items match your search or filters.</div>';
+                } else {
+                    menuContainer.innerHTML = '<div class="text-center text-gray-400 text-xl py-12">Menu not available or under maintenance.</div>';
+                }
                 return;
             }
             // Sort menuDocs by categoryOrder and itemOrder if present
