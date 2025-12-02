@@ -138,8 +138,31 @@
                     <span class="dietary-legend-item"><span class="dietary-vegan">🌱</span> Vegan</span>
                 </div>
 
-                <div id="loadingMessage" class="text-center text-gray-500 text-lg" role="status" aria-live="polite">
-                    Loading menu...
+                <!-- Loading Skeleton -->
+                <div id="loadingMessage" class="space-y-6" role="status" aria-live="polite" aria-label="Loading menu">
+                    <!-- Restaurant header skeleton -->
+                    <div class="text-center mb-8">
+                        <div class="loading-skeleton h-10 w-64 mx-auto mb-3"></div>
+                        <div class="loading-skeleton h-5 w-48 mx-auto mb-2"></div>
+                        <div class="loading-skeleton h-5 w-40 mx-auto"></div>
+                    </div>
+                    <!-- Category skeletons -->
+                    <div class="menu-card">
+                        <div class="loading-skeleton h-8 w-48 mb-4"></div>
+                        <div class="space-y-3">
+                            <div class="loading-skeleton h-16 w-full"></div>
+                            <div class="loading-skeleton h-16 w-full"></div>
+                            <div class="loading-skeleton h-16 w-full"></div>
+                        </div>
+                    </div>
+                    <div class="menu-card">
+                        <div class="loading-skeleton h-8 w-40 mb-4"></div>
+                        <div class="space-y-3">
+                            <div class="loading-skeleton h-16 w-full"></div>
+                            <div class="loading-skeleton h-16 w-full"></div>
+                        </div>
+                    </div>
+                    <span class="sr-only">Loading menu, please wait...</span>
                 </div>
 
                 <div id="menuContainer" role="region" aria-label="Menu items">
@@ -170,6 +193,67 @@
         const ingredientFilters = new Set();
         let spicyOnlyFilter = false;
         let searchQuery = '';
+        
+        // Lazy loading observer for menu categories
+        let categoryObserver = null;
+        const renderedCategories = new Set();
+        
+        function initLazyLoading() {
+            if ('IntersectionObserver' in window) {
+                categoryObserver = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            const card = entry.target;
+                            if (card.dataset.lazyCategory && !renderedCategories.has(card.id)) {
+                                // Render the actual content
+                                const categoryData = JSON.parse(card.dataset.lazyCategory);
+                                renderCategoryContent(card, categoryData);
+                                renderedCategories.add(card.id);
+                                categoryObserver.unobserve(card);
+                            }
+                        }
+                    });
+                }, {
+                    rootMargin: '200px 0px', // Pre-load 200px before visible
+                    threshold: 0.01
+                });
+            }
+        }
+        
+        function renderCategoryContent(card, { category, items, chineseName, note }) {
+            card.innerHTML = `
+                <h2 class="category-header">
+                    ${escapeHtml(category)}
+                    ${chineseName ? `<span class='category-chinese'>${escapeHtml(chineseName)}</span>` : ''}
+                </h2>
+                ${note ? `<div class='category-note'>${escapeHtml(note)}</div>` : ''}
+                <ul class="space-y-4">
+                    ${items.map(item => {
+                        const details = buildDetailsHtml(item);
+                        return `
+                        <li class="border-b pb-2 menu-item-card" 
+                            data-name="${escapeAttr(item.name)}" 
+                            data-desc="${escapeAttr(item.description || '')}" 
+                            data-ingredients="${escapeAttr(Array.isArray(item.ingredients) ? item.ingredients.join(' ') : (item.ingredients || ''))}"
+                            data-category="${escapeAttr(category)}">
+                            <div class="flex-grow">
+                                <h3 class="text-lg font-semibold flex items-center flex-wrap gap-1">
+                                    ${item.spicy ? `<span class="spicy-icon" role="img" aria-label="spicy" title="Spicy">🌶️</span>` : ''}${escapeHtml(item.name)}
+                                    ${item.vegetarian ? `<span class="dietary-tag dietary-vegetarian" role="img" aria-label="vegetarian" title="Vegetarian">🥬</span>` : ''}
+                                    ${item.vegan ? `<span class="dietary-tag dietary-vegan" role="img" aria-label="vegan" title="Vegan">🌱</span>` : ''}
+                                </h3>
+                                <p class="text-sm text-gray-500 mb-1">${escapeHtml(item.description || '')}</p>
+                                ${((Array.isArray(item.ingredients) && item.ingredients.length > 0) || (typeof item.ingredients === 'string' && item.ingredients.trim().length > 0)) ? `<div class="text-sm text-gray-600 mb-1"><b>Ingredients:</b> ${Array.isArray(item.ingredients) ? item.ingredients.map(i => escapeHtml(i)).join(', ') : escapeHtml(String(item.ingredients))}</div>` : ''}
+                                ${details ? details : ''}
+                            </div>
+                        </li>
+                        `;
+                    }).join('')}
+                </ul>
+            `;
+            card.classList.add('lazy-loaded');
+            delete card.dataset.lazyCategory;
+        }
 
         // Search functionality
         function initSearch() {
@@ -575,47 +659,76 @@
             });
             
             // Render menu categories with IDs for navigation
-            for (const category in groupedMenu) {
+            // Clear rendered categories set for fresh render
+            renderedCategories.clear();
+            const categoryKeys = Object.keys(groupedMenu);
+            const EAGER_LOAD_COUNT = 3; // First 3 categories load immediately
+            
+            categoryKeys.forEach((category, index) => {
                 const categorySlug = category.toLowerCase().replace(/\s+/g, '-');
                 const categoryCard = document.createElement('div');
                 categoryCard.classList.add('menu-card');
                 categoryCard.id = `category-${categorySlug}`;
-                // Get meta info from first item in category
+                
                 const firstItem = groupedMenu[category][0] || {};
                 const chineseName = firstItem.chinese_name || '';
                 const note = firstItem.note || '';
-                categoryCard.innerHTML = `
-                    <h2 class="category-header">
-                        ${escapeHtml(category)}
-                        ${chineseName ? `<span class='category-chinese'>${escapeHtml(chineseName)}</span>` : ''}
-                    </h2>
-                    ${note ? `<div class='category-note'>${escapeHtml(note)}</div>` : ''}
-                    <ul class="space-y-4">
-                        ${groupedMenu[category].map(item => {
-                            const details = buildDetailsHtml(item);
-                            return `
-                            <li class="border-b pb-2 menu-item-card" 
-                                data-name="${escapeAttr(item.name)}" 
-                                data-desc="${escapeAttr(item.description || '')}" 
-                                data-ingredients="${escapeAttr(Array.isArray(item.ingredients) ? item.ingredients.join(' ') : (item.ingredients || ''))}"
-                                data-category="${escapeAttr(category)}">
-                                <div class="flex-grow">
-                                    <h3 class="text-lg font-semibold flex items-center flex-wrap gap-1">
-                                        ${item.spicy ? `<span class="spicy-icon" role="img" aria-label="spicy" title="Spicy">🌶️</span>` : ''}${escapeHtml(item.name)}
-                                        ${item.vegetarian ? `<span class="dietary-tag dietary-vegetarian" role="img" aria-label="vegetarian" title="Vegetarian">🥬</span>` : ''}
-                                        ${item.vegan ? `<span class="dietary-tag dietary-vegan" role="img" aria-label="vegan" title="Vegan">🌱</span>` : ''}
-                                    </h3>
-                                    <p class="text-sm text-gray-500 mb-1">${escapeHtml(item.description || '')}</p>
-                                    ${((Array.isArray(item.ingredients) && item.ingredients.length > 0) || (typeof item.ingredients === 'string' && item.ingredients.trim().length > 0)) ? `<div class="text-sm text-gray-600 mb-1"><b>Ingredients:</b> ${Array.isArray(item.ingredients) ? item.ingredients.map(i => escapeHtml(i)).join(', ') : escapeHtml(String(item.ingredients))}</div>` : ''}
-                                    ${details ? details : ''}
-                                </div>
-                            </li>
-                            `;
-                        }).join('')}
-                    </ul>
-                `;
+                const items = groupedMenu[category];
+                
+                // Eager load first few categories, lazy load the rest
+                if (index < EAGER_LOAD_COUNT || !categoryObserver) {
+                    // Render immediately
+                    categoryCard.innerHTML = `
+                        <h2 class="category-header">
+                            ${escapeHtml(category)}
+                            ${chineseName ? `<span class='category-chinese'>${escapeHtml(chineseName)}</span>` : ''}
+                        </h2>
+                        ${note ? `<div class='category-note'>${escapeHtml(note)}</div>` : ''}
+                        <ul class="space-y-4">
+                            ${items.map(item => {
+                                const details = buildDetailsHtml(item);
+                                return `
+                                <li class="border-b pb-2 menu-item-card" 
+                                    data-name="${escapeAttr(item.name)}" 
+                                    data-desc="${escapeAttr(item.description || '')}" 
+                                    data-ingredients="${escapeAttr(Array.isArray(item.ingredients) ? item.ingredients.join(' ') : (item.ingredients || ''))}"
+                                    data-category="${escapeAttr(category)}">
+                                    <div class="flex-grow">
+                                        <h3 class="text-lg font-semibold flex items-center flex-wrap gap-1">
+                                            ${item.spicy ? `<span class="spicy-icon" role="img" aria-label="spicy" title="Spicy">🌶️</span>` : ''}${escapeHtml(item.name)}
+                                            ${item.vegetarian ? `<span class="dietary-tag dietary-vegetarian" role="img" aria-label="vegetarian" title="Vegetarian">🥬</span>` : ''}
+                                            ${item.vegan ? `<span class="dietary-tag dietary-vegan" role="img" aria-label="vegan" title="Vegan">🌱</span>` : ''}
+                                        </h3>
+                                        <p class="text-sm text-gray-500 mb-1">${escapeHtml(item.description || '')}</p>
+                                        ${((Array.isArray(item.ingredients) && item.ingredients.length > 0) || (typeof item.ingredients === 'string' && item.ingredients.trim().length > 0)) ? `<div class="text-sm text-gray-600 mb-1"><b>Ingredients:</b> ${Array.isArray(item.ingredients) ? item.ingredients.map(i => escapeHtml(i)).join(', ') : escapeHtml(String(item.ingredients))}</div>` : ''}
+                                        ${details ? details : ''}
+                                    </div>
+                                </li>
+                                `;
+                            }).join('')}
+                        </ul>
+                    `;
+                    renderedCategories.add(categoryCard.id);
+                } else {
+                    // Lazy load - render placeholder with skeleton
+                    categoryCard.innerHTML = `
+                        <h2 class="category-header">
+                            ${escapeHtml(category)}
+                            ${chineseName ? `<span class='category-chinese'>${escapeHtml(chineseName)}</span>` : ''}
+                        </h2>
+                        <div class="space-y-3 py-2">
+                            <div class="loading-skeleton h-14 w-full"></div>
+                            <div class="loading-skeleton h-14 w-full"></div>
+                            <div class="loading-skeleton h-14 w-full"></div>
+                        </div>
+                    `;
+                    // Store data for lazy rendering
+                    categoryCard.dataset.lazyCategory = JSON.stringify({ category, items, chineseName, note });
+                    categoryObserver.observe(categoryCard);
+                }
+                
                 menuContainer.appendChild(categoryCard);
-            }
+            });
         }
 
         async function listenForMenuUpdates() {
@@ -661,6 +774,9 @@
 
         window.onload = async () => {
             try {
+                // Initialize lazy loading for menu categories
+                initLazyLoading();
+                
                 // Firebase already initialized in firebase-config.js
                 await fetchRestaurantData();
                 listenForMenuUpdates();

@@ -504,6 +504,20 @@ html {
     border-radius: 0.5rem;
 }
 
+/* Lazy loaded category fade-in */
+.menu-card.lazy-loaded {
+    animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0.5;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
 @keyframes loading {
     0% {
         background-position: 200% 0;
