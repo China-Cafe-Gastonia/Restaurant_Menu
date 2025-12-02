@@ -202,7 +202,7 @@
                     
                     // Re-render menu with search filter
                     if (_cachedMenuItems.length > 0) {
-                        renderMenuCategories(_cachedMenuItems);
+                        renderMenu(_cachedMenuItems);
                         updateSearchResults();
                     }
                     
@@ -221,7 +221,7 @@
                     clearBtn.classList.add('hidden');
                     searchResults.classList.add('hidden');
                     if (_cachedMenuItems.length > 0) {
-                        renderMenuCategories(_cachedMenuItems);
+                        renderMenu(_cachedMenuItems);
                     }
                     searchInput.focus();
                 });
