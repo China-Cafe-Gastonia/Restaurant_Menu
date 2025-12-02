@@ -763,6 +763,8 @@ html {
     #scrollToTop,
     #searchContainer,
     #filterBar,
+    #dietaryLegend,
+    .dietary-legend,
     .print\\:hidden,
     button,
     nav[aria-label="Site navigation"] {
