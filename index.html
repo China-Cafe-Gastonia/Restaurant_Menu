@@ -176,6 +176,8 @@
 
         // Filtering and search state for public page
         let _cachedMenuItems = [];
+        let _cachedRestaurantInfo = null; // Store restaurant and notes info separately
+        let _cachedNotes = null;
         const ingredientFilters = new Set();
         let spicyOnlyFilter = false;
         let searchQuery = '';
@@ -202,7 +204,7 @@
                     
                     // Re-render menu with search filter
                     if (_cachedMenuItems.length > 0) {
-                        renderMenu(_cachedMenuItems);
+                        renderMenu(_cachedMenuItems, true);
                         updateSearchResults();
                     }
                     
@@ -221,7 +223,7 @@
                     clearBtn.classList.add('hidden');
                     searchResults.classList.add('hidden');
                     if (_cachedMenuItems.length > 0) {
-                        renderMenu(_cachedMenuItems);
+                        renderMenu(_cachedMenuItems, true);
                     }
                     searchInput.focus();
                 });
@@ -306,14 +308,14 @@
                 btn.addEventListener('click', () => {
                     const token = decodeURIComponent(btn.getAttribute('data-ingredient'));
                     if (ingredientFilters.has(token)) ingredientFilters.delete(token); else ingredientFilters.add(token);
-                    renderMenu(_cachedMenuItems);
+                    renderMenu(_cachedMenuItems, true);
                 });
             });
             const spicyBtn = filterBar.querySelector('[data-filter-spicy]');
             if (spicyBtn) {
                 spicyBtn.addEventListener('click', () => {
                     spicyOnlyFilter = !spicyOnlyFilter;
-                    renderMenu(_cachedMenuItems);
+                    renderMenu(_cachedMenuItems, true);
                 });
             }
         }
@@ -388,7 +390,7 @@
             }
         }
 
-        function renderMenu(menuItems) {
+        function renderMenu(menuItems, isRerender = false) {
             const menuContainer = document.getElementById('menuContainer');
             menuContainer.innerHTML = '';
             // Separate _info doc and menu items
@@ -403,7 +405,18 @@
                     menuDocs.push(item);
                 }
             }
-            // Render restaurant info (unchanged)
+            
+            // Cache restaurant info on first load, use cached on re-renders (search/filter)
+            if (restaurant) {
+                _cachedRestaurantInfo = restaurant;
+                _cachedNotes = notes;
+            } else if (isRerender) {
+                // Use cached values during search/filter re-renders
+                restaurant = _cachedRestaurantInfo;
+                notes = _cachedNotes;
+            }
+            
+            // Render restaurant info
             const nameEl = document.getElementById('restaurantName');
             const infoEl = document.getElementById('restaurantInfo');
             const notesEl = document.getElementById('restaurantNotes');
