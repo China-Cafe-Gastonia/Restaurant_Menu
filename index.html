@@ -71,26 +71,6 @@
                 </nav>
             </div>
             
-            <!-- Print & Admin Links at bottom -->
-            <div class="border-t border-gray-200 p-4 bg-white print:hidden">
-                <nav class="space-y-2" aria-label="Site navigation">
-                    <a href="index.html" 
-                       class="flex items-center justify-center gap-2 px-4 py-3 text-blue-600 font-semibold bg-blue-50 rounded-xl hover:bg-blue-100 transition-all duration-200 shadow-sm"
-                       aria-current="page">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
-                        </svg>
-                        <span>Public Menu</span>
-                    </a>
-                    <a href="admin.html" 
-                       class="flex items-center justify-center gap-2 px-4 py-3 text-gray-600 hover:text-gray-900 bg-gray-50 hover:bg-gray-100 rounded-xl transition-all duration-200">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
-                        </svg>
-                        <span>Admin Panel</span>
-                    </a>
-                </nav>
-            </div>
         </aside>
 
         <!-- Overlay for mobile -->
@@ -581,10 +561,8 @@
                 filterBar.className = 'mb-4 flex flex-wrap items-center gap-2';
                 menuContainer.appendChild(filterBar);
             }
-            // Build HTML for tags
+            // Build HTML for tags (ingredient filters only)
             const parts = [];
-            // Spicy toggle
-            parts.push(`<button data-filter-spicy="1" class="px-3 py-1 rounded-full text-sm ${spicyOnlyFilter ? 'bg-red-100 text-red-800' : 'bg-gray-100 text-gray-700'}">🌶️ Spicy</button>`);
             // Ingredient tags
             Array.from(ingredientSet.entries()).sort((a,b)=> a[1].localeCompare(b[1])).forEach(([token, display]) => {
                 const active = ingredientFilters.has(token);
@@ -601,13 +579,6 @@
                     renderMenu(_cachedMenuItems, true);
                 });
             });
-            const spicyBtn = filterBar.querySelector('[data-filter-spicy]');
-            if (spicyBtn) {
-                spicyBtn.addEventListener('click', () => {
-                    spicyOnlyFilter = !spicyOnlyFilter;
-                    renderMenu(_cachedMenuItems, true);
-                });
-            }
         }
 
         // Build details HTML for an item: group units by size and render options per-size
@@ -1013,6 +984,8 @@
                     categoryNav.classList.remove('-translate-x-full');
                     categoryNav.classList.add('translate-x-0');
                     overlay.classList.remove('hidden');
+                    // Hide hamburger icon when sidebar is open
+                    if (mobileToggle) mobileToggle.classList.add('hidden');
                     // Update ARIA state
                     if (mobileToggle) mobileToggle.setAttribute('aria-expanded', 'true');
                     // Focus first category link for keyboard users
@@ -1025,6 +998,8 @@
                     categoryNav.classList.remove('translate-x-0');
                     categoryNav.classList.add('-translate-x-full');
                     overlay.classList.add('hidden');
+                    // Show hamburger icon when sidebar is closed
+                    if (mobileToggle) mobileToggle.classList.remove('hidden');
                     // Update ARIA state
                     if (mobileToggle) mobileToggle.setAttribute('aria-expanded', 'false');
                     // Return focus to toggle button
